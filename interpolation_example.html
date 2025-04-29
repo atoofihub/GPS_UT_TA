@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPS Satellite Position Calculation Example</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
     <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
     <style>
         :root {
@@ -90,206 +90,233 @@
 </head>
 <body>
     <div class="container">
-        <h1>GPS Satellite Position Calculation Example</h1>
+        <div class="row">
+            <div class="col-6">
+              <img
+                src="./assets/ut_logo.png"
+                alt="University of Tehran Logo"
+                class="img-fluid"
+                style="max-height: 100px; margin-bottom: 20px"
+              />
+            </div>
+            <div class="col-6" style="text-align: right;">
+              <img
+                src="./assets/fanni_logo.png"
+                alt="College of Engineering Logo"
+                class="img-fluid"
+                style="max-height: 100px; margin-top: 0px; transform: scale(1.2)"
+              />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>GPS Satellite Position Calculation Example</h1>
+            </div>
+        </div>
         
-        <div class="calculation-step">
-            <h2>Constants</h2>
-            <div class="formula">
-                μ = 3.986005e14 m³/s² (Earth's gravitational parameter)<br>
-                c = 299792458 m/s (Speed of light)<br>
-                ωe = 7.292115e-5 rad/s (Earth rotation rate)
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Input Data</h2>
-            <p><strong>Target Time:</strong> 2024-01-01 14:30:30</p>
-            <p><strong>Satellite:</strong> G01</p>
-            <p><strong>Pseudorange (C1C):</strong> 25092668.962 meters</p>
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2>Constants</h2>
+                    <div class="formula">
+                        μ = 3.986005e14 m³/s² (Earth's gravitational parameter)<br>
+                        c = 299792458 m/s (Speed of light)<br>
+                        ωe = 7.292115e-5 rad/s (Earth rotation rate)
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Input Data</h2>
+                    <p><strong>Target Time:</strong> 2024-01-01 14:30:30</p>
+                    <p><strong>Satellite:</strong> G01</p>
+                    <p><strong>Pseudorange (C1C):</strong> 25092668.962 meters</p>
+                    
+                    <h3>Broadcast Ephemeris Parameters</h3>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Value</th>
+                            <th>Units</th>
+                        </tr>
+                        <tr>
+                            <td>a₀</td>
+                            <td>1.650359481573e-04</td>
+                            <td>seconds</td>
+                        </tr>
+                        <tr>
+                            <td>a₁</td>
+                            <td>7.958078640513e-13</td>
+                            <td>seconds/second</td>
+                        </tr>
+                        <tr>
+                            <td>a₂</td>
+                            <td>0.000000000000e+00</td>
+                            <td>seconds/second²</td>
+                        </tr>
+                        <tr>
+                            <td>√a</td>
+                            <td>5.154027334213e+03</td>
+                            <td>√meters</td>
+                        </tr>
+                        <tr>
+                            <td>e</td>
+                            <td>1.305763632990e-02</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>M₀</td>
+                            <td>1.271399167061e+00</td>
+                            <td>radians</td>
+                        </tr>
+                        <tr>
+                            <td>ω</td>
+                            <td>9.986105883222e-01</td>
+                            <td>radians</td>
+                        </tr>
+                        <tr>
+                            <td>I₀</td>
+                            <td>9.903396547303e-01</td>
+                            <td>radians</td>
+                        </tr>
+                        <tr>
+                            <td>Ω₀</td>
+                            <td>-1.610077279119e+00</td>
+                            <td>radians</td>
+                        </tr>
+                        <tr>
+                            <td>Δn</td>
+                            <td>3.770514199908e-09</td>
+                            <td>rad/s</td>
+                        </tr>
+                        <tr>
+                            <td>toe</td>
+                            <td>136800</td>
+                            <td>seconds</td>
+                        </tr>
+                    </table>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 1: Initial Time Calculations</h2>
+                    <div class="formula">
+                        t_reception = gps_time_from_julian("2024-01-01 14:30:30")<br>
+                        dt = t_reception - toe<br>
+                        dt_sat_tilda = a₀ + a₁ * dt + a₂ * dt²<br>
+                        Mk = M₀ + (√(μ/a³) + Δn) * dt<br>
+                        Ek = solve_kepler(Mk, e)<br>
+                        d_rel = -2 * √(μa) * e * sin(Ek) / c²<br>
+                        dt_sat = dt_sat_tilda + d_rel<br>
+                        t_emission = t_reception - (C1C/c) - dt_sat
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 2: Time of Flight Calculations</h2>
+                    <div class="formula">
+                        tk = t_emission - toe = 1829.916120 seconds<br>
+                        // Check if tk is in valid range [-302400, 302400]<br>
+                        -302400 < 1829.916120 < 302400 ✓ (valid)
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 3: Mean Anomaly</h2>
+                    <div class="formula">
+                        Mk = M₀ + (√(μ/a³) + Δn) * tk<br>
+                        Mk = 1.538252 radians
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 4: Eccentric Anomaly</h2>
+                    <div class="formula">
+                        Ek = solve_kepler(Mk, e)<br>
+                        Ek = 1.551307 radians
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 5: True Anomaly</h2>
+                    <div class="formula">
+                        vk = arctan2(√(1-e²) * sin(Ek), cos(Ek) - e)<br>
+                        vk = 1.564364 radians
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 6: Argument of Latitude</h2>
+                    <div class="formula">
+                        uk = ω + vk + Cuc * cos(2(ω + vk)) + Cus * sin(2(ω + vk))<br>
+                        uk = 2.562969 radians
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 7: Radius</h2>
+                    <div class="formula">
+                        rk = a * (1 - e * cos(Ek)) + Crc * cos(2(ω + vk)) + Crs * sin(2(ω + vk))<br>
+                        rk = 26557279.850159 meters
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 8: Inclination</h2>
+                    <div class="formula">
+                        Ik = I₀ + IDOT * tk + Cic * cos(2(ω + vk)) + Cis * sin(2(ω + vk))<br>
+                        Ik = 0.990340 radians
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 9: Longitude of Ascending Node</h2>
+                    <div class="formula">
+                        Ωk = Ω₀ + (ΩDOT - ωe) * tk - ωe * toe<br>
+                        Ωk = -11.719145 radians
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 10: Rotation Matrices</h2>
+                    <div class="formula">
+                        R1(-Ik) = [<br>
+                        &nbsp;&nbsp;[ 1.000000,  0.000000,  0.000000],<br>
+                        &nbsp;&nbsp;[ 0.000000,  0.548406, -0.836212],<br>
+                        &nbsp;&nbsp;[ 0.000000,  0.836212,  0.548406]<br>
+                        ]<br><br>
+                        R3(-Ωk) = [<br>
+                        &nbsp;&nbsp;[ 0.662065, -0.749447,  0.000000],<br>
+                        &nbsp;&nbsp;[ 0.749447,  0.662065,  0.000000],<br>
+                        &nbsp;&nbsp;[ 0.000000,  0.000000,  1.000000]<br>
+                        ]<br><br>
+                        R3(-uk) = [<br>
+                        &nbsp;&nbsp;[-0.837216, -0.546872,  0.000000],<br>
+                        &nbsp;&nbsp;[ 0.546872, -0.837216,  0.000000],<br>
+                        &nbsp;&nbsp;[ 0.000000,  0.000000,  1.000000]<br>
+                        ]
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Step 11: Final ECEF Position</h2>
+                    <div class="formula">
+                        satellite_coords = R3(-Ωk) * R1(-Ik) * R3(-uk) * [rk, 0, 0]<br><br>
+                        X = -20689614.63469926 meters<br>
+                        Y = -11390159.94029376 meters<br>
+                        Z =  12144678.49890683 meters
+                    </div>
+                </div>
+        
+                <div class="calculation-step">
+                    <h2>Notes</h2>
+                    <ul>
+                        <li>All calculations follow the ESA algorithm exactly as specified</li>
+                        <li>Results are taken directly from the numerical computations in p3.ipynb</li>
+                        <li>Coordinates are in ECEF (Earth-Centered, Earth-Fixed) reference frame</li>
+                        <li>All intermediate values are shown for verification</li>
+                    </ul>
+                </div>
             
-            <h3>Broadcast Ephemeris Parameters</h3>
-            <table class="parameter-table">
-                <tr>
-                    <th>Parameter</th>
-                    <th>Value</th>
-                    <th>Units</th>
-                </tr>
-                <tr>
-                    <td>a₀</td>
-                    <td>1.650359481573e-04</td>
-                    <td>seconds</td>
-                </tr>
-                <tr>
-                    <td>a₁</td>
-                    <td>7.958078640513e-13</td>
-                    <td>seconds/second</td>
-                </tr>
-                <tr>
-                    <td>a₂</td>
-                    <td>0.000000000000e+00</td>
-                    <td>seconds/second²</td>
-                </tr>
-                <tr>
-                    <td>√a</td>
-                    <td>5.154027334213e+03</td>
-                    <td>√meters</td>
-                </tr>
-                <tr>
-                    <td>e</td>
-                    <td>1.305763632990e-02</td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>M₀</td>
-                    <td>1.271399167061e+00</td>
-                    <td>radians</td>
-                </tr>
-                <tr>
-                    <td>ω</td>
-                    <td>9.986105883222e-01</td>
-                    <td>radians</td>
-                </tr>
-                <tr>
-                    <td>I₀</td>
-                    <td>9.903396547303e-01</td>
-                    <td>radians</td>
-                </tr>
-                <tr>
-                    <td>Ω₀</td>
-                    <td>-1.610077279119e+00</td>
-                    <td>radians</td>
-                </tr>
-                <tr>
-                    <td>Δn</td>
-                    <td>3.770514199908e-09</td>
-                    <td>rad/s</td>
-                </tr>
-                <tr>
-                    <td>toe</td>
-                    <td>136800</td>
-                    <td>seconds</td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 1: Initial Time Calculations</h2>
-            <div class="formula">
-                t_reception = gps_time_from_julian("2024-01-01 14:30:30")<br>
-                dt = t_reception - toe<br>
-                dt_sat_tilda = a₀ + a₁ * dt + a₂ * dt²<br>
-                Mk = M₀ + (√(μ/a³) + Δn) * dt<br>
-                Ek = solve_kepler(Mk, e)<br>
-                d_rel = -2 * √(μa) * e * sin(Ek) / c²<br>
-                dt_sat = dt_sat_tilda + d_rel<br>
-                t_emission = t_reception - (C1C/c) - dt_sat
             </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 2: Time of Flight Calculations</h2>
-            <div class="formula">
-                tk = t_emission - toe = 1829.916120 seconds<br>
-                // Check if tk is in valid range [-302400, 302400]<br>
-                -302400 < 1829.916120 < 302400 ✓ (valid)
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 3: Mean Anomaly</h2>
-            <div class="formula">
-                Mk = M₀ + (√(μ/a³) + Δn) * tk<br>
-                Mk = 1.538252 radians
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 4: Eccentric Anomaly</h2>
-            <div class="formula">
-                Ek = solve_kepler(Mk, e)<br>
-                Ek = 1.551307 radians
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 5: True Anomaly</h2>
-            <div class="formula">
-                vk = arctan2(√(1-e²) * sin(Ek), cos(Ek) - e)<br>
-                vk = 1.564364 radians
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 6: Argument of Latitude</h2>
-            <div class="formula">
-                uk = ω + vk + Cuc * cos(2(ω + vk)) + Cus * sin(2(ω + vk))<br>
-                uk = 2.562969 radians
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 7: Radius</h2>
-            <div class="formula">
-                rk = a * (1 - e * cos(Ek)) + Crc * cos(2(ω + vk)) + Crs * sin(2(ω + vk))<br>
-                rk = 26557279.850159 meters
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 8: Inclination</h2>
-            <div class="formula">
-                Ik = I₀ + IDOT * tk + Cic * cos(2(ω + vk)) + Cis * sin(2(ω + vk))<br>
-                Ik = 0.990340 radians
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 9: Longitude of Ascending Node</h2>
-            <div class="formula">
-                Ωk = Ω₀ + (ΩDOT - ωe) * tk - ωe * toe<br>
-                Ωk = -11.719145 radians
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 10: Rotation Matrices</h2>
-            <div class="formula">
-                R1(-Ik) = [<br>
-                &nbsp;&nbsp;[ 1.000000,  0.000000,  0.000000],<br>
-                &nbsp;&nbsp;[ 0.000000,  0.548406, -0.836212],<br>
-                &nbsp;&nbsp;[ 0.000000,  0.836212,  0.548406]<br>
-                ]<br><br>
-                R3(-Ωk) = [<br>
-                &nbsp;&nbsp;[ 0.662065, -0.749447,  0.000000],<br>
-                &nbsp;&nbsp;[ 0.749447,  0.662065,  0.000000],<br>
-                &nbsp;&nbsp;[ 0.000000,  0.000000,  1.000000]<br>
-                ]<br><br>
-                R3(-uk) = [<br>
-                &nbsp;&nbsp;[-0.837216, -0.546872,  0.000000],<br>
-                &nbsp;&nbsp;[ 0.546872, -0.837216,  0.000000],<br>
-                &nbsp;&nbsp;[ 0.000000,  0.000000,  1.000000]<br>
-                ]
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Step 11: Final ECEF Position</h2>
-            <div class="formula">
-                satellite_coords = R3(-Ωk) * R1(-Ik) * R3(-uk) * [rk, 0, 0]<br><br>
-                X = -20689614.63469926 meters<br>
-                Y = -11390159.94029376 meters<br>
-                Z =  12144678.49890683 meters
-            </div>
-        </div>
-
-        <div class="calculation-step">
-            <h2>Notes</h2>
-            <ul>
-                <li>All calculations follow the ESA algorithm exactly as specified</li>
-                <li>Results are taken directly from the numerical computations in p3.ipynb</li>
-                <li>Coordinates are in ECEF (Earth-Centered, Earth-Fixed) reference frame</li>
-                <li>All intermediate values are shown for verification</li>
-            </ul>
         </div>
     </div>
 
