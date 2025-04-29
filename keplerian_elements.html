@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keplerian Elements of GPS Satellite</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="./assets/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            direction: ltr;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            text-align: center;
+            margin: 40px 0 20px;
+            font-size: 2em;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            text-align: left;
+            margin: 20px 0 10px;
+            font-size: 1.5em;
+            border-bottom: 1px solid var(--secondary-color);
+            padding-bottom: 5px;
+        }
+
+        .keplerian-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            table-layout: fixed;
+        }
+
+        .keplerian-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .keplerian-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .element-name {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .element-value {
+            font-family: 'Courier New', monospace;
+            color: var(--text-color);
+            text-align: left;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        .description-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .element-description {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+            text-align: left;
+        }
+
+        .element-description p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .element-description strong {
+            color: var(--primary-color);
+        }
+
+        .formula-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .katex {
+            font-size: 1.1em;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: var(--secondary-color);
+        }
+
+        .accordion-item {
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .keplerian-table {
+                font-size: 0.8em;
+            }
+
+            .element-name, .element-value {
+                font-size: 0.8em;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            h3 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img
+                src="./assets/ut_logo.png"
+                alt="University of Tehran Logo"
+                class="img-fluid"
+                style="max-height: 100px; margin-bottom: 20px"
+              />
+            </div>
+            <div class="col-6" style="text-align: right;">
+              <img
+                src="./assets/fanni_logo.png"
+                alt="College of Engineering Logo"
+                class="img-fluid"
+                style="max-height: 100px; margin-top: 0px; transform: scale(1.2)"
+              />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <h1>Keplerian Elements of GPS Satellites</h1>
+                
+                <div class="accordion" id="satellitesAccordion">
+                    <!-- G07 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingG07">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseG07" aria-expanded="true" aria-controls="collapseG07">
+                                Satellite G07 (2024/01/01 01:59:44)
+                            </button>
+                        </h2>
+                        <div id="collapseG07" class="accordion-collapse collapse show" aria-labelledby="headingG07" data-bs-parent="#satellitesAccordion">
+                            <div class="accordion-body">
+                                <table class="keplerian-table">
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">PRN</div>
+                                            <div class="element-value">G07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Date</div>
+                                            <div class="element-value">2024/01/01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Time</div>
+                                            <div class="element-value">01:59:44</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₀ (seconds)</div>
+                                            <div class="element-value">-2.613384276628D-05</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₁ (seconds/second)</div>
+                                            <div class="element-value">-9.436007530894D-12</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₂ (seconds/second²)</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">IOD</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crs (meters)</div>
+                                            <div class="element-value">1.200000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Δn (rad/s)</div>
+                                            <div class="element-value">4.854845080927D-09</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">M₀ (rad)</div>
+                                            <div class="element-value">6.239840220677D-01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">Cuc (rad)</div>
+                                            <div class="element-value">8.177012205124D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">e</div>
+                                            <div class="element-value">1.773746171966D-02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cus (rad)</div>
+                                            <div class="element-value">8.910894393921D-06</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">√a (√m)</div>
+                                            <div class="element-value">5.153683597565D+03</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">toe (s)</div>
+                                            <div class="element-value">9.358400000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cic (rad)</div>
+                                            <div class="element-value">-2.365559339523D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω (rad)</div>
+                                            <div class="element-value">1.512483407131D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cis (rad)</div>
+                                            <div class="element-value">1.322478055954D-07</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i₀ (rad)</div>
+                                            <div class="element-value">9.498578426946D-01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crc (meters)</div>
+                                            <div class="element-value">2.058125000000D+02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">ω (rad)</div>
+                                            <div class="element-value">-2.159927596900D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω̇ (rad/s)</div>
+                                            <div class="element-value">-8.354633718315D-09</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i̇ (rad/s)</div>
+                                            <div class="element-value">2.221521106700D-10</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2</div>
+                                            <div class="element-value">1.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">GPS Week</div>
+                                            <div class="element-value">2.295000000000D+03</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2 P</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">sat_acc</div>
+                                            <div class="element-value">2.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">sat_health</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">TGD (seconds)</div>
+                                            <div class="element-value">-1.117587000000D-08</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">IODC</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">transmission_time (s)</div>
+                                            <div class="element-value">8.649000000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">spare</div>
+                                            <div class="element-value">4.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- G01 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingG01">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseG01" aria-expanded="false" aria-controls="collapseG01">
+                                Satellite G01 (2024/01/01 02:00:00)
+                            </button>
+                        </h2>
+                        <div id="collapseG01" class="accordion-collapse collapse" aria-labelledby="headingG01" data-bs-parent="#satellitesAccordion">
+                            <div class="accordion-body">
+                                <table class="keplerian-table">
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">PRN</div>
+                                            <div class="element-value">G01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Date</div>
+                                            <div class="element-value">2024/01/01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Time</div>
+                                            <div class="element-value">02:00:00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₀ (seconds)</div>
+                                            <div class="element-value">1.650028862059D-04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₁ (seconds/second)</div>
+                                            <div class="element-value">7.958078640513D-13</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₂ (seconds/second²)</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">IOD</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crs (meters)</div>
+                                            <div class="element-value">1.200000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Δn (rad/s)</div>
+                                            <div class="element-value">4.854845080927D-09</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">M₀ (rad)</div>
+                                            <div class="element-value">6.239840220677D-01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">Cuc (rad)</div>
+                                            <div class="element-value">8.177012205124D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">e</div>
+                                            <div class="element-value">1.773746171966D-02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cus (rad)</div>
+                                            <div class="element-value">8.910894393921D-06</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">√a (√m)</div>
+                                            <div class="element-value">5.153683597565D+03</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">toe (s)</div>
+                                            <div class="element-value">9.358400000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cic (rad)</div>
+                                            <div class="element-value">-2.365559339523D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω (rad)</div>
+                                            <div class="element-value">1.512483407131D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cis (rad)</div>
+                                            <div class="element-value">1.322478055954D-07</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i₀ (rad)</div>
+                                            <div class="element-value">9.498578426946D-01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crc (meters)</div>
+                                            <div class="element-value">2.058125000000D+02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">ω (rad)</div>
+                                            <div class="element-value">-2.159927596900D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω̇ (rad/s)</div>
+                                            <div class="element-value">-8.354633718315D-09</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i̇ (rad/s)</div>
+                                            <div class="element-value">2.221521106700D-10</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2</div>
+                                            <div class="element-value">1.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">GPS Week</div>
+                                            <div class="element-value">2.295000000000D+03</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2 P</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">sat_acc</div>
+                                            <div class="element-value">2.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">sat_health</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">TGD (seconds)</div>
+                                            <div class="element-value">-1.117587000000D-08</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">IODC</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">transmission_time (s)</div>
+                                            <div class="element-value">8.649000000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">spare</div>
+                                            <div class="element-value">4.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- G02 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingG02">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseG02" aria-expanded="false" aria-controls="collapseG02">
+                                Satellite G02 (2024/01/01 02:00:00)
+                            </button>
+                        </h2>
+                        <div id="collapseG02" class="accordion-collapse collapse" aria-labelledby="headingG02" data-bs-parent="#satellitesAccordion">
+                            <div class="accordion-body">
+                                <table class="keplerian-table">
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">PRN</div>
+                                            <div class="element-value">G02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Date</div>
+                                            <div class="element-value">2024/01/01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Time</div>
+                                            <div class="element-value">02:00:00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₀ (seconds)</div>
+                                            <div class="element-value">-5.074706859887D-04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₁ (seconds/second)</div>
+                                            <div class="element-value">5.456968210638D-12</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₂ (seconds/second²)</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">IOD</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crs (meters)</div>
+                                            <div class="element-value">1.200000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Δn (rad/s)</div>
+                                            <div class="element-value">4.854845080927D-09</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">M₀ (rad)</div>
+                                            <div class="element-value">6.239840220677D-01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">Cuc (rad)</div>
+                                            <div class="element-value">8.177012205124D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">e</div>
+                                            <div class="element-value">1.773746171966D-02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cus (rad)</div>
+                                            <div class="element-value">8.910894393921D-06</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">√a (√m)</div>
+                                            <div class="element-value">5.153683597565D+03</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">toe (s)</div>
+                                            <div class="element-value">9.358400000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cic (rad)</div>
+                                            <div class="element-value">-2.365559339523D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω (rad)</div>
+                                            <div class="element-value">1.512483407131D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cis (rad)</div>
+                                            <div class="element-value">1.322478055954D-07</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i₀ (rad)</div>
+                                            <div class="element-value">9.498578426946D-01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crc (meters)</div>
+                                            <div class="element-value">2.058125000000D+02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">ω (rad)</div>
+                                            <div class="element-value">-2.159927596900D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω̇ (rad/s)</div>
+                                            <div class="element-value">-8.354633718315D-09</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i̇ (rad/s)</div>
+                                            <div class="element-value">2.221521106700D-10</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2</div>
+                                            <div class="element-value">1.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">GPS Week</div>
+                                            <div class="element-value">2.295000000000D+03</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2 P</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">sat_acc</div>
+                                            <div class="element-value">2.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">sat_health</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">TGD (seconds)</div>
+                                            <div class="element-value">-1.117587000000D-08</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">IODC</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">transmission_time (s)</div>
+                                            <div class="element-value">8.649000000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">spare</div>
+                                            <div class="element-value">4.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- G03 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingG03">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseG03" aria-expanded="false" aria-controls="collapseG03">
+                                Satellite G03 (2024/01/01 02:00:00)
+                            </button>
+                        </h2>
+                        <div id="collapseG03" class="accordion-collapse collapse" aria-labelledby="headingG03" data-bs-parent="#satellitesAccordion">
+                            <div class="accordion-body">
+                                <table class="keplerian-table">
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">PRN</div>
+                                            <div class="element-value">G03</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Date</div>
+                                            <div class="element-value">2024/01/01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Time</div>
+                                            <div class="element-value">02:00:00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₀ (seconds)</div>
+                                            <div class="element-value">9.497860446572D-05</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₁ (seconds/second)</div>
+                                            <div class="element-value">2.660272002686D-11</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₂ (seconds/second²)</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">IOD</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crs (meters)</div>
+                                            <div class="element-value">1.200000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Δn (rad/s)</div>
+                                            <div class="element-value">4.854845080927D-09</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">M₀ (rad)</div>
+                                            <div class="element-value">6.239840220677D-01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">Cuc (rad)</div>
+                                            <div class="element-value">8.177012205124D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">e</div>
+                                            <div class="element-value">1.773746171966D-02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cus (rad)</div>
+                                            <div class="element-value">8.910894393921D-06</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">√a (√m)</div>
+                                            <div class="element-value">5.153683597565D+03</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">toe (s)</div>
+                                            <div class="element-value">9.358400000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cic (rad)</div>
+                                            <div class="element-value">-2.365559339523D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω (rad)</div>
+                                            <div class="element-value">1.512483407131D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cis (rad)</div>
+                                            <div class="element-value">1.322478055954D-07</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i₀ (rad)</div>
+                                            <div class="element-value">9.498578426946D-01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crc (meters)</div>
+                                            <div class="element-value">2.058125000000D+02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">ω (rad)</div>
+                                            <div class="element-value">-2.159927596900D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω̇ (rad/s)</div>
+                                            <div class="element-value">-8.354633718315D-09</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i̇ (rad/s)</div>
+                                            <div class="element-value">2.221521106700D-10</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2</div>
+                                            <div class="element-value">1.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">GPS Week</div>
+                                            <div class="element-value">2.295000000000D+03</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2 P</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">sat_acc</div>
+                                            <div class="element-value">2.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">sat_health</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">TGD (seconds)</div>
+                                            <div class="element-value">-1.117587000000D-08</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">IODC</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">transmission_time (s)</div>
+                                            <div class="element-value">8.649000000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">spare</div>
+                                            <div class="element-value">4.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- G06 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingG06">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseG06" aria-expanded="false" aria-controls="collapseG06">
+                                Satellite G06 (2024/01/01 02:00:00)
+                            </button>
+                        </h2>
+                        <div id="collapseG06" class="accordion-collapse collapse" aria-labelledby="headingG06" data-bs-parent="#satellitesAccordion">
+                            <div class="accordion-body">
+                                <table class="keplerian-table">
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">PRN</div>
+                                            <div class="element-value">G06</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Date</div>
+                                            <div class="element-value">2024/01/01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Time</div>
+                                            <div class="element-value">02:00:00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₀ (seconds)</div>
+                                            <div class="element-value">4.599601961672D-04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₁ (seconds/second)</div>
+                                            <div class="element-value">-1.250555214938D-11</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">a₂ (seconds/second²)</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">IOD</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crs (meters)</div>
+                                            <div class="element-value">1.200000000000D+01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Δn (rad/s)</div>
+                                            <div class="element-value">4.854845080927D-09</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">M₀ (rad)</div>
+                                            <div class="element-value">6.239840220677D-01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">Cuc (rad)</div>
+                                            <div class="element-value">8.177012205124D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">e</div>
+                                            <div class="element-value">1.773746171966D-02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cus (rad)</div>
+                                            <div class="element-value">8.910894393921D-06</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">√a (√m)</div>
+                                            <div class="element-value">5.153683597565D+03</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">toe (s)</div>
+                                            <div class="element-value">9.358400000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cic (rad)</div>
+                                            <div class="element-value">-2.365559339523D-07</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω (rad)</div>
+                                            <div class="element-value">1.512483407131D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Cis (rad)</div>
+                                            <div class="element-value">1.322478055954D-07</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i₀ (rad)</div>
+                                            <div class="element-value">9.498578426946D-01</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Crc (meters)</div>
+                                            <div class="element-value">2.058125000000D+02</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">ω (rad)</div>
+                                            <div class="element-value">-2.159927596900D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">Ω̇ (rad/s)</div>
+                                            <div class="element-value">-8.354633718315D-09</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">i̇ (rad/s)</div>
+                                            <div class="element-value">2.221521106700D-10</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2</div>
+                                            <div class="element-value">1.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">GPS Week</div>
+                                            <div class="element-value">2.295000000000D+03</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">L2 P</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">sat_acc</div>
+                                            <div class="element-value">2.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">sat_health</div>
+                                            <div class="element-value">0.000000000000D+00</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">TGD (seconds)</div>
+                                            <div class="element-value">-1.117587000000D-08</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">IODC</div>
+                                            <div class="element-value">4.400000000000D+01</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="element-name">transmission_time (s)</div>
+                                            <div class="element-value">8.649000000000D+04</div>
+                                        </td>
+                                        <td>
+                                            <div class="element-name">spare</div>
+                                            <div class="element-value">4.000000000000D+00</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="description-section">
+                    <h2>Keplerian Elements Description</h2>
+                    
+                    <div class="element-description">
+                        <h3>Main Orbital Parameters</h3>
+                        <p><strong>√a (Square root of semi-major axis):</strong> This parameter represents the size of the orbit. Its value is equal to the square root of the semi-major axis of the orbital ellipse.</p>
+                        <p><strong>e (Eccentricity):</strong> This parameter determines the shape of the orbit and shows the deviation from a perfect circle.</p>
+                        <p><strong>i₀ (Orbital inclination):</strong> The angle between the orbital plane and the Earth's equatorial plane.</p>
+                        <p><strong>Ω (Right ascension of ascending node):</strong> The angle that determines the position of the intersection point of the orbit with the equatorial plane.</p>
+                        <p><strong>ω (Argument of perigee):</strong> The angle between the ascending node and the perigee point in the orbital plane.</p>
+                        <p><strong>M₀ (Mean anomaly):</strong> Specifies the angular position of the satellite at the reference time.</p>
+                    </div>
+        
+                    <div class="element-description">
+                        <h3>Correction Parameters</h3>
+                        <p><strong>Cuc, Cus:</strong> Latitude argument correction coefficients</p>
+                        <p><strong>Crc, Crs:</strong> Orbital radius correction coefficients</p>
+                        <p><strong>Cic, Cis:</strong> Inclination correction coefficients</p>
+                    </div>
+        
+                    <div class="element-description">
+                        <h3>Time Parameters</h3>
+                        <p><strong>toe:</strong> Ephemeris reference time (seconds in week)</p>
+                        <p><strong>a₀:</strong> Satellite clock offset (seconds)</p>
+                        <p><strong>a₁:</strong> Satellite clock drift rate (seconds/second)</p>
+                        <p><strong>a₂:</strong> Satellite clock drift rate acceleration (seconds/second²)</p>
+                    </div>
+        
+                    <div class="element-description">
+                        <h3>Additional Parameters</h3>
+                        <p><strong>i̇:</strong> Rate of inclination angle</p>
+                        <p><strong>L2:</strong> P-code on L2 frequency</p>
+                        <p><strong>GPS Week:</strong> GPS week number</p>
+                        <p><strong>TGD:</strong> Group delay</p>
+                        <p><strong>IODC:</strong> Clock data issue number</p>
+                        <p><strong>transmission_time:</strong> Message transmission time</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html> 
