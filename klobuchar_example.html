@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klobuchar Ionospheric Delay Example</title>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .calculation-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .parameter-table th, .parameter-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+        .parameter-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .formula {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .center-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img src="./assets/ut_logo.png" alt="University of Tehran Logo" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+            </div>
+            <div class="col-6" style="text-align: right;">
+              <img src="./assets/fanni_logo.png" alt="College of Engineering Logo" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>Klobuchar Ionospheric Delay Example</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2>Klobuchar Model Description</h2>
+                    <div class="note">
+                        <p>
+                        The Klobuchar model is an empirical algorithm for single-frequency ionospheric delay correction in GPS and Beidou. It assumes the ionospheric electron content is concentrated in a thin shell at 350 km altitude. Using 8 broadcast coefficients ($\alpha_n$, $\beta_n$) and the user's position, satellite elevation, and azimuth, the vertical and slant ionospheric delay are estimated. The slant delay is computed from the vertical delay at the Ionospheric Pierce Point (IPP) using a mapping function. The figure below shows the geometry of the model:
+                        </p>
+                        <img src="./assets/images/Figure-5.13.png" alt="Klobuchar Model Geometry (Figure 5.13)" class="center-img" style="max-width:500px; margin: 20px auto;" />
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Input Parameters</h2>
+                    <table class="parameter-table">
+                        <tr><th>Parameter</th><th>Value</th><th>Unit</th></tr>
+                        <tr><td>Elevation angle ($E$)</td><td>45.23456789012</td><td>degrees</td></tr>
+                        <tr><td>Azimuth ($A$)</td><td>138.67890123456</td><td>degrees</td></tr>
+                        <tr><td>User latitude ($\varphi_u$)</td><td>37.43678912345</td><td>degrees</td></tr>
+                        <tr><td>User longitude ($\lambda_u$)</td><td>51.32456789012</td><td>degrees</td></tr>
+                        <tr><td>GPS time ($t_{GPS}$)</td><td>259400</td><td>seconds</td></tr>
+                        <tr><td>$\alpha$ coefficients</td><td>[0.2335e-7, 0, 0.5960e-7, 0.1192e-6]</td><td>-</td></tr>
+                        <tr><td>$\beta$ coefficients</td><td>[0.1464e6, 0.1966e6, 0, 0.1966e6]</td><td>-</td></tr>
+                    </table>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 1: Earth-centered angle ($\psi$)</h2>
+                    <div class="formula">
+                        $$
+                        \psi = \frac{\pi}{2} - E - \arcsin\left(\frac{R_E}{R_E + h} \cos E\right)
+                        $$
+                    </div>
+                    <p>
+                        This is the angle between the vector from the Earth's center to the receiver and the vector from the Earth's center to the Ionospheric Pierce Point (IPP). $h$ is the ionospheric shell height (typically 350 km), $R_E$ is the Earth's radius, and $E$ is the satellite elevation angle.
+                    </p>
+                    <div class="result">
+                        Numerical value: $\psi = 2.888407^\circ$
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 2: Latitude of the IPP ($\varphi_I$)</h2>
+                    <div class="formula">
+                        $$
+                        \varphi_I = \arcsin\left(\sin \varphi_u \cos \psi + \cos \varphi_u \sin \psi \cos A\right)
+                        $$
+                    </div>
+                    <p>
+                        This formula computes the latitude of the Ionospheric Pierce Point (IPP) based on the user's position and satellite angles.
+                    </p>
+                    <div class="result">
+                        Numerical value: $\varphi_I = 35.244303^\circ$
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 3: Longitude of the IPP ($\lambda_I$)</h2>
+                    <div class="formula">
+                        $$
+                        \lambda_I = \lambda_u + \frac{\psi \sin A}{\cos \varphi_I}
+                        $$
+                    </div>
+                    <p>
+                        This formula computes the longitude of the IPP based on the user's position and satellite angles.
+                    </p>
+                    <div class="result">
+                        Numerical value: $\lambda_I = 53.659764^\circ$
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 4: Geomagnetic latitude of the IPP ($\varphi_m$)</h2>
+                    <div class="formula">
+                        $$
+                        \varphi_m = \arcsin\left(\sin \varphi_I \sin \varphi_P + \cos \varphi_I \cos \varphi_P \cos(\lambda_I - \lambda_P)\right)
+                        $$
+                    </div>
+                    <p>
+                        $\varphi_P = 78.3^\circ$ and $\lambda_P = 291.0^\circ$ are the coordinates of the geomagnetic pole.
+                    </p>
+                    <div class="result">
+                        Numerical value: $\varphi_m = 28.404910^\circ$
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 5: Local time at the IPP ($t$)</h2>
+                    <div class="formula">
+                        $$
+                        t = 43200 \frac{\lambda_I}{\pi} + t_{GPS}
+                        $$
+                    </div>
+                    <p>
+                        This formula computes the local time at the IPP in seconds. If $t \geq 86400$, subtract 86400; if $t < 0$, add 86400.
+                    </p>
+                    <div class="result">
+                        Numerical value: $t = 185878.34$ seconds
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 6: Amplitude of ionospheric delay ($A_I$)</h2>
+                    <div class="formula">
+                        $$
+                        A_I = \sum_{n=0}^3 \alpha_n \left(\frac{\varphi_m}{\pi}\right)^n
+                        $$
+                    </div>
+                    <p>
+                        The amplitude is computed using the $\alpha_n$ coefficients and the geomagnetic latitude. If $A_I < 0$, set $A_I = 0$.
+                    </p>
+                    <div class="result">
+                        Numerical value: $A_I = 2.530261 \times 10^{-8}$ seconds
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 7: Period of ionospheric delay ($P_I$)</h2>
+                    <div class="formula">
+                        $$
+                        P_I = \sum_{n=0}^3 \beta_n \left(\frac{\varphi_m}{\pi}\right)^n
+                        $$
+                    </div>
+                    <p>
+                        The period is computed using the $\beta_n$ coefficients and the geomagnetic latitude. If $P_I < 72000$, set $P_I = 72000$.
+                    </p>
+                    <div class="result">
+                        Numerical value: $P_I = 178197.06$ seconds
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 8: Phase of ionospheric delay ($X_I$)</h2>
+                    <div class="formula">
+                        $$
+                        X_I = \frac{2\pi (t - 50400)}{P_I}
+                        $$
+                    </div>
+                    <p>
+                        This phase is used to determine the temporal position of the ionospheric delay.
+                    </p>
+                    <div class="result">
+                        Numerical value: $X_I = 273.698141$ radians
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 9: Slant factor ($F$)</h2>
+                    <div class="formula">
+                        $$
+                        F = \left[1 - \left(\frac{R_E}{R_E + h} \cos E\right)^2\right]^{-1/2}
+                        $$
+                    </div>
+                    <p>
+                        This factor is used to convert the vertical delay to the slant delay.
+                    </p>
+                    <div class="result">
+                        Numerical value: $F = 1.343040$
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 10: Ionospheric time delay ($I_1$)</h2>
+                    <div class="formula">
+                        $$
+                        I_1 = \begin{cases}
+                        (5 \times 10^{-9} + A_I \cos X_I) \times F & |X_I| < \frac{\pi}{2} \\
+                        5 \times 10^{-9} \times F & |X_I| \geq \frac{\pi}{2}
+                        \end{cases}
+                        $$
+                    </div>
+                    <p>
+                        This is the ionospheric time delay in seconds, valid for the GPS L1 signal.
+                    </p>
+                    <div class="result">
+                        Numerical value: $I_1 = 6.715202 \times 10^{-9}$ seconds
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 11: Convert time delay to meters</h2>
+                    <div class="formula">
+                        $$
+                        \text{Delay (meters)} = I_1 \times c
+                        $$
+                    </div>
+                    <p>
+                        By multiplying the time delay by the speed of light, the ionospheric delay in meters is obtained.
+                    </p>
+                    <div class="result">
+                        Numerical value: $2.014560$ meters
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Summary</h2>
+                    <ul>
+                        <li>The Klobuchar model provides a simple and fast correction for single-frequency GNSS signals.</li>
+                        <li>In this example, the total ionospheric delay on the L1 signal is <span class="result">2.01 meters</span>.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html> 

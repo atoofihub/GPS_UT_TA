@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>آموزش استفاده از Git و کلون کردن ریپوی GPS</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            direction: rtl;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: #fff;
+        }
+        h1, h2 {
+            color: #005a9c;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        pre {
+            background-color: #f3f3f3;
+            padding: 10px;
+            border-left: 4px solid #ccc;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>آموزش استفاده از Git برای دانشجویان درس GPS</h1>
+    <p>در این آموزش، یاد می‌گیرید چطور ریپوی زیر را کلون کرده و همیشه به‌روز نگه دارید:</p>
+    <p><a href="https://github.com/atoofihub/GPS_UT_TA" target="_blank">https://github.com/atoofihub/GPS_UT_TA</a></p>
+
+    <h2>۱. نصب Git</h2>
+
+    <h3>برای ویندوز:</h3>
+    <ol>
+        <li>به سایت <a href="https://git-scm.com/download/win" target="_blank">https://git-scm.com/download/win</a> بروید.</li>
+        <li>نصب‌کننده (Installer) را دانلود و نصب کنید (تنظیمات پیش‌فرض را تأیید کنید).</li>
+        <li>پس از نصب، برنامه <strong>Git Bash</strong> را اجرا کنید.</li>
+    </ol>
+
+    <h3>برای مک (macOS):</h3>
+    <ol>
+        <li>ترمینال (Terminal) را باز کنید.</li>
+        <li>دستور زیر را وارد کنید:</li>
+        <pre><code>xcode-select --install</code></pre>
+        <li>این دستور ابزارهای توسعه را نصب می‌کند که شامل Git نیز هست.</li>
+    </ol>
+
+    <h3>برای اوبونتو (Ubuntu):</h3>
+    <ol>
+        <li>ترمینال را باز کنید.</li>
+        <li>دستور زیر را وارد کرده و رمز عبور خود را وارد کنید:</li>
+        <pre><code>sudo apt update
+sudo apt install git</code></pre>
+    </ol>
+
+    <h2>۲. کلون کردن ریپو</h2>
+    <p>در مرحله بعدی، باید ریپو را به سیستم خود منتقل (clone) کنید.</p>
+    <p>در ترمینال یا Git Bash دستور زیر را اجرا کنید:</p>
+    <pre><code>git clone https://github.com/atoofihub/GPS_UT_TA.git</code></pre>
+    <p>با این کار پوشه‌ای به نام <code>GPS_UT_TA</code> در مسیر فعلی ایجاد می‌شود.</p>
+
+    <h2>۳. رفتن به داخل پوشه</h2>
+    <pre><code>cd GPS_UT_TA</code></pre>
+
+    <h2>۴. دریافت آخرین تغییرات (Pull)</h2>
+    <p>هر بار که استاد یا همکلاسی شما تغییری در ریپو ایجاد کردند، می‌توانید آخرین نسخه را با دستور زیر دریافت کنید:</p>
+    <pre><code>git pull</code></pre>
+
+    <h2>۵. نکات تکمیلی</h2>
+    <ul>
+        <li>برای اجرای دستورات بالا نیاز به اتصال اینترنت دارید.</li>
+        <li>اگر بار اول است که Git را روی سیستم اجرا می‌کنید، بهتر است نام و ایمیل خود را تنظیم کنید:</li>
+    </ul>
+    <pre><code>git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"</code></pre>
+
+    <h2>۶. سوالات متداول</h2>
+    <p><strong>❓ من ریپو را کلون کرده‌ام. برای به‌روزرسانی چه کنم؟</strong><br> فقط وارد پوشه شوید و دستور <code>git pull</code> را بزنید.</p>
+
+    <p><strong>❓ من پوشه‌ای ندارم. چه کنم؟</strong><br> ابتدا با <code>git clone</code> ریپو را دریافت کنید.</p>
+
+    <p><strong>❓ Git نصب نیست.</strong><br> به بخش نصب Git در این صفحه برگردید و سیستم‌عامل خود را انتخاب کنید.</p>
+
+</body>
+</html>
