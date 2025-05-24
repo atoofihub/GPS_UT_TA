@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحلیل DOP (تضعیف دقت) در موقعیت‌یابی ماهواره‌ای</title>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: Vazirmatn, Tahoma, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 2.1;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .calculation-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-right: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+        .parameter-table, .dop-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .parameter-table th, .parameter-table td, .dop-table th, .dop-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+        .parameter-table th, .dop-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .formula {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-right: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .center-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img src="./assets/ut_logo.png" alt="لوگوی دانشگاه تهران" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+            </div>
+            <div class="col-6" style="text-align: left;">
+              <img src="./assets/fanni_logo.png" alt="لوگوی دانشکده فنی" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>تحلیل DOP (تضعیف دقت) در موقعیت‌یابی ماهواره‌ای</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2>مقدمه</h2>
+                    <div class="note">
+                        <p>
+                        در سامانه‌های ناوبری ماهواره‌ای مانند GPS، دقت نهایی موقعیت‌یابی نه تنها به دقت اندازه‌گیری (مثلاً خطای شبه‌فاصله)، بلکه به آرایش هندسی ماهواره‌ها در آسمان نیز وابسته است. این اثر هندسی با شاخص <b>Dilution of Precision (DOP)</b> سنجیده می‌شود. DOP نشان می‌دهد که هندسه ماهواره‌ها چگونه خطاهای اندازه‌گیری را در موقعیت و زمان تقویت می‌کند. هرچه مقدار DOP کمتر باشد، هندسه بهتر و دقت بالاتر است.
+                        </p>
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>تعریف ریاضی</h2>
+                    <div class="formula">
+                        $$
+                        \mathbf{Q}_{xx} = (A^T A)^{-1}
+                        $$
+                    </div>
+                    <p>
+                        در این رابطه، $A$ ماتریس طراحی (ژاکوبین) معادلات مشاهده و $\mathbf{Q}_{xx}$ ماتریس کوواریانس پارامترهای تخمینی (موقعیت و بایاس ساعت) است. ریشه دوم قطرات اصلی $\mathbf{Q}_{xx}$ معرف انحراف معیار پارامترهاست و برای محاسبه انواع DOP استفاده می‌شود.
+                    </p>
+                </div>
+                <div class="calculation-step">
+                    <h2>انواع DOP</h2>
+                    <ul>
+                        <li><b>GDOP (تضعیف هندسی):</b> موقعیت سه‌بعدی و زمان</li>
+                        <li><b>PDOP (تضعیف موقعیت):</b> فقط موقعیت سه‌بعدی</li>
+                        <li><b>HDOP (تضعیف افقی):</b> موقعیت افقی (x, y)</li>
+                        <li><b>VDOP (تضعیف ارتفاع):</b> موقعیت عمودی (z)</li>
+                        <li><b>TDOP (تضعیف زمان):</b> بایاس ساعت گیرنده</li>
+                    </ul>
+                </div>
+                <div class="calculation-step">
+                    <h2>فرمول‌های DOP</h2>
+                    <div class="formula">
+                        $$
+                        \begin{align*}
+                        GDOP &= \sqrt{\sigma_x^2 + \sigma_y^2 + \sigma_z^2 + \sigma_t^2} = \sqrt{\mathrm{trace}(Q_{xx})} \\
+                        PDOP &= \sqrt{\sigma_x^2 + \sigma_y^2 + \sigma_z^2} \\
+                        HDOP &= \sqrt{\sigma_x^2 + \sigma_y^2} \\
+                        VDOP &= \sigma_z \\
+                        TDOP &= \sigma_t
+                        \end{align*}
+                        $$
+                    </div>
+                    <p>
+                        که در آن $\sigma_x^2, \sigma_y^2, \sigma_z^2, \sigma_t^2$ قطرات اصلی $Q_{xx}$ واریانس پارامترهای تخمینی هستند.
+                    </p>
+                </div>
+                <div class="calculation-step">
+                    <h2>نحوه محاسبه DOP در عمل</h2>
+                    <ol>
+                        <li>تشکیل معادلات مشاهده و ساخت ماتریس طراحی $A$</li>
+                        <li>محاسبه $Q_{xx} = (A^T A)^{-1}$</li>
+                        <li>استخراج قطرات اصلی: $\sigma_x^2 = Q_{xx}(1,1)$، $\sigma_y^2 = Q_{xx}(2,2)$، $\sigma_z^2 = Q_{xx}(3,3)$، $\sigma_t^2 = Q_{xx}(4,4)$</li>
+                        <li>جایگذاری در فرمول‌های بالا</li>
+                    </ol>
+                </div>
+                <div class="calculation-step">
+                    <h2>تفسیر عددی DOP</h2>
+                    <table class="dop-table">
+                        <tr><th>مقدار DOP</th><th>کیفیت هندسه</th><th>تفسیر</th></tr>
+                        <tr><td>۱ – ۲</td><td>عالی</td><td>بهترین هندسه، ماهواره‌ها با پراکندگی مناسب</td></tr>
+                        <tr><td>۲ – ۵</td><td>خوب</td><td>قابل قبول برای اکثر کاربردها</td></tr>
+                        <tr><td>۵ – ۱۰</td><td>متوسط</td><td>کاهش محسوس دقت</td></tr>
+                        <tr><td>۱۰ – ۲۰</td><td>ضعیف</td><td>دقت پایین، نیاز به هشدار</td></tr>
+                        <tr><td>&gt; ۲۰</td><td>بسیار ضعیف</td><td>موقعیت‌یابی غیرقابل اطمینان</td></tr>
+                    </table>
+                </div>
+                <div class="calculation-step">
+                    <h2>عوامل مؤثر بر DOP</h2>
+                    <ul>
+                        <li><b>تعداد ماهواره‌ها:</b> افزایش تعداد ماهواره‌ها معمولاً DOP را کاهش می‌دهد.</li>
+                        <li><b>پراکندگی زاویه‌ای ماهواره‌ها:</b> هرچه ماهواره‌ها در آسمان پراکنده‌تر باشند (زاویه جدایی بیشتر)، DOP کمتر است.</li>
+                        <li><b>ماسک ارتفاع:</b> حذف ماهواره‌های کم‌ارتفاع (مثلاً به دلیل موانع) می‌تواند DOP را افزایش دهد.</li>
+                        <li><b>طراحی منظومه ماهواره‌ای:</b> سامانه‌های GNSS برای بهینه‌سازی DOP طراحی شده‌اند، اما موانع محلی می‌تواند آن را بدتر کند.</li>
+                    </ul>
+                </div>
+                <div class="calculation-step">
+                    <h2>نکات عملی و کاربردها</h2>
+                    <ul>
+                        <li>DOP یک شاخص بی‌بعد است: خطای اندازه‌گیری را در خطای موقعیت ضرب می‌کند.</li>
+                        <li>DOP پایین برای کاربردهای دقیق (مانند نقشه‌برداری، هوانوردی، خودروهای خودران) حیاتی است.</li>
+                        <li>گیرنده‌های GNSS معمولاً PDOP، HDOP و VDOP را نمایش می‌دهند.</li>
+                        <li>نرم‌افزارهای برنامه‌ریزی مأموریت می‌توانند DOP را برای زمان‌ها و مکان‌های آینده پیش‌بینی کنند (مناسب برای UAV، برداشت میدانی و ...).</li>
+                        <li>در زمان برداشت داده، DOP را پایش کنید و در صورت امکان از بازه‌های DOP بالا اجتناب کنید.</li>
+                    </ul>
+                </div>
+                <div class="calculation-step">
+                    <h2>جمع‌بندی</h2>
+                    <ul>
+                        <li>DOP اثر هندسه ماهواره‌ها بر دقت موقعیت‌یابی را کمی می‌کند.</li>
+                        <li>همیشه هنگام ارزیابی کیفیت داده GNSS یا برنامه‌ریزی برداشت، DOP را در نظر بگیرید.</li>
+                        <li>درک DOP به تفسیر نتایج GNSS و بهینه‌سازی استراتژی برداشت کمک می‌کند.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html> 

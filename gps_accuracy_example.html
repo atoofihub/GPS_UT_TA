@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Accuracy: DOP, Multipath, and Error Sources</title>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .calculation-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .center-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img src="./assets/ut_logo.png" alt="University of Tehran Logo" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+            </div>
+            <div class="col-6" style="text-align: right;">
+              <img src="./assets/fanni_logo.png" alt="College of Engineering Logo" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>GPS Accuracy: DOP, Multipath, and Error Sources</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2>How Accurate is GPS?</h2>
+                    <div class="note">
+                        <p>A well-designed GPS receiver can achieve horizontal accuracy of 3 meters or better, and vertical accuracy of 5 meters or better (95% of the time). With augmentation, sub-meter accuracy is possible. However, several error sources can degrade this accuracy.</p>
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Main Sources of GPS Error</h2>
+                    <ul>
+                        <li>Satellite geometry (DOP)</li>
+                        <li>Atmospheric effects (ionosphere, troposphere)</li>
+                        <li>Multipath (signal reflection)</li>
+                        <li>Satellite clock and ephemeris errors</li>
+                        <li>Receiver noise and environment</li>
+                    </ul>
+                </div>
+                <div class="calculation-step">
+                    <h2>Satellite Geometry: DOP</h2>
+                    <p>GDOP (Geometric Dilution of Precision) and PDOP (Position Dilution of Precision) describe the error caused by the relative position of the GPS satellites. The more widely spread the satellites are in the sky, the better the DOP and the more precise your position.</p>
+                    <img src="./assets/satellites-1.png" alt="Good satellite geometry" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                    <p class="note">When satellites are well spread, DOP is low and accuracy is high.</p>
+                    <img src="./assets/satellites-2.png" alt="Poor satellite geometry" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                    <p class="note">When satellites are close together, DOP is high and accuracy is degraded.</p>
+                </div>
+                <div class="calculation-step">
+                    <h2>Atmospheric Refraction</h2>
+                    <p>The troposphere and ionosphere can change the speed of GPS signals, causing refraction. This can introduce errors of up to 5 meters. Dual-frequency GPS can minimize this error.</p>
+                    <img src="./assets/satellites-3.png" alt="Atmospheric refraction" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                </div>
+                <div class="calculation-step">
+                    <h2>Multipath Effects</h2>
+                    <p>Multipath occurs when GPS signals bounce off nearby structures (buildings, mountains), causing the receiver to detect the same signal twice at different ranges. This can introduce errors of about 1 meter.</p>
+                    <img src="./assets/multipath.png" alt="Multipath effect" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                </div>
+                <div class="calculation-step">
+                    <h2>Satellite Time and Location (Ephemeris)</h2>
+                    <p>The accuracy of a GPS satellite's atomic clock is about one nanosecond per tick. Small errors in satellite time or ephemeris (orbital position) can introduce a few meters of error in the final position solution.</p>
+                </div>
+                <div class="calculation-step">
+                    <h2>GPS Trilateration and Ephemeris Error</h2>
+                    <p>GPS receivers use trilateration of time signals from satellites to determine position. If the satellite's position (ephemeris) is not perfectly known, this can introduce additional error.</p>
+                    <img src="./assets/spherical.png" alt="GPS trilateration and ephemeris error" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                </div>
+                <div class="calculation-step">
+                    <h2>Summary and Best Practices</h2>
+                    <ul>
+                        <li>Monitor DOP values and avoid high DOP periods for critical measurements.</li>
+                        <li>Use dual-frequency or augmented GPS for higher accuracy.</li>
+                        <li>Avoid multipath environments (open sky is best).</li>
+                        <li>Be aware of atmospheric conditions and satellite health.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html> 

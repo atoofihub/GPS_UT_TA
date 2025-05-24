@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دقت GPS: DOP، چندمسیره و منابع خطا</title>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: Vazirmatn, Tahoma, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 2.1;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .calculation-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-right: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-right: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .center-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img src="./assets/ut_logo.png" alt="لوگوی دانشگاه تهران" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+            </div>
+            <div class="col-6" style="text-align: left;">
+              <img src="./assets/fanni_logo.png" alt="لوگوی دانشکده فنی" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>دقت GPS: DOP، چندمسیره و منابع خطا</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2>GPS چقدر دقیق است؟</h2>
+                    <div class="note">
+                        <p>یک گیرنده GPS با طراحی مناسب می‌تواند به دقت افقی ۳ متر یا بهتر و دقت ارتفاعی ۵ متر یا بهتر (در ۹۵٪ مواقع) برسد. با سامانه‌های تقویتی، دقت زیر یک متر نیز ممکن است. با این حال، چندین منبع خطا می‌توانند این دقت را کاهش دهند.</p>
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>مهم‌ترین منابع خطا در GPS</h2>
+                    <ul>
+                        <li>هندسه ماهواره‌ها (DOP)</li>
+                        <li>اثرات جوی (یونسفر، تروپوسفر)</li>
+                        <li>چندمسیره (بازتاب سیگنال)</li>
+                        <li>خطاهای ساعت و اپمریس ماهواره</li>
+                        <li>نویز گیرنده و محیط اطراف</li>
+                    </ul>
+                </div>
+                <div class="calculation-step">
+                    <h2>هندسه ماهواره‌ها: DOP</h2>
+                    <p>GDOP (تضعیف هندسی دقت) و PDOP (تضعیف دقت موقعیت) خطایی را توصیف می‌کنند که ناشی از آرایش نسبی ماهواره‌های GPS است. هرچه ماهواره‌ها در آسمان پراکنده‌تر باشند، DOP کمتر و دقت موقعیت‌یابی بیشتر است.</p>
+                    <img src="./assets/satellites-1.png" alt="هندسه خوب ماهواره‌ها" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                    <p class="note">وقتی ماهواره‌ها پراکندگی خوبی دارند، DOP پایین و دقت بالا است.</p>
+                    <img src="./assets/satellites-2.png" alt="هندسه ضعیف ماهواره‌ها" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                    <p class="note">وقتی ماهواره‌ها نزدیک به هم هستند، DOP بالا و دقت پایین است.</p>
+                </div>
+                <div class="calculation-step">
+                    <h2>شکست جوی</h2>
+                    <p>تروپوسفر و یونسفر می‌توانند سرعت سیگنال‌های GPS را تغییر دهند و باعث شکست شوند. این پدیده می‌تواند تا ۵ متر خطا ایجاد کند. استفاده از GPS دوفرکانسه این خطا را به حداقل می‌رساند.</p>
+                    <img src="./assets/satellites-3.png" alt="شکست جوی" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                </div>
+                <div class="calculation-step">
+                    <h2>اثر چندمسیره</h2>
+                    <p>چندمسیره زمانی رخ می‌دهد که سیگنال GPS از سطوح اطراف (مانند ساختمان یا کوه) بازتاب پیدا کند و گیرنده همان سیگنال را با تاخیر دریافت کند. این پدیده می‌تواند حدود ۱ متر خطا ایجاد کند.</p>
+                    <img src="./assets/multipath.png" alt="اثر چندمسیره" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                </div>
+                <div class="calculation-step">
+                    <h2>زمان و موقعیت ماهواره (اپمریس)</h2>
+                    <p>دقت ساعت اتمی ماهواره GPS حدود یک نانوثانیه است. خطاهای کوچک در زمان یا اپمریس ماهواره می‌تواند چند متر خطا در موقعیت نهایی ایجاد کند.</p>
+                </div>
+                <div class="calculation-step">
+                    <h2>تثلیث GPS و خطای اپمریس</h2>
+                    <p>گیرنده GPS با تثلیث سیگنال‌های زمانی ماهواره‌ها موقعیت را تعیین می‌کند. اگر موقعیت ماهواره (اپمریس) دقیق نباشد، خطای اضافی وارد می‌شود.</p>
+                    <img src="./assets/spherical.png" alt="تثلیث GPS و خطای اپمریس" class="center-img" style="max-width:400px; margin: 20px auto;" />
+                </div>
+                <div class="calculation-step">
+                    <h2>جمع‌بندی و توصیه‌های عملی</h2>
+                    <ul>
+                        <li>مقادیر DOP را پایش کنید و برای اندازه‌گیری‌های حساس، از بازه‌های DOP بالا اجتناب کنید.</li>
+                        <li>برای دقت بالاتر از GPS دوفرکانسه یا سامانه‌های تقویتی استفاده کنید.</li>
+                        <li>از محیط‌های چندمسیره (مانند کنار ساختمان‌ها) دوری کنید؛ آسمان باز بهترین است.</li>
+                        <li>به شرایط جوی و سلامت ماهواره‌ها توجه داشته باشید.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html> 

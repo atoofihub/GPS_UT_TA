@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dilution of Precision (DOP) in Satellite Positioning</title>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .calculation-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+        .parameter-table, .dop-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .parameter-table th, .parameter-table td, .dop-table th, .dop-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+        .parameter-table th, .dop-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .formula {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .center-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img src="./assets/ut_logo.png" alt="University of Tehran Logo" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+            </div>
+            <div class="col-6" style="text-align: right;">
+              <img src="./assets/fanni_logo.png" alt="College of Engineering Logo" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>Dilution of Precision (DOP) in Satellite Positioning</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2>Introduction</h2>
+                    <div class="note">
+                        <p>
+                        In satellite navigation systems such as GPS, the final positioning accuracy depends not only on the measurement precision (e.g., pseudorange errors), but also on the geometric configuration of the satellites in the sky. This geometric effect is quantified by the <b>Dilution of Precision (DOP)</b> factor. DOP expresses how satellite geometry amplifies measurement errors into position and time errors. Lower DOP values indicate better geometry and higher positioning reliability.
+                        </p>
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Mathematical Definition</h2>
+                    <div class="formula">
+                        $$
+                        \mathbf{Q}_{xx} = (A^T A)^{-1}
+                        $$
+                    </div>
+                    <p>
+                        Here, $A$ is the design (Jacobian) matrix of the observation equations, and $\mathbf{Q}_{xx}$ is the covariance matrix of the estimated parameters (position and clock bias). The square roots of the diagonal elements of $\mathbf{Q}_{xx}$ correspond to the standard deviations of the estimated parameters and are used to compute the various DOP values.
+                    </p>
+                </div>
+                <div class="calculation-step">
+                    <h2>Types of DOP</h2>
+                    <ul>
+                        <li><b>GDOP (Geometric DOP):</b> 3D position and time</li>
+                        <li><b>PDOP (Position DOP):</b> 3D position only</li>
+                        <li><b>HDOP (Horizontal DOP):</b> Horizontal position (x, y)</li>
+                        <li><b>VDOP (Vertical DOP):</b> Vertical position (z)</li>
+                        <li><b>TDOP (Time DOP):</b> Receiver clock bias</li>
+                    </ul>
+                </div>
+                <div class="calculation-step">
+                    <h2>DOP Formulas</h2>
+                    <div class="formula">
+                        $$
+                        \begin{align*}
+                        GDOP &= \sqrt{\sigma_x^2 + \sigma_y^2 + \sigma_z^2 + \sigma_t^2} = \sqrt{\mathrm{trace}(Q_{xx})} \\
+                        PDOP &= \sqrt{\sigma_x^2 + \sigma_y^2 + \sigma_z^2} \\
+                        HDOP &= \sqrt{\sigma_x^2 + \sigma_y^2} \\
+                        VDOP &= \sigma_z \\
+                        TDOP &= \sigma_t
+                        \end{align*}
+                        $$
+                    </div>
+                    <p>
+                        Where $\sigma_x^2, \sigma_y^2, \sigma_z^2, \sigma_t^2$ are the diagonal elements of $Q_{xx}$, representing the variances of the estimated parameters.
+                    </p>
+                </div>
+                <div class="calculation-step">
+                    <h2>How to Compute DOP in Practice</h2>
+                    <ol>
+                        <li>Formulate the observation equations and build the design matrix $A$.</li>
+                        <li>Compute $Q_{xx} = (A^T A)^{-1}$.</li>
+                        <li>Extract the diagonal elements: $\sigma_x^2 = Q_{xx}(1,1)$, $\sigma_y^2 = Q_{xx}(2,2)$, $\sigma_z^2 = Q_{xx}(3,3)$, $\sigma_t^2 = Q_{xx}(4,4)$.</li>
+                        <li>Plug these into the DOP formulas above.</li>
+                    </ol>
+                </div>
+                <div class="calculation-step">
+                    <h2>Interpretation of DOP Values</h2>
+                    <table class="dop-table">
+                        <tr><th>DOP Value</th><th>Geometry Quality</th><th>Interpretation</th></tr>
+                        <tr><td>1 – 2</td><td>Excellent</td><td>Best geometry, satellites well spread</td></tr>
+                        <tr><td>2 – 5</td><td>Good</td><td>Acceptable for most applications</td></tr>
+                        <tr><td>5 – 10</td><td>Moderate</td><td>Noticeable accuracy degradation</td></tr>
+                        <tr><td>10 – 20</td><td>Poor</td><td>Low accuracy, warning needed</td></tr>
+                        <tr><td>&gt; 20</td><td>Very Poor</td><td>Unreliable positioning</td></tr>
+                    </table>
+                </div>
+                <div class="calculation-step">
+                    <h2>Factors Affecting DOP</h2>
+                    <ul>
+                        <li><b>Number of satellites:</b> More satellites generally reduce DOP.</li>
+                        <li><b>Satellite geometry:</b> Satellites spread widely in the sky (high angular separation) yield lower DOP.</li>
+                        <li><b>Elevation mask:</b> Excluding low-elevation satellites (e.g., due to obstructions) can increase DOP.</li>
+                        <li><b>Satellite constellation design:</b> GNSS systems are designed to optimize DOP globally, but local obstructions can still degrade it.</li>
+                    </ul>
+                </div>
+                <div class="calculation-step">
+                    <h2>Practical Notes and Applications</h2>
+                    <ul>
+                        <li>DOP is a dimensionless factor: it multiplies the measurement error to estimate the position error.</li>
+                        <li>Low DOP is critical for high-precision applications (e.g., surveying, aviation, autonomous vehicles).</li>
+                        <li>GNSS receivers often display PDOP, HDOP, and VDOP in their status screens.</li>
+                        <li>Mission planning software can predict DOP values for future times and locations (useful for UAV flights, field campaigns, etc.).</li>
+                        <li>Always monitor DOP during data collection and avoid periods of high DOP if possible.</li>
+                    </ul>
+                </div>
+                <div class="calculation-step">
+                    <h2>Summary</h2>
+                    <ul>
+                        <li>DOP quantifies the effect of satellite geometry on positioning accuracy.</li>
+                        <li>Always consider DOP when evaluating GNSS data quality or planning fieldwork.</li>
+                        <li>Understanding DOP helps you interpret GNSS results and optimize your measurement strategy.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html> 
