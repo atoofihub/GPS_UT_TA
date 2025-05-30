@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collins Tropospheric Delay Example</title>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .calculation-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .parameter-table th, .parameter-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+        .parameter-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .formula {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .center-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img src="./assets/ut_logo.png" alt="University of Tehran Logo" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+            </div>
+            <div class="col-6" style="text-align: right;">
+              <img src="./assets/fanni_logo.png" alt="College of Engineering Logo" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>Collins Tropospheric Delay Example</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2>Collins Model Description</h2>
+                    <div class="note">
+                        <p>
+                        The Collins (1999) tropospheric model is widely used in Satellite-Based Augmentation Systems (SBAS) such as WAAS and EGNOS. It estimates the total tropospheric delay (dry + wet) for GNSS signals using meteorological parameters interpolated from a global data table (<code>Trop_Data.mat</code>). The model uses a common mapping function for both dry and wet components, and accounts for seasonal and latitudinal variations in atmospheric conditions.
+                        </p>
+                        <p>
+                        <b>Data source:</b> Meteorological parameters are interpolated from <code>Trop_Data.mat</code> based on the receiver's latitude. This file contains average and seasonal variation values for pressure, temperature, water vapor pressure, and lapse rates.
+                        </p>
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Input Parameters</h2>
+                    <table class="parameter-table">
+                        <tr><th>Parameter</th><th>Value</th><th>Unit</th></tr>
+                        <tr><td>Latitude ($\varphi$)</td><td>35.0</td><td>degrees</td></tr>
+                        <tr><td>Height ($H$)</td><td>500.0</td><td>meters</td></tr>
+                        <tr><td>Day of year ($D$)</td><td>100</td><td>-</td></tr>
+                        <tr><td>Elevation angle ($E$)</td><td>30.0</td><td>degrees</td></tr>
+                    </table>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 1: Interpolate Meteorological Parameters</h2>
+                    <div class="formula">
+                        $$
+                        \begin{align*}
+                        P_0, \Delta P, T_0, \Delta T, e_0, \Delta e, \beta_0, \Delta\beta, \lambda_0, \Delta\lambda = \text{interpolate from Trop\_Data.mat at } \varphi
+                        \end{align*}
+                        $$
+                    </div>
+                    <p>
+                        The parameters are linearly interpolated from the data file for the given latitude. For this example:
+                    </p>
+                    <div class="result">
+                        $P_0 = 1016.15$, $\Delta P = $ (see data), $T_0 = 293.97$, $\Delta T = $ (see data), $e_0 = 21.21$, $\Delta e = $ (see data), $\beta_0 = 0.00594$, $\Delta\beta = $ (see data), $\lambda_0 = 3.1465$, $\Delta\lambda = $ (see data)
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 2: Compute Seasonal Meteorological Values</h2>
+                    <div class="formula">
+                        $$
+                        \xi(\varphi, D) = \xi_0(\varphi) + \Delta\xi(\varphi) \cos\left(\frac{2\pi(D - D_{min})}{365.25}\right)
+                        $$
+                    </div>
+                    <p>
+                        Where $D_{min} = 28$ for northern latitudes. For this example:
+                    </p>
+                    <div class="result">
+                        $P = 1016.15$, $T = 293.97$, $e = 21.21$, $\beta = 0.00594$, $\lambda = 3.1465$
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 3: Zero-altitude Vertical Delays</h2>
+                    <div class="formula">
+                        $$
+                        \begin{align*}
+                        T_{rz0,d} &= 10^{-6} k_1 R_d \frac{P}{g_m} \\
+                        T_{rz0,w} &= \frac{10^{-6} k_2 R_d}{(\lambda + 1) g_m - \beta R_d} \frac{e}{T}
+                        \end{align*}
+                        $$
+                    </div>
+                    <p>
+                        Where $k_1 = 77.604$ K/mbar, $k_2 = 382000$ K$^2$/mbar, $R_d = 287.054$ J/(kg K), $g_m = 9.784$ m/s$^2$.
+                    </p>
+                    <div class="result">
+                        $T_{rz0,d} = 2.3136$ m, $T_{rz0,w} = 0.2036$ m
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 4: Vertical Delays at Receiver Height</h2>
+                    <div class="formula">
+                        $$
+                        \begin{align*}
+                        T_{rz,d} &= \left(1 - \frac{\beta H}{T}\right)^{\frac{g}{R_d \beta}} T_{rz0,d} \\
+                        T_{rz,w} &= \left(1 - \frac{\beta H}{T}\right)^{\frac{g(\lambda+1)}{R_d \beta} - 1} T_{rz0,w}
+                        \end{align*}
+                        $$
+                    </div>
+                    <p>
+                        Where $g = 9.80665$ m/s$^2$, $H$ is the receiver height in meters.
+                    </p>
+                    <div class="result">
+                        $T_{rz,d} = 2.1824$ m, $T_{rz,w} = 0.1615$ m
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 5: Mapping Function (Obliquity Factor)</h2>
+                    <div class="formula">
+                        $$
+                        M(E) = \frac{1.001}{\sqrt{0.002001 + \sin^2(E)}}
+                        $$
+                    </div>
+                    <p>
+                        Where $E$ is the satellite elevation angle in degrees. For this example:
+                    </p>
+                    <div class="result">
+                        $M(E) = 1.9940$
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Step 6: Total Tropospheric Delay</h2>
+                    <div class="formula">
+                        $$
+                        T_r(E) = (T_{rz,d} + T_{rz,w}) M(E)
+                        $$
+                    </div>
+                    <p>
+                        The total slant tropospheric delay for the given elevation angle:
+                    </p>
+                    <div class="result">
+                        $T_r(E) = 4.6736$ meters
+                    </div>
+                </div>
+                <div class="calculation-step">
+                    <h2>Summary</h2>
+                    <ul>
+                        <li>The Collins model provides a reliable estimate of tropospheric delay for GNSS signals, using interpolated meteorological data and a common mapping function.</li>
+                        <li>In this example, the total tropospheric delay is <span class="result">4.67 meters</span> for a receiver at 35° latitude, 500 m height, on day 100, with a satellite elevation of 30°.</li>
+                        <li>Meteorological parameters are sourced from <code>Trop_Data.mat</code>, which should be updated for best accuracy in different regions.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html> 
