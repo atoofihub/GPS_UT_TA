@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RINEX Observation File Example and Explanation</title>
+    <link rel="stylesheet" href="./assets/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        .header-table th, .header-table td {
+            text-align: left;
+            padding: 8px;
+        }
+        .epoch-table th, .epoch-table td {
+            text-align: center;
+            padding: 6px;
+            font-size: 0.95em;
+        }
+        .epoch-table {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            font-size: 1.7em;
+        }
+        .explanation {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container" style="direction: ltr; text-align: left;">
+    <div class="row">
+        <div class="col-6">
+            <img src="./assets/ut_logo.png" alt="University of Tehran Logo" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+        </div>
+        <div class="col-6" style="text-align: right;">
+            <img src="./assets/fanni_logo.png" alt="College of Engineering Logo" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+        </div>
+    </div>
+    <h1 class="head_name" style="text-align:center;">RINEX Observation File: Structure and Example</h1>
+
+    <div class="section-title">1. What is a RINEX Observation File?</div>
+    <div class="explanation">
+        <p><strong>RINEX</strong> (Receiver Independent Exchange Format) is a standard text format for storing GNSS (Global Navigation Satellite System) data, including GPS, GLONASS, Galileo, and BeiDou. The observation file (extension <code>.rnx</code> or <code>.obs</code>) contains raw measurements from a GNSS receiver, organized in a way that is independent of receiver brand.</p>
+    </div>
+
+    <div class="section-title">2. Header Section</div>
+    <div class="explanation">
+        <p>The header provides metadata about the file, receiver, antenna, observation types, and timing. Here are some key fields from the sample file:</p>
+        <table class="header-table table table-bordered">
+            <tr><th>Field</th><th>Example Value</th><th>Description</th></tr>
+            <tr><td>RINEX VERSION / TYPE</td><td>3.04 OBSERVATION DATA M</td><td>RINEX version (3.04), file type (Observation), mixed GNSS systems</td></tr>
+            <tr><td>PGM / RUN BY / DATE</td><td>JPS2RIN v.2.1.223 JAVAD GNSS 20240102 000920 UTC</td><td>Program, agency, and creation date</td></tr>
+            <tr><td>OBSERVER / AGENCY</td><td>GGN NASA GODDARD SPACE FLIGHT CENTER</td><td>Observer and agency</td></tr>
+            <tr><td>MARKER NAME / NUMBER</td><td>GODS / 40451M128</td><td>Station name and marker number</td></tr>
+            <tr><td>REC # / TYPE / VERS</td><td>02704 JAVAD TRE_3 DELTA 4.1.01</td><td>Receiver number, type, and firmware version</td></tr>
+            <tr><td>APPROX POSITION XYZ</td><td>1130752.1541 -4831349.1034 3994098.9626</td><td>Approximate receiver position in ECEF (meters)</td></tr>
+            <tr><td>ANT # / TYPE</td><td>02083 JAVRINGANT_DM SCIS</td><td>Antenna number and type</td></tr>
+            <tr><td>ANTENNA: DELTA H/E/N</td><td>0.0083 0.0000 0.0000</td><td>Antenna height, east, and north offsets (meters)</td></tr>
+            <tr><td>SYS / # / OBS TYPES</td><td>G 18 C1C L1C S1C ...</td><td>Observation types for each GNSS system (see below)</td></tr>
+            <tr><td>INTERVAL</td><td>30.000</td><td>Observation interval in seconds</td></tr>
+            <tr><td>TIME OF FIRST OBS</td><td>2024 1 1 0 0 0.0000000 GPS</td><td>Date/time of first observation (GPS time)</td></tr>
+            <tr><td>TIME OF LAST OBS</td><td>2024 1 1 23 59 30.0000000 GPS</td><td>Date/time of last observation (GPS time)</td></tr>
+            <tr><td>LEAP SECONDS</td><td>18</td><td>Number of leap seconds</td></tr>
+        </table>
+    </div>
+
+    <div class="section-title">3. Observation Types</div>
+    <div class="explanation">
+        <p>Each GNSS system (GPS, GLONASS, Galileo, BeiDou) has its own set of observation types. These are listed in the header and define the columns in the observation data. For example:</p>
+        <table class="table table-bordered">
+            <tr><th>System</th><th>Observation Types</th></tr>
+            <tr><td>GPS (G)</td><td>C1C, L1C, S1C, C1W, L1W, S1W, C2X, L2X, S2X, C2W, L2W, S2W, C5X, L5X, S5X, C1X, L1X, S1X</td></tr>
+            <tr><td>GLONASS (R)</td><td>C1C, L1C, S1C, C1P, L1P, S1P, C2C, L2C, S2C, C2P, L2P, S2P, C3X, L3X, S3X</td></tr>
+            <tr><td>Galileo (E)</td><td>C1X, L1X, S1X, C8X, L8X, S8X, C6X, L6X, S6X, C7X, L7X, S7X, C5X, L5X, S5X</td></tr>
+            <tr><td>BeiDou (C)</td><td>C2I, L2I, S2I, C8X, L8X, S8X, C6I, L6I, S6I, C7Z, C7I, L7Z, L7I, S7Z, S7I, C5X, L5X, S5X, C1X, L1X, S1X</td></tr>
+        </table>
+        <p><strong>Legend:</strong> C = Code, L = Carrier phase, S = Signal strength, numbers = frequency bands, X/P/C = signal type.</p>
+    </div>
+
+    <div class="section-title">4. Epochs and Observation Data</div>
+    <div class="explanation">
+        <p>Each <strong>epoch</strong> represents a measurement time. The epoch line starts with a ">" and gives the date, time, and number of satellites observed. Each following line lists the observations for one satellite, with values in the order defined by the header. Example:</p>
+    </div>
+    <div class="calculation-step">
+        <pre>> 2024 01 01 00 00  0.0000000  0 34        .000000015974
+G01  20888756.039   109771298.977 8        48.750    20888756.369   109771289.968 7        43.000 ...
+G02  23201822.669   121926668.150 7        43.250    23201822.179   121926528.154 5        34.750 ...
+...</pre>
+    </div>
+    <div class="explanation">
+        <ul>
+            <li><strong>Epoch line:</strong> <code>> 2024 01 01 00 00  0.0000000  0 34</code> means year 2024, Jan 1, 00:00:00, 34 satellites observed.</li>
+            <li><strong>Satellite line:</strong> Each line starts with the satellite PRN (e.g., G01), followed by the observation values for that epoch.</li>
+        </ul>
+    </div>
+
+    <div class="section-title">5. Example: Detailed Epoch Table</div>
+    <div class="explanation">
+        <p>The table below shows a sample epoch with a few satellites and their observation values. Each column corresponds to an observation type as defined in the header for that system.</p>
+    </div>
+    <table class="epoch-table table table-bordered">
+        <tr>
+            <th>Satellite</th>
+            <th>C1C</th>
+            <th>L1C</th>
+            <th>S1C</th>
+            <th>C1W</th>
+            <th>L1W</th>
+            <th>S1W</th>
+            <th>C2X</th>
+            <th>L2X</th>
+            <th>S2X</th>
+        </tr>
+        <tr>
+            <td>G01</td>
+            <td>20888756.039</td>
+            <td>109771298.977</td>
+            <td>8</td>
+            <td>48.750</td>
+            <td>20888756.369</td>
+            <td>109771289.968</td>
+            <td>7</td>
+            <td>43.000</td>
+            <td>20888756.829</td>
+        </tr>
+        <tr>
+            <td>G02</td>
+            <td>23201822.669</td>
+            <td>121926668.150</td>
+            <td>7</td>
+            <td>43.250</td>
+            <td>23201822.179</td>
+            <td>121926528.154</td>
+            <td>5</td>
+            <td>34.750</td>
+            <td>23201819.079</td>
+        </tr>
+    </table>
+    <div class="explanation">
+        <ul>
+            <li><strong>C1C:</strong> Code pseudorange on L1C</li>
+            <li><strong>L1C:</strong> Carrier phase on L1C</li>
+            <li><strong>S1C:</strong> Signal strength on L1C</li>
+            <li>... and so on for each observation type.</li>
+        </ul>
+    </div>
+
+    <div class="section-title">6. Notes and References</div>
+    <div class="explanation">
+        <ul>
+            <li>This example is based on a real RINEX 3.04 file from NASA/JPL, with data for GPS, GLONASS, Galileo, and BeiDou.</li>
+            <li>For more details, see the <a href="https://files.igs.org/pub/data/format/rinex304.pdf" target="_blank">RINEX 3.04 official documentation</a> and the ESA GNSS Book.</li>
+        </ul>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="note">
+                <strong>Tip:</strong> Understanding the structure of RINEX files is essential for GNSS data processing, quality control, and research.
+            </div>
+        </div>
+    </div>
+</div>
+<script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ]
+        });
+    });
+</script>
+</body>
+</html> 
