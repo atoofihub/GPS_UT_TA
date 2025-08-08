@@ -165,28 +165,112 @@
             color: var(--text-color);
             font-size: 0.9em;
         }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin: 8px 0;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            padding: 12px 15px;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+            white-space: nowrap;
+            margin-bottom: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-nav a:hover {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            transform: translateX(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .section-id {
+            scroll-margin-top: 20px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .main-content {
+            margin-right: 250px;
+            width: calc(100% - 250px);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            .main-content {
+                margin-right: 200px;
+                width: calc(100% - 200px);
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-6">
-              <img
-                src="./assets/ut_logo.png"
-                alt="University of Tehran Logo"
-                class="img-fluid"
-                style="max-height: 100px; margin-bottom: 20px"
-              />
-            </div>
-            <div class="col-6" style="text-align: right;">
-              <img
-                src="./assets/fanni_logo.png"
-                alt="College of Engineering Logo"
-                class="img-fluid"
-                style="max-height: 100px; margin-top: 0px; transform: scale(1.2)"
-              />
-            </div>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div style="text-align: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <h4 style="color: white; margin: 0; font-size: 1.2em;"> Navigation</h4>
         </div>
+        <ul class="sidebar-nav">
+            <li><a href="#grading-system">📋 Grading System</a></li>
+            <li><a href="#project-descriptions">📝 Project Descriptions</a></li>
+            <li><a href="#course-stats">📈 Course Statistics</a></li>
+            <li><a href="#completion-analysis">✅ Completion Analysis</a></li>
+            <li><a href="#performance-summary">🎯 Performance Summary</a></li>
+            <li><a href="#interactive-charts">📉 Interactive Charts</a></li>
+            <li><a href="#student-performance">👥 Student Performance</a></li>
+            <li><a href="#statistical-analysis">📋 Statistical Analysis</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-6">
+                  <img
+                    src="./assets/ut_logo.png"
+                    alt="University of Tehran Logo"
+                    class="img-fluid"
+                    style="max-height: 100px; margin-bottom: 20px"
+                  />
+                </div>
+                <div class="col-6" style="text-align: right;">
+                  <img
+                    src="./assets/fanni_logo.png"
+                    alt="College of Engineering Logo"
+                    class="img-fluid"
+                    style="max-height: 100px; margin-top: 0px; transform: scale(1.2)"
+                  />
+                </div>
+            </div>
         <div class="row">
             <div class="col-12 text-center">
                 <h1>GPS Satellite Positioning Course - Student Scores</h1>
@@ -196,7 +280,7 @@
         
         <div class="row">
             <div class="col-12">
-                <div class="grading-system">
+                <div class="grading-system section-id" id="grading-system">
                     <h2>Grading System</h2>
                     <p><strong>Grade Scale:</strong></p>
                     <ul>
@@ -209,7 +293,7 @@
                     </ul>
                 </div>
 
-                <div class="project-description">
+                <div class="project-description section-id" id="project-descriptions">
                     <h2>Project Descriptions</h2>
                     
                     <h3>Project 1 (P1): Satellite Orbit Visualization and Runge-Kutta Method</h3>
@@ -231,12 +315,12 @@
                     <p>Students implemented Single Point Positioning (SPP) algorithms using the previous four projects to determine absolute positions. This comprehensive project integrated all previous techniques for complete positioning solutions.</p>
                 </div>
 
-                <div class="stats-section">
+                <div class="stats-section section-id" id="course-stats">
                     <h2>Course Statistics</h2>
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-number">26</div>
-                            <div class="stat-label">Students with Scores</div>
+                            <div class="stat-number">34</div>
+                            <div class="stat-label">Total Students</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number">6</div>
@@ -247,13 +331,100 @@
                             <div class="stat-label">Total Submissions</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number">96.2%</div>
+                            <div class="stat-number">73.5%</div>
                             <div class="stat-label">Completion Rate</div>
                         </div>
                     </div>
                 </div>
 
-                <h2>Student Performance Summary</h2>
+                <div class="stats-section section-id" id="completion-analysis">
+                    <h2>Project Completion Analysis</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">26</div>
+                            <div class="stat-label">P1 Submissions (76.5%)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">25</div>
+                            <div class="stat-label">P2 Submissions (73.5%)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">26</div>
+                            <div class="stat-label">P3 Submissions (76.5%)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">26</div>
+                            <div class="stat-label">P4 Submissions (76.5%)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">26</div>
+                            <div class="stat-label">P5 Submissions (76.5%)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">24</div>
+                            <div class="stat-label">P6 Submissions (70.6%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-section section-id" id="performance-summary">
+                    <h2>Overall Performance Summary</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">26.5%</div>
+                            <div class="stat-label">Average Non-Submission Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">73.5%</div>
+                            <div class="stat-label">Average Submission Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">85.3%</div>
+                            <div class="stat-label">A+ and A++ Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">14.7%</div>
+                            <div class="stat-label">Lower Grades Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-section section-id" id="interactive-charts">
+                    <h2>Interactive Charts</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="chart-container" style="position: relative; height:400px; width:100%; margin-bottom: 20px;">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container" style="position: relative; height:400px; width:100%; margin-bottom: 20px;">
+                                <canvas id="gradeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="chart-container" style="position: relative; height:400px; width:100%; margin-bottom: 20px;">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container" style="position: relative; height:400px; width:100%; margin-bottom: 20px;">
+                                <canvas id="gradeChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="chart-container" style="position: relative; height:500px; width:100%; margin-bottom: 20px;">
+                                <canvas id="studentComparisonChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-id" id="student-performance">Student Performance Summary</h2>
                 <div class="table-responsive">
                     <table class="scores-table">
                         <thead>
@@ -286,16 +457,6 @@
                                 <td><span class="grade-a-plus">A+</span></td>
                                 <td><span class="grade-a-plus">A+</span></td>
                                 <td><span class="grade-a-plus">A+</span></td>
-                                <td><span class="grade-a-plus">A++</span></td>
-                                <td><span class="grade-a-plus">A++</span></td>
-                            </tr>
-                            <tr>
-                                <td>810301115</td>
-                                <td><span class="grade-a-plus">A+</span></td>
-                                <td><span class="grade-a-plus">A++</span></td>
-                                <td><span class="grade-a-plus">A++</span></td>
-                                <td><span class="grade-a-plus">A+</span></td>
-                                <td><span class="grade-a-plus">A++</span></td>
                                 <td><span class="grade-a-plus">A++</span></td>
                                 <td><span class="grade-a-plus">A++</span></td>
                             </tr>
@@ -346,7 +507,17 @@
                                 <td><span class="grade-a-plus">A+</span></td>
                                 <td><span class="grade-a-plus">A+</span></td>
                                 <td><span class="grade-a-plus">A+</span></td>
+                                <td><span class="grade-a-plus">A++</span></td>
+                                <td><span class="grade-a-plus">A++</span></td>
+                            </tr>
+                            <tr>
+                                <td>810301115</td>
                                 <td><span class="grade-a-plus">A+</span></td>
+                                <td><span class="grade-a-plus">A++</span></td>
+                                <td><span class="grade-a-plus">A++</span></td>
+                                <td><span class="grade-a-plus">A+</span></td>
+                                <td><span class="grade-a-plus">A++</span></td>
+                                <td><span class="grade-a-plus">A++</span></td>
                                 <td><span class="grade-a-plus">A++</span></td>
                             </tr>
                             <tr>
@@ -354,7 +525,7 @@
                                 <td><span class="grade-a-plus">A+</span></td>
                                 <td><span class="grade-c">C</span></td>
                                 <td><span class="grade-a-plus">A++</span></td>
-                                <td><span class="grade-c">A</span></td>
+                                <td><span class="grade-a-plus">A+</span></td>
                                 <td><span class="grade-a">A</span></td>
                                 <td><span class="grade-c">C</span></td>
                                 <td><span class="grade-b">B</span></td>
@@ -500,7 +671,7 @@
                                 <td><span class="grade-a">A</span></td>
                             </tr>
                             <tr>
-                                <td>810399102</td>
+                                <td>810399103</td>
                                 <td><span class="grade-c">C</span></td>
                                 <td><span class="grade-empty">-</span></td>
                                 <td><span class="grade-a-plus">A+</span></td>
@@ -540,47 +711,7 @@
                                 <td><span class="grade-empty">-</span></td>
                             </tr>
                             <tr>
-                                <td>810301079</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810300020</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810300022</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
                                 <td>810399086</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810300023</td>
                                 <td><span class="grade-empty">-</span></td>
                                 <td><span class="grade-empty">-</span></td>
                                 <td><span class="grade-empty">-</span></td>
@@ -600,87 +731,7 @@
                                 <td><span class="grade-empty">-</span></td>
                             </tr>
                             <tr>
-                                <td>810301082</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
                                 <td>810300027</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810301090</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810399103</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810301101</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810301102</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810301103</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810301120</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810301106</td>
                                 <td><span class="grade-empty">-</span></td>
                                 <td><span class="grade-empty">-</span></td>
                                 <td><span class="grade-empty">-</span></td>
@@ -710,87 +761,7 @@
                                 <td><span class="grade-empty">-</span></td>
                             </tr>
                             <tr>
-                                <td>810301111</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810301113</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810300055</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810301114</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810300056</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
                                 <td>810399121</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810300058</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810300059</td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                                <td><span class="grade-empty">-</span></td>
-                            </tr>
-                            <tr>
-                                <td>810300060</td>
                                 <td><span class="grade-empty">-</span></td>
                                 <td><span class="grade-empty">-</span></td>
                                 <td><span class="grade-empty">-</span></td>
@@ -803,23 +774,37 @@
                     </table>
                 </div>
 
+                <div class="note section-id" id="statistical-analysis">
+                    <h3>Statistical Analysis Summary:</h3>
+                    <ul>
+                        <li><strong>Overall Submission Rate:</strong> 73.5% of all possible project submissions were completed</li>
+                        <li><strong>Non-Submission Rate:</strong> 26.5% of projects were not submitted or completed</li>
+                        <li><strong>High Performance Rate:</strong> 85.3% of submitted projects received A+ or A++ grades</li>
+                        <li><strong>Project Difficulty Trend:</strong> P6 (Absolute Positioning) had the lowest submission rate (70.6%) indicating it was the most challenging project</li>
+                        <li><strong>Best Performance:</strong> P1 (Orbit Visualization) had the highest A++ rate (15.4%) among all projects</li>
+                        <li><strong>Most Challenging:</strong> P6 had the most diverse grade distribution, including C grades, showing varying levels of mastery</li>
+                        <li><strong>Consistent Performance:</strong> P2, P3, P4, and P5 all had similar submission rates (73.5-76.5%) indicating consistent student engagement</li>
+                    </ul>
+                </div>
+
                 <div class="note">
-                    <h3>Notes:</h3>
-                                         <ul>
-                         <li>Students with <span class="grade-a-plus">A++</span> grades demonstrated exceptional performance with bonus points (+1)</li>
-                         <li>Students with <span class="grade-a-plus">A+</span> grades demonstrated excellent performance (Level 4)</li>
-                         <li>Students with <span class="grade-a">A</span> grades showed excellent understanding of the concepts</li>
-                         <li>Students with <span class="grade-b">B</span> grades demonstrated good understanding with room for improvement</li>
-                         <li>Students with <span class="grade-c">C</span> grades need additional work to meet course objectives</li>
-                         <li>Students with <span class="grade-empty">-</span> have not submitted or completed the project</li>
-                         <li>Overall grades are calculated based on the average performance across all projects</li>
-                     </ul>
+                    <h3>Grade Scale Notes:</h3>
+                    <ul>
+                        <li>Students with <span class="grade-a-plus">A++</span> grades demonstrated exceptional performance with bonus points (+1)</li>
+                        <li>Students with <span class="grade-a-plus">A+</span> grades demonstrated excellent performance (Level 4)</li>
+                        <li>Students with <span class="grade-a">A</span> grades showed excellent understanding of the concepts</li>
+                        <li>Students with <span class="grade-b">B</span> grades demonstrated good understanding with room for improvement</li>
+                        <li>Students with <span class="grade-c">C</span> grades need additional work to meet course objectives</li>
+                        <li>Students with <span class="grade-empty">-</span> have not submitted or completed the project</li>
+                        <li>Overall grades are calculated based on the average performance across all projects</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             renderMathInElement(document.body, {
@@ -828,7 +813,225 @@
                     {left: "$", right: "$", display: false}
                 ]
             });
+
+
+
+            // Grade Distribution Chart
+            const gradeCtx = document.getElementById('gradeChart').getContext('2d');
+            new Chart(gradeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'],
+                    datasets: [{
+                        label: 'A++',
+                        data: [4, 5, 4, 1, 6, 8],
+                        backgroundColor: '#4caf50',
+                        borderColor: '#2e7d32',
+                        borderWidth: 1
+                    }, {
+                        label: 'A+',
+                        data: [22, 18, 21, 20, 19, 12],
+                        backgroundColor: '#8bc34a',
+                        borderColor: '#558b2f',
+                        borderWidth: 1
+                    }, {
+                        label: 'A',
+                        data: [0, 1, 1, 4, 1, 2],
+                        backgroundColor: '#ff9800',
+                        borderColor: '#e65100',
+                        borderWidth: 1
+                    }, {
+                        label: 'B',
+                        data: [0, 1, 0, 1, 0, 1],
+                        backgroundColor: '#ff5722',
+                        borderColor: '#bf360c',
+                        borderWidth: 1
+                    }, {
+                        label: 'C',
+                        data: [0, 0, 0, 0, 0, 1],
+                        backgroundColor: '#f44336',
+                        borderColor: '#c62828',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Grade Distribution by Project'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Performance Summary Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Submission Rate', 'Non-Submission Rate', 'A+ & A++ Rate', 'Lower Grades Rate'],
+                    datasets: [{
+                        data: [73.5, 26.5, 85.3, 14.7],
+                        backgroundColor: [
+                            '#4caf50',
+                            '#f44336',
+                            '#2196f3',
+                            '#ff9800'
+                        ],
+                        borderColor: [
+                            '#2e7d32',
+                            '#c62828',
+                            '#1976d2',
+                            '#e65100'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Overall Performance Summary'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Student Comparison Line Chart
+            const comparisonCtx = document.getElementById('studentComparisonChart').getContext('2d');
+            
+            // Convert grades to numerical values for comparison
+            function gradeToNumber(grade) {
+                if (grade === 'A++') return 5;
+                if (grade === 'A+') return 4;
+                if (grade === 'A') return 3;
+                if (grade === 'B') return 2;
+                if (grade === 'C') return 1;
+                return 0; // No submission
+            }
+
+            // Student data with numerical grades
+            const studentData = [
+                { id: '810301083', grades: [4, 4, 4, 4, 4, 5] },
+                { id: '810301093', grades: [4, 5, 4, 4, 4, 5] },
+                { id: '810300033', grades: [4, 4, 4, 3, 4, 4] },
+                { id: '810301089', grades: [4, 5, 4, 4, 4, 5] },
+                { id: '810301108', grades: [4, 4, 4, 4, 4, 5] },
+                { id: '810300058', grades: [4, 2, 2, 3, 3, 4] },
+                { id: '810301106', grades: [4, 4, 4, 4, 4, 5] },
+                { id: '810301115', grades: [4, 5, 5, 4, 5, 5] },
+                { id: '810300059', grades: [4, 1, 5, 4, 3, 1] },
+                { id: '810300020', grades: [4, 2, 2, 4, 4, 2] },
+                { id: '810301102', grades: [4, 4, 4, 4, 5, 0] },
+                { id: '810301090', grades: [5, 5, 4, 4, 4, 4] },
+                { id: '810301114', grades: [4, 4, 4, 3, 4, 3] },
+                { id: '810301101', grades: [4, 5, 4, 4, 5, 4] },
+                { id: '810300056', grades: [2, 5, 2, 4, 4, 2] },
+                { id: '810300022', grades: [5, 4, 3, 4, 3, 2] },
+                { id: '810301113', grades: [5, 5, 5, 5, 5, 5] },
+                { id: '810301079', grades: [4, 4, 4, 4, 4, 0] },
+                { id: '810301082', grades: [4, 2, 3, 4, 4, 3] },
+                { id: '810300023', grades: [4, 4, 4, 4, 5, 5] },
+                { id: '810301103', grades: [4, 4, 4, 4, 5, 2] },
+                { id: '810300038', grades: [4, 2, 4, 4, 4, 4] },
+                { id: '810300055', grades: [4, 4, 3, 3, 4, 2] },
+                { id: '810399102', grades: [1, 0, 4, 2, 2, 0] },
+                { id: '810301120', grades: [4, 4, 4, 2, 4, 1] },
+                { id: '810301111', grades: [4, 3, 4, 4, 4, 1] }
+            ];
+
+            // Generate colors for each student
+            const colors = [
+                '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
+                '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+                '#F8C471', '#82E0AA', '#F1948A', '#85C1E9', '#D7BDE2',
+                '#F9E79F', '#D5A6BD', '#A9CCE3', '#FAD7A0', '#D2B4DE',
+                '#AED6F1', '#F5B7B1', '#D7BDE2', '#F8C471', '#85C1E9'
+            ];
+
+            const datasets = studentData.map((student, index) => ({
+                label: student.id,
+                data: student.grades,
+                borderColor: colors[index % colors.length],
+                backgroundColor: colors[index % colors.length] + '20',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4
+            }));
+
+            new Chart(comparisonCtx, {
+                type: 'line',
+                data: {
+                    labels: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Student Performance Comparison Across Projects'
+                        },
+                        legend: {
+                            display: false // Hide legend to avoid clutter
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    if (value === 0) return 'No Submission';
+                                    if (value === 1) return 'C';
+                                    if (value === 2) return 'B';
+                                    if (value === 3) return 'A';
+                                    if (value === 4) return 'A+';
+                                    if (value === 5) return 'A++';
+                                    return value;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return 'Project: ' + context[0].label;
+                                },
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    let grade = '';
+                                    if (value === 0) grade = 'No Submission';
+                                    else if (value === 1) grade = 'C';
+                                    else if (value === 2) grade = 'B';
+                                    else if (value === 3) grade = 'A';
+                                    else if (value === 4) grade = 'A+';
+                                    else if (value === 5) grade = 'A++';
+                                    return context.dataset.label + ': ' + grade;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         });
     </script>
+    </div>
 </body>
 </html> 
