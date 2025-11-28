@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive SP3 Reference</title>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .calculation-step {
+            margin: 30px 0;
+            padding: 20px;
+            border-left: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        .parameter-table th, .parameter-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .parameter-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .formula, .code-box {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+        }
+
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img
+                src="./assets/ut_logo.png"
+                alt="University of Tehran Logo"
+                class="img-fluid"
+                style="max-height: 100px; margin-bottom: 20px"
+              />
+            </div>
+            <div class="col-6" style="text-align: right;">
+              <img
+                src="./assets/fanni_logo.png"
+                alt="College of Engineering Logo"
+                class="img-fluid"
+                style="max-height: 100px; transform: scale(1.2)"
+              />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>Understanding SP3 Files for High-Precision Positioning (PPP/POD)</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2>I. Introduction</h2>
+                    <h3>1. Why do we need SP3 files?</h3>
+                    <p>GNSS receivers require the exact satellite position at the observation epoch. Broadcast ephemerides contain meter-level errors and simplified dynamics, which makes them unsuitable for PPP and precise geodesy. Analysis centers such as IGS, CODE/AIUB, JPL, GFZ, and ESA estimate precise orbits and clocks from global networks and publish them as SP3 products.</p>
+                    <h3>2. SP3 vs. RINEX Navigation</h3>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Navigation File</th>
+                            <th>SP3 File</th>
+                        </tr>
+                        <tr>
+                            <td>Content</td>
+                            <td>Keplerian parameters</td>
+                            <td>Cartesian coordinates + clock</td>
+                        </tr>
+                        <tr>
+                            <td>Typical accuracy</td>
+                            <td>Several meters</td>
+                            <td>Centimeter level</td>
+                        </tr>
+                        <tr>
+                            <td>Primary use</td>
+                            <td>Everyday positioning</td>
+                            <td>PPP, POD, precise geodesy</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>II. What is SP3?</h2>
+                    <h3>1. Definition</h3>
+                    <p>SP3 is the global standard for distributing <strong>precise orbits</strong>, <strong>precise clocks</strong>, and quality indicators in time-tagged three-dimensional records.</p>
+                    <h3>2. Versions</h3>
+                    <ul>
+                        <li><strong>SP1 / SP2:</strong> Early, now obsolete formats.</li>
+                        <li><strong>SP3-a / SP3-b:</strong> Improved quality yet limited multi-GNSS support.</li>
+                        <li><strong>SP3-c:</strong> Multi-GNSS support and quality metadata.</li>
+                        <li><strong>SP3-d:</strong> Current mainstream format; the provided file belongs to this family.</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>III. Foundational Concepts</h2>
+                    <h3>1. Reference frame</h3>
+                    <ul>
+                        <li>Coordinates are in the ECEF system, compatible with IGS20/ITRF.</li>
+                        <li>X points toward the intersection of the equator and Greenwich meridian; Y is 90° east; Z points to the North Pole.</li>
+                        <li>Units are kilometers (software often multiplies by 1000).</li>
+                    </ul>
+                    <h3>2. Time scale</h3>
+                    <p>SP3 products normally use GPS Time (GPST) without leap seconds. Each epoch line starts with <code>*</code>; the offset from UTC (e.g., 18 s) must be handled externally.</p>
+                    <h3>3. Supported constellations</h3>
+                    <p>The sample file contains five constellations: GPS (G), GLONASS (R), Galileo (E), BeiDou (C), and QZSS (J).</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>IV. Header Structure</h2>
+                    <h3>1. Primary line (#)</h3>
+                    <div class="code-box">
+#dP2024  1  1  0  0  0.00000000     289 d+D   IGS20 FIT AIUB
+                    </div>
+                    <p>Encodes the file version (d), data type (P), start epoch, number of epochs, product type, and antenna reference frame.</p>
+                    <h3>2. The `##` line</h3>
+                    <div class="code-box">
+## 2295  86400.00000000   300.00000000 60310 0.0000000000000
+                    </div>
+                    <p>Defines epoch spacing (300 s), total span, and internal epoch counters.</p>
+                    <h3>3. `+` lines</h3>
+                    <p>List the satellites included (e.g., 120 IDs) and their order in subsequent epoch records.</p>
+                    <h3>4. `++` lines</h3>
+                    <p>These values are the <strong>satellite orbit accuracy exponents</strong> as defined in the SP3-c/d standard. They indicate the expected orbit accuracy for each satellite. Practically, they can also be used as a guideline when choosing the interpolation strategy, but their primary meaning is accuracy, not interpolation order.</p>
+                    <h3>5. `%c`, `%f`, `%i` lines</h3>
+                    <ul>
+                        <li><strong>%c:</strong> <code>%c</code> defines the coordinate and time system; in this file, the comments indicate <code>PCV:IGS20</code> as the antenna/PCV frame.</li>
+                        <li><strong>%f:</strong> Internal scale factors—typically ignored by end users.</li>
+                        <li><strong>%i:</strong> Flags indicating availability of velocity, acceleration, covariance (zeros here).</li>
+                    </ul>
+                    <h3>6. `/*` comment lines</h3>
+                    <p>Provide human-readable metadata: producer (CODE), product class (MGEX/CoN), ocean tide model (FES2014b), and supported constellations.</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>V. Epoch Records</h2>
+                    <h3>1. Epoch header (*)</h3>
+                    <div class="code-box">
+*  2024  1  1  0  0  0.00000000
+*  2024  1  1  0  5  0.00000000
+                    </div>
+                    <p>Each star line marks an epoch; the example shows consecutive epochs spaced by five minutes.</p>
+                    <h3>2. Position lines (P)</h3>
+                    <div class="code-box">
+PG01  12908.438647 -10025.115815  20508.373980    164.997276
+                    </div>
+                    <div class="code-box">
+PR01 -13702.301720  -9569.020649 -19272.667460     73.433546
+                    </div>
+                    <div class="code-box">
+PE02  20736.718618 -19839.138457   7292.148602     91.299093
+                    </div>
+                    <p>After the constellation letter and PRN, three Cartesian coordinates (km) and the satellite clock (microseconds) are listed.</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>VI. The 999999.999999 Flag</h2>
+                    <p>A clock value of <code>999999.999999</code> denotes missing or invalid data. PPP software ignores it or substitutes values from a dedicated CLK file.</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>VII. SP3 Orbits vs. Broadcast Orbits</h2>
+                    <ul>
+                        <li><strong>Navigation:</strong> 1–3 m orbit errors, suited to routine positioning.</li>
+                        <li><strong>SP3:</strong> &lt;5 cm orbit accuracy and 2–10 ns clock accuracy.</li>
+                        <li>Broadcast files require solving Kepler’s equation, whereas SP3 delivers ready-to-use Cartesian states.</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>VIII. Interpolating SP3 Data</h2>
+                    <h3>1. Motivation</h3>
+                    <p>Epochs are typically provided every five minutes, yet receiver measurements may be at 1 Hz. Interpolation bridges this gap.</p>
+                    <h3>2. Recommended method</h3>
+                    <p>High-order Lagrange interpolation using five epochs before and after the target time offers excellent accuracy.</p>
+                    <div class="formula">
+$$X(t) = \sum_{i=0}^{n} X_i L_i(t)$$
+$$L_i(t) = \prod_{j \ne i} \frac{t - t_j}{t_i - t_j}$$
+                    </div>
+                    <p>Apply the same formulation independently to Y(t) and Z(t).</p>
+                    <h3>3. Walkthrough with real G01 data</h3>
+                    <div class="note">
+                        The following example uses five consecutive epochs of satellite G01 extracted from <code>COD0MGXFIN_20240010000_01D_05M_ORB.SP3</code> (lines 31–32, 152–153, 273–274, 394–395, 515–516).
+                    </div>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>Epoch</th>
+                            <th>GPST</th>
+                            <th>tk (s)</th>
+                            <th>X (km)</th>
+                            <th>Y (km)</th>
+                            <th>Z (km)</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>00:00:00</td>
+                            <td>0</td>
+                            <td>12908.438647</td>
+                            <td>-10025.115815</td>
+                            <td>20508.373980</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>00:05:00</td>
+                            <td>300</td>
+                            <td>12988.440556</td>
+                            <td>-9216.822128</td>
+                            <td>20838.836691</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>00:10:00</td>
+                            <td>600</td>
+                            <td>13084.429049</td>
+                            <td>-8398.467123</td>
+                            <td>21127.872753</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>00:15:00</td>
+                            <td>900</td>
+                            <td>13196.669424</td>
+                            <td>-7571.999376</td>
+                            <td>21374.927788</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>00:20:00</td>
+                            <td>1200</td>
+                            <td>13325.318847</td>
+                            <td>-6739.388472</td>
+                            <td>21579.534446</td>
+                        </tr>
+                    </table>
+                    <p><strong>Step 1 – pick the target time:</strong> assume the receiver produced an observation at 00:07:30 GPST, i.e., 450 s after the first epoch.</p>
+                    <p><strong>Step 2 – build the basis polynomials:</strong> each epoch contributes a Lagrange basis. The first two look like</p>
+                    <div class="formula">
+$$L_0(t)=\frac{(t-300)(t-600)(t-900)(t-1200)}{(0-300)(0-600)(0-900)(0-1200)}$$
+$$L_1(t)=\frac{(t-0)(t-600)(t-900)(t-1200)}{(300-0)(300-600)(300-900)(300-1200)}$$
+                    </div>
+                    <p>The remaining bases \(L_2\)–\(L_4\) follow the same pattern. Position components are obtained by \(X(t)=\sum X_i L_i(t)\) (and similarly for Y and Z).</p>
+                    <p><strong>Step 3 – evaluate at \(t = 450\,\text{s}\):</strong> plugging the time into each basis yields the following interpolated coordinates.</p>
+                    <div class="formula">
+$$\begin{aligned}
+X(450\,\text{s}) &\approx 13034.417\,\text{km} \\
+Y(450\,\text{s}) &\approx -8808.781\,\text{km} \\
+Z(450\,\text{s}) &\approx 20988.570\,\text{km}
+\end{aligned}$$
+                    </div>
+                    <p><strong>Step 4 – convert to SI units:</strong> multiply each component by 1000 to feed PPP engines, resulting in \((1.3034\times10^{7}, -8.8088\times10^{6}, 2.0989\times10^{7})\) meters.</p>
+                    <p>The same workflow repeats for subsequent epochs and satellites to align precise orbits with high-rate observations.</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>IX. Role of SP3 in PPP & POD</h2>
+                    <p>The carrier-phase observation equation includes SP3 quantities:</p>
+                    <div class="formula">
+$$\rho = \lVert r_{sat}(t) - r_{rec}(t) \rVert + c(\Delta t_{rec} - \Delta t_{sat}) + \cdots$$
+                    </div>
+                    <ul>
+                        <li>Satellite positions come directly from SP3.</li>
+                        <li>Satellite clocks are read from the fourth column or a CLK file.</li>
+                        <li>With SP3 + CLK + ATX + ERP and dual-frequency data, PPP delivers ~1–2 cm horizontal and 3–4 cm vertical accuracy.</li>
+                        <li>Applications: precise geodesy, troposphere sensing, GPS meteorology, autonomous navigation.</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>X. Key Takeaways</h2>
+                    <ul>
+                        <li>SP3 is the de facto reference for precise GNSS orbits and clocks.</li>
+                        <li>In this particular CODE MGEX product, SP3-d files provide 5-minute ECEF coordinates in the IGS20 frame. Other SP3-d products may use different sampling intervals and reference frames depending on the analysis center.</li>
+                        <li>The 999999.999999 flag marks invalid clock records.</li>
+                        <li>Lagrange interpolation is required to align SP3 data with high-rate measurements.</li>
+                        <li>SP3 products underpin PPP and modern geodetic workflows.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html>

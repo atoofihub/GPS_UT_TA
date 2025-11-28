@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راهنمای جامع فایل SP3</title>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        @font-face {
+            font-family: "IRANSansWebFaNum";
+            src: url("./assets/fonts/IRANSansWeb(FaNum).woff") format("woff");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: "IRANSansWebFaNum", "IRANSans", Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .calculation-step {
+            margin: 30px 0;
+            padding: 20px;
+            border-right: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .calculation-step ul {
+            padding-right: 20px;
+        }
+
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        .parameter-table th, .parameter-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .parameter-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .formula, .code-box {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .note {
+            background-color: #fff3cd;
+            border-right: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img
+                src="./assets/ut_logo.png"
+                alt="لوگوی دانشگاه تهران"
+                class="img-fluid"
+                style="max-height: 100px; margin-bottom: 20px"
+              />
+            </div>
+            <div class="col-6" style="text-align: left;">
+              <img
+                src="./assets/fanni_logo.png"
+                alt="لوگوی دانشکده فنی"
+                class="img-fluid"
+                style="max-height: 100px; transform: scale(1.2)"
+              />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>«آشنایی با فایل SP3 و نقش آن در تعیین موقعیت دقیق (PPP/POD)»</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2>I. مقدمه</h2>
+                    <h3>۱. چرا به فایل SP3 نیاز داریم؟</h3>
+                    <p>در سامانه‌های ناوبری ماهواره‌ای (GNSS)، برای تعیین موقعیت دقیق باید مختصات ماهواره در لحظه مشاهده به صورت دقیق در دسترس باشد. مدارهای پخش‌شده (Broadcast Ephemeris) خطاهای چندمتری دارند و برای کاربردهای PPP و ژئودزی دقیق کافی نیستند. مراکزی همچون IGS، CODE/AIUB، JPL، GFZ و ESA با پردازش شبکه جهانی، مدار و ساعت دقیق را محاسبه کرده و در قالب SP3 منتشر می‌کنند.</p>
+                    <h3>۲. تفاوت SP3 با فایل ناوبری RINEX</h3>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>ویژگی</th>
+                            <th>Nav</th>
+                            <th>SP3</th>
+                        </tr>
+                        <tr>
+                            <td>نوع داده</td>
+                            <td>پارامترهای کپلری</td>
+                            <td>مختصات دکارتی دقیق + ساعت</td>
+                        </tr>
+                        <tr>
+                            <td>دقت معمول</td>
+                            <td>چند متر</td>
+                            <td>سانتی‌متر</td>
+                        </tr>
+                        <tr>
+                            <td>کاربرد اصلی</td>
+                            <td>موقعیت‌گیری روزمره</td>
+                            <td>PPP، POD، ژئودزی دقیق</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>II. SP3 چیست؟</h2>
+                    <h3>۱. تعریف</h3>
+                    <p>SP3 یک استاندارد جهانی برای ذخیره <strong>مدار دقیق</strong>، <strong>ساعت دقیق</strong> و اطلاعات کیفیت ماهواره‌ها در قالب اپک‌های زمانی و مختصات سه‌بعدی است.</p>
+                    <h3>۲. نسخه‌ها</h3>
+                    <ul>
+                        <li><strong>SP1 و SP2:</strong> نسل‌های اولیه، اکنون منسوخ.</li>
+                        <li><strong>SP3-a / SP3-b:</strong> بهبود یافته نسبت به نسخه‌های قبلی اما بدون پشتیبانی کامل چندمنظومه‌ای.</li>
+                        <li><strong>SP3-c:</strong> پشتیبانی Multi-GNSS و ابزارهای کیفیت.</li>
+                        <li><strong>SP3-d:</strong> نسخه رایج امروز؛ فایل مورد بحث نیز از این خانواده است.</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>III. مفاهیم پایه قبل از ورود به فایل</h2>
+                    <h3>۱. دستگاه مختصات</h3>
+                    <ul>
+                        <li>مختصات در دستگاه ECEF و چارچوب IGS20/ITRF-compatible ارائه می‌شوند.</li>
+                        <li>محور X به نصف‌النهار مبدا، Y به ۹۰ درجه شرق و Z به سمت قطب شمال اشاره دارد.</li>
+                        <li>واحد مقادیر: کیلومتر (برای استفاده معمول ×1000 می‌شود).</li>
+                    </ul>
+                    <h3>۲. زمان</h3>
+                    <p>SP3 از زمان GPST استفاده می‌کند. خطوط اپک با نماد <code>*</code> ثبت شده و اختلاف ثابت آن با UTC (مثلاً ۱۸ ثانیه) باید لحاظ شود.</p>
+                    <h3>۳. منظومه‌ها</h3>
+                    <p>در فایل حاضر پنج منظومه پشتیبانی می‌شود: GPS (G)، GLONASS (R)، Galileo (E)، BeiDou (C) و QZSS (J).</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>IV. ساختار هدر</h2>
+                    <h3>۱. خط اصلی (#)</h3>
+                    <div class="code-box">
+#dP2024  1  1  0  0  0.00000000     289 d+D   IGS20 FIT AIUB
+                    </div>
+                    <p>این خط نسخه فایل (d)، نوع داده (P)، زمان اولین اپک، تعداد اپک‌ها، نوع محصول و چارچوب آنتن را مشخص می‌کند.</p>
+                    <h3>۲. خط `##`</h3>
+                    <div class="code-box">
+## 2295  86400.00000000   300.00000000 60310 0.0000000000000
+                    </div>
+                    <p>اطلاعات فاصله زمانی بین اپک‌ها (۳۰۰ ثانیه)، طول بازه و شمارنده زمانی را نشان می‌دهد.</p>
+                    <h3>۳. خطوط `+`</h3>
+                    <p>فهرست ماهواره‌های موجود (مثلاً ۱۲۰ شناسه) و ترتیب پیش‌فرض داده‌ها را تعیین می‌کند.</p>
+                    <h3>۴. خطوط `++`</h3>
+                    <p>این مقادیر در استاندارد SP3 نشان‌دهندهٔ <strong>توان نمایی دقت مدار (orbit accuracy exponent)</strong> برای هر ماهواره هستند؛ یعنی از روی آن‌ها می‌توان دقت تقریبی مدار را تخمین زد. در عمل، همین اطلاعات دقت می‌تواند برای انتخاب استراتژی درونیابی هم راهنما باشد، اما معنی اصلی آن‌ها «دقت مدار» است، نه «درجهٔ درونیابی».</p>
+                    <h3>۵. خطوط `%c`, `%f`, `%i`</h3>
+                    <ul>
+                        <li><strong>%c:</strong> خطوط <code>%c</code> نوع سیستم مختصات و مقیاس زمان را مشخص می‌کنند؛ در این فایل همچنین در بخش کامنت‌ها عبارت <code>PCV:IGS20</code> برای چارچوب PCV آمده است.</li>
+                        <li><strong>%f:</strong> ضرایب مقیاس داخلی که در کاربرد معمول لازم نیست.</li>
+                        <li><strong>%i:</strong> فلگ وجود سرعت، شتاب یا کوواریانس (در این فایل صفر است).</li>
+                    </ul>
+                    <h3>۶. خطوط `/*`</h3>
+                    <p>توضیحات انسانی درباره مرکز تولید (CODE)، نوع محصول (MGEX) و مدل‌ها (FES2014b).</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>V. ساختار اپک‌ها</h2>
+                    <h3>۱. خط اپک (*)</h3>
+                    <div class="code-box">
+*  2024  1  1  0  0  0.00000000
+*  2024  1  1  0  5  0.00000000
+                    </div>
+                    <p>هر خط ستاره‌دار زمان اپک را با گام ۵ دقیقه‌ای نشان می‌دهد.</p>
+                    <h3>۲. خطوط داده (P)</h3>
+                    <div class="code-box">
+PG01  12908.438647 -10025.115815  20508.373980    164.997276
+                    </div>
+                    <div class="code-box">
+PR01 -13702.301720  -9569.020649 -19272.667460     73.433546
+                    </div>
+                    <div class="code-box">
+PE02  20736.718618 -19839.138457   7292.148602     91.299093
+                    </div>
+                    <p>پس از حرف سیستم و شماره PRN، سه مختصات (کیلومتر) و ساعت (میکروثانیه) ثبت می‌شود.</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>VI. مقدار 999999.999999</h2>
+                    <p>اگر ستون ساعت برابر <code>999999.999999</code> باشد، یعنی داده ساعت موجود نیست یا باید از فایل CLK جداگانه استفاده شود.</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>VII. مقایسه مدار SP3 با Nav</h2>
+                    <ul>
+                        <li><strong>Nav:</strong> خطاهای ۱ تا ۳ متر، مناسب کاربردهای روتین.</li>
+                        <li><strong>SP3:</strong> دقیق‌تر از ۵ سانتی‌متر برای مدار و ۲–۱۰ نانوثانیه برای ساعت.</li>
+                        <li>Nav نیازمند حل معادله کیپلر است؛ SP3 مختصات مستقیم دکارتی ارائه می‌دهد.</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>VIII. درونیابی SP3</h2>
+                    <h3>۱. ضرورت</h3>
+                    <p>اپک‌ها هر ۵ دقیقه ثبت می‌شوند، درحالی‌که مشاهدات گیرنده می‌تواند ثانیه‌ای باشد؛ بنابراین باید مختصات بین اپک‌ها درونیابی شوند.</p>
+                    <h3>۲. روش پیشنهادی</h3>
+                    <p>درونیابی لگرانژ مرتبه بالا با استفاده از ۵ اپک قبل و ۵ اپک بعد بهترین عملکرد را دارد.</p>
+                    <div class="formula">
+$$X(t) = \sum_{i=0}^{n} X_i L_i(t)$$
+$$L_i(t) = \prod_{j \ne i} \frac{t - t_j}{t_i - t_j}$$
+                    </div>
+                    <p>برای Y و Z نیز همین ساختار استفاده می‌شود.</p>
+                    <h3>۳. مثال گام‌به‌گام با داده واقعی G01</h3>
+                    <div class="note">
+                        این مثال از اپک‌های متوالی فایل <code>COD0MGXFIN_20240010000_01D_05M_ORB.SP3</code> برای ماهواره G01 (سطرهای ۳۱–۳۲، ۱۵۲–۱۵۳، ۲۷۳–۲۷۴، ۳۹۴–۳۹۵، ۵۱۵–۵۱۶) استفاده می‌کند.
+                    </div>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>اپک</th>
+                            <th>زمان GPST</th>
+                            <th>tk (ثانیه)</th>
+                            <th>X (km)</th>
+                            <th>Y (km)</th>
+                            <th>Z (km)</th>
+                        </tr>
+                        <tr>
+                            <td>۱</td>
+                            <td>00:00:00</td>
+                            <td>0</td>
+                            <td>12908.438647</td>
+                            <td>-10025.115815</td>
+                            <td>20508.373980</td>
+                        </tr>
+                        <tr>
+                            <td>۲</td>
+                            <td>00:05:00</td>
+                            <td>300</td>
+                            <td>12988.440556</td>
+                            <td>-9216.822128</td>
+                            <td>20838.836691</td>
+                        </tr>
+                        <tr>
+                            <td>۳</td>
+                            <td>00:10:00</td>
+                            <td>600</td>
+                            <td>13084.429049</td>
+                            <td>-8398.467123</td>
+                            <td>21127.872753</td>
+                        </tr>
+                        <tr>
+                            <td>۴</td>
+                            <td>00:15:00</td>
+                            <td>900</td>
+                            <td>13196.669424</td>
+                            <td>-7571.999376</td>
+                            <td>21374.927788</td>
+                        </tr>
+                        <tr>
+                            <td>۵</td>
+                            <td>00:20:00</td>
+                            <td>1200</td>
+                            <td>13325.318847</td>
+                            <td>-6739.388472</td>
+                            <td>21579.534446</td>
+                        </tr>
+                    </table>
+                    <p><strong>مرحله ۱ – انتخاب زمان هدف:</strong> فرض کنید گیرنده مشاهده‌ای در 00:07:30 GPST ثبت کرده است. این لحظه ۴۵۰ ثانیه بعد از اپک اول قرار دارد.</p>
+                    <p><strong>مرحله ۲ – ساخت چندجمله‌ای برای X(t):</strong> برای هر یک از ۵ اپک، پایه‌های لگرانژ تعریف می‌شود. برای نمونه، دو پایه اول به صورت زیر هستند:</p>
+                    <div class="formula">
+$$L_0(t)=\frac{(t-300)(t-600)(t-900)(t-1200)}{(0-300)(0-600)(0-900)(0-1200)}$$
+$$L_1(t)=\frac{(t-0)(t-600)(t-900)(t-1200)}{(300-0)(300-600)(300-900)(300-1200)}$$
+                    </div>
+                    <p>پایه‌های <code>L₂</code> تا <code>L₄</code> نیز مشابه همین الگو ساخته می‌شوند. سپس X(t) = Σ Xi·Li(t) محاسبه می‌گردد.</p>
+                    <p><strong>مرحله ۳ – جایگذاری عددی:</strong> با قرار دادن t = 450 s در پایه‌ها و جمع وزن‌دار، مختصات زیر به‌دست می‌آید.</p>
+                    <div class="formula">
+$$\begin{aligned}
+X(450\,\text{s}) &\approx 13034.417\,\text{km} \\
+Y(450\,\text{s}) &\approx -8808.781\,\text{km} \\
+Z(450\,\text{s}) &\approx 20988.570\,\text{km}
+\end{aligned}$$
+                    </div>
+                    <p><strong>مرحله ۴ – تبدیل واحد:</strong> برای استفاده در PPP، هر مؤلفه در ۱۰۰۰ ضرب می‌شود؛ در نتیجه بردار ۳بعدی $(1.3034\times10^{7}, -8.8088\times10^{6}, 2.0989\times10^{7})$ متر به‌دست می‌آید.</p>
+                    <p>این فرآیند برای اپک‌های بعدی و دیگر ماهواره‌ها نیز تکرار می‌شود تا مختصات لحظه‌ای دقیق فراهم شود.</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>IX. کاربرد SP3 در PPP و POD</h2>
+                    <p>در PPP، فاصله ظاهری فاز به شکل زیر مدل می‌شود:</p>
+                    <div class="formula">
+$$\rho = \lVert r_{sat}(t) - r_{rec}(t) \rVert + c(dt_{rec} - dt_{sat}) + \cdots$$
+                    </div>
+                    <ul>
+                        <li>بردار موقعیت ماهواره از SP3 استخراج می‌شود.</li>
+                        <li>اختلاف ساعت ماهواره از ستون چهارم SP3 یا فایل CLK خوانده می‌شود.</li>
+                        <li>ترکیب SP3 + CLK + ATX + ERP و مشاهدات دو فرکانسه به دقت ۱–۲ سانتی‌متر افقی و ۳–۴ سانتی‌متر ارتفاع می‌انجامد.</li>
+                        <li>کاربردها: ژئودزی دقیق، تعیین تروپسفر، GPS Meteorology و ناوبری دقیق.</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>X. جمع‌بندی</h2>
+                    <ul>
+                        <li>SP3 استاندارد مرجع برای مدار و ساعت دقیق ماهواره‌ها است.</li>
+                        <li>در محصول خاص CODE/MGEX که این جزوه بر اساس آن نوشته شده، فایل SP3-d با گام ۵ دقیقه‌ای و مختصات کیلومتری در چارچوب IGS20 ارائه می‌شود. در سایر محصولات SP3-d ممکن است گام زمانی یا چارچوب مرجع متفاوت باشد.</li>
+                        <li>کد 999999.999999 نشان‌دهنده داده نامعتبر است.</li>
+                        <li>برای استفاده عملی باید بین اپک‌ها درونیابی لگرانژ انجام شود.</li>
+                        <li>ترکیب SP3 با محصولات کمکی، بنیان PPP دقیق و ژئودزی مدرن است.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html>
