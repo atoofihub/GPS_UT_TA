@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saastamoinen Tropospheric Delay Model - Worked Example</title>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 2.1;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .calculation-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .parameter-table th, .parameter-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+        .parameter-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .formula {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .center-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(','\\)'], ['$', '$']],
+                displayMath: [['\\[','\\]'], ['$$','$$']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="./assets/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <img src="./assets/ut_logo.png" alt="University of Tehran logo" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+            </div>
+            <div class="col-6" style="text-align: right;">
+                <img src="./assets/fanni_logo.png" alt="Faculty of Engineering logo" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>Saastamoinen Tropospheric Delay Model</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+
+                <div class="calculation-step">
+                    <h2>Introduction</h2>
+                    <p>
+                        GNSS signals (e.g. GPS) propagate through several atmospheric layers before reaching the receiver.
+                        One of the most important layers for precise positioning is the <strong>troposphere</strong>, extending from the Earth’s surface up to about 12 km.
+                    </p>
+                    <p>
+                        Variations in air density and composition in this region slow down the signal slightly and effectively increase the optical path length.
+                        In ranging observables, this appears as a <strong>positive excess delay</strong> in the satellite–receiver distance.
+                    </p>
+                    <p>
+                        The magnitude of the tropospheric delay depends on <strong>pressure, temperature, water vapour content, station height and satellite elevation angle</strong>.
+                        Therefore, we need a physical model that can predict this delay as a function of the local atmospheric state and geometry.
+                        A widely used model in geodesy is the <strong>Saastamoinen model</strong>, which still serves as a standard reference in many processing strategies and geodetic software packages.
+                    </p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>1. Structure of the Tropospheric Delay</h2>
+                    <p>The neutral-atmosphere delay is usually decomposed into two components:</p>
+                    <h3>1) Hydrostatic (Dry) Component</h3>
+                    <ul>
+                        <li>Caused by the dry gases of the atmosphere (mainly nitrogen and oxygen).</li>
+                        <li>Under normal conditions, it contributes about <strong>90% of the total tropospheric delay</strong>.</li>
+                        <li>It varies slowly in time and space and is therefore <strong>highly predictable</strong>.</li>
+                    </ul>
+                    <h3>2) Wet Component</h3>
+                    <ul>
+                        <li>Caused by water vapour in the troposphere.</li>
+                        <li>Water vapour is <strong>highly variable</strong> in space and time, even between closely spaced stations, which makes this component more difficult to model.</li>
+                    </ul>
+                    <p>
+                        In the zenith direction, the sum of these components is typically on the order of <strong>2–2.5 m</strong>.
+                        For low-elevation satellites (near the horizon), the slant delay can easily reach <strong>10–20 m</strong>.
+                    </p>
+                    <div class="text-center mt-3">
+                        <img src="./assets/images/trop.png" alt="Schematic of tropospheric delay versus elevation angle along the satellite line-of-sight" class="center-img" style="max-width: 80%;">
+                        <p style="margin-top: 10px;">
+                            Conceptual illustration of zenith and slant tropospheric delay as a function of satellite elevation angle in GNSS observations.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>2. Required Inputs for the Saastamoinen Model</h2>
+                    <p>
+                        The Saastamoinen formulation requires a set of local environmental and geometric parameters.
+                        Each parameter has a clear physical meaning and will be used in the corresponding formulas:
+                    </p>
+                    <ul>
+                        <li>Ellipsoidal height of the GNSS station</li>
+                        <li>Geodetic latitude of the station</li>
+                        <li>Surface pressure at the station</li>
+                        <li>Surface temperature at the station</li>
+                        <li>Water vapour content (via relative humidity)</li>
+                        <li>Satellite elevation angle \( e \) or zenith angle \( z \)</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>3. Standard Atmosphere Model (Pressure, Temperature, Water Vapour)</h2>
+                    <p>
+                        In many practical situations, collocated meteorological observations are not available at the GNSS site.
+                        In that case, we can apply a simple standard-atmosphere model that relates the state parameters to the station height.
+                        For educational and many operational geodetic applications, these relations are sufficiently accurate.
+                    </p>
+
+                    <h3>3.1. Surface Pressure</h3>
+                    <div class="formula">
+                        \[
+                        p = 1013.25\left(1 - 2.2557 \times 10^{-5} \, h\right)^{5.2568}
+                        \]
+                    </div>
+                    <ul>
+                        <li>\( p \): surface pressure in hPa</li>
+                        <li>\( h \): station height in metres</li>
+                        <li>The constant 1013.25 hPa corresponds to mean sea level pressure.</li>
+                    </ul>
+
+                    <h3>3.2. Surface Temperature</h3>
+                    <div class="formula">
+                        \[
+                        T = 15 - 6.5 \times 10^{-3} \, h + 273.15
+                        \]
+                    </div>
+                    <ul>
+                        <li>The sea level temperature is assumed to be \(15^\circ\text{C}\).</li>
+                        <li>Adding 273.15 converts the temperature to kelvin.</li>
+                    </ul>
+
+                    <h3>3.3. Water Vapour Pressure</h3>
+                    <div class="formula">
+                        \[
+                        e = e_s(T) \times RH
+                        \]
+                    </div>
+                    <p>
+                        Here \( RH \) is the relative humidity (fraction) and \( e_s(T) \) is the saturation vapour pressure at temperature \( T \).
+                        A commonly used empirical approximation for \( e_s(T) \) is:
+                    </p>
+                    <div class="formula">
+                        \[
+                        e_s(T) = 6.108 \exp\left(\frac{17.15\,T - 4684}{T - 38.45}\right)
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>4. Hydrostatic Component of the Saastamoinen Model</h2>
+                    <h3>4.1. Zenith Hydrostatic Delay (ZHD)</h3>
+                    <div class="formula">
+                        \[
+                        ZHD = 0.0022768 \,
+                        \frac{p}{1 - 0.00266 \cos 2\varphi - 0.00028\,h/1000}
+                        \]
+                    </div>
+                    <ul>
+                        <li>\( p \): surface pressure (hPa)</li>
+                        <li>\( \varphi \): geodetic latitude of the station</li>
+                        <li>\( h \): station height (km in the denominator term)</li>
+                        <li>The denominator accounts for the variation of gravity with latitude and height.</li>
+                    </ul>
+
+                    <h3>4.2. Mapping the Hydrostatic Delay to the Line-of-Sight</h3>
+                    <p>If the satellite elevation angle is \( e \), then the zenith angle is</p>
+                    <div class="formula">
+                        \[
+                        z = 90^\circ - e
+                        \]
+                    </div>
+                    <p>The hydrostatic delay in the slant direction (along the satellite line-of-sight) is then</p>
+                    <div class="formula">
+                        \[
+                        T_h = \frac{ZHD}{\cos z}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>5. Wet Component of the Saastamoinen Model</h2>
+                    <h3>5.1. Zenith Wet Delay (ZWD)</h3>
+                    <div class="formula">
+                        \[
+                        ZWD = 0.002277 \left(\frac{1255}{T} + 0.05\right) e
+                        \]
+                    </div>
+                    <ul>
+                        <li>\( T \): surface temperature (K)</li>
+                        <li>\( e \): water vapour pressure (hPa)</li>
+                    </ul>
+
+                    <h3>5.2. Mapping the Wet Delay to the Line-of-Sight</h3>
+                    <div class="formula">
+                        \[
+                        T_w = \frac{ZWD}{\cos z}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>6. Total Tropospheric Delay Along the Signal Path</h2>
+                    <div class="formula">
+                        \[
+                        T_{\text{trop}} = T_h + T_w
+                        \]
+                    </div>
+                    <p>
+                        The total neutral-atmosphere delay \(T_{\text{trop}}\) is a positive range error, expressed in metres,
+                        and must be subtracted from the measured geometric distance in precise GNSS positioning.
+                    </p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>7. Complete Numerical Example</h2>
+                    <p>
+                        In this section we work through a realistic numerical example for the
+                        <strong>city centre of Tehran</strong>. We assume the following approximate station parameters:
+                    </p>
+                    <ul>
+                        <li>Height: \( h = 1200 \,\text{m} \)</li>
+                        <li>Latitude: \( \varphi = 35.7^\circ \) (used in the formulas in radians: \( 0.623 \,\text{rad} \))</li>
+                        <li>Relative humidity: \( RH = 0.40 \) (40%)</li>
+                        <li>Satellite elevation angle: \( e = 30^\circ \)</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>Step 1: Surface Pressure</h2>
+                    <div class="formula">
+                        \[
+                        p = 1013.25 (1 - 2.2557\times10^{-5} \times 1200)^{5.2568}
+                        \]
+                    </div>
+                    <p>First, evaluate the term in parentheses:</p>
+                    <div class="formula">
+                        \[
+                        1 - 2.2557\times10^{-5} \times 1200 = 0.9729
+                        \]
+                    </div>
+                    <p>Raise to the power:</p>
+                    <div class="formula">
+                        \[
+                        0.9729^{5.2568} \approx 0.876
+                        \]
+                    </div>
+                    <p>Thus, the surface pressure is</p>
+                    <div class="formula">
+                        \[
+                        p = 1013.25 \times 0.876 = 887.6\ \text{hPa}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>Step 2: Surface Temperature</h2>
+                    <div class="formula">
+                        \[
+                        T = 15 - 6.5\times10^{-3} \times 1200 + 273.15
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        6.5\times10^{-3} \times 1200 = 7.8
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        T = 15 - 7.8 + 273.15 = 280.35\ K
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>Step 3: Water Vapour Pressure</h2>
+                    <p>First compute the saturation vapour pressure:</p>
+                    <div class="formula">
+                        \[
+                        e_s = 6.108 \exp\left(\frac{17.15 T - 4684}{T - 38.45}\right)
+                        \]
+                    </div>
+                    <p>Numerator of the exponent:</p>
+                    <div class="formula">
+                        \[
+                        17.15 \times 280.35 = 4800.0
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        4800 - 4684 = 116
+                        \]
+                    </div>
+                    <p>Denominator of the exponent:</p>
+                    <div class="formula">
+                        \[
+                        T - 38.45 = 241.9
+                        \]
+                    </div>
+                    <p>Hence</p>
+                    <div class="formula">
+                        \[
+                        \frac{116}{241.9} = 0.479
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        e_s = 6.108 \times e^{0.479} = 6.108 \times 1.614 = 9.86\ \text{hPa}
+                        \]
+                    </div>
+                    <p>The actual water vapour pressure is then</p>
+                    <div class="formula">
+                        \[
+                        e = 9.86 \times 0.40 = 3.94\ \text{hPa}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>Step 4: Zenith Hydrostatic Delay</h2>
+                    <div class="formula">
+                        \[
+                        ZHD = 0.0022768\,
+                        \frac{887.6}{1 - 0.00266\cos(2\times0.623) - 0.00028\times1.2 }
+                        \]
+                    </div>
+                    <p>First compute the argument of the cosine:</p>
+                    <div class="formula">
+                        \[
+                        2\times 0.623 = 1.246
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        \cos 1.246 = 0.316
+                        \]
+                    </div>
+                    <p>Now the denominator:</p>
+                    <div class="formula">
+                        \[
+                        1 - 0.00266(0.316) - 0.00028(1.2) = 1 - 0.00084 - 0.000336 = 0.998824
+                        \]
+                    </div>
+                    <p>Thus</p>
+                    <div class="formula">
+                        \[
+                        ZHD = 0.0022768 \times \frac{887.6}{0.998824}
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        \frac{887.6}{0.998824} = 888.7
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        ZHD = 0.0022768 \times 888.7 = 2.025\ \text{m}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>Step 5: Zenith Wet Delay</h2>
+                    <div class="formula">
+                        \[
+                        ZWD = 0.002277 \left(\frac{1255}{280.35} + 0.05\right) 3.94
+                        \]
+                    </div>
+                    <p>Compute the factors:</p>
+                    <div class="formula">
+                        \[
+                        \frac{1255}{280.35} = 4.476
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        4.476 + 0.05 = 4.526
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        4.526 \times 3.94 = 17.84
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        ZWD = 0.002277 \times 17.84 = 0.0406\ \text{m}
+                        \]
+                    </div>
+                    <p>
+                        This corresponds to about 4 cm of zenith wet delay, which is a reasonable magnitude for relatively dry conditions in Tehran.
+                    </p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>Step 6: Mapping to the Satellite Line-of-Sight</h2>
+                    <p>Zenith angle:</p>
+                    <div class="formula">
+                        \[
+                        z = 90^\circ - 30^\circ = 60^\circ
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        \cos 60^\circ = 0.5
+                        \]
+                    </div>
+                    <h3>Hydrostatic delay along the line-of-sight:</h3>
+                    <div class="formula">
+                        \[
+                        T_h = \frac{2.025}{0.5} = 4.05\ \text{m}
+                        \]
+                    </div>
+                    <h3>Wet delay along the line-of-sight:</h3>
+                    <div class="formula">
+                        \[
+                        T_w = \frac{0.0406}{0.5} = 0.0812\ \text{m}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>Step 7: Total Tropospheric Delay</h2>
+                    <div class="formula">
+                        \[
+                        T_{\text{trop}} = 4.05 + 0.0812 = 4.1312\ \text{m}
+                        \]
+                    </div>
+                    <p class="result">
+                        Final result: For a station in central Tehran and a satellite at an elevation angle of \(30^\circ\),
+                        the Saastamoinen model predicts a tropospheric slant delay of approximately 4.13 m.
+                    </p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>8. Typical Tropospheric Delays in GNSS Geodesy</h2>
+                    <p>For geodetic training and quality control, it is useful to remember the following approximate ranges:</p>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>Condition</th>
+                            <th>Typical tropospheric delay</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Zenith (overhead satellite)</strong></td>
+                            <td>Typically 2–2.5 m</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Elevation angle 30°</strong></td>
+                            <td>On the order of 4–5 m</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Elevation angle below 15°</strong></td>
+                            <td>Can reach 10–20 m</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Wet component</strong></td>
+                            <td>Typically 3–20 cm, depending on atmospheric humidity</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hydrostatic component</strong></td>
+                            <td>Stable, contributes about 90% of the total delay</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+

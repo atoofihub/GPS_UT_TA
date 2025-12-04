@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مثال تأخیر تروپسفری Saastamoinen</title>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        @font-face {
+            font-family: 'IRANSansWebFaNum';
+            src: url('./assets/fonts/IRANSansWeb(FaNum).woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: 'IRANSansWebFaNum', Tahoma, Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 2.1;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .calculation-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-right: 4px solid var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .parameter-table th, .parameter-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+        }
+        .parameter-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .formula {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-right: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .center-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(','\\)'], ['$', '$']],
+                displayMath: [['\\[','\\]'], ['$$','$$']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="./assets/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <img src="./assets/ut_logo.png" alt="لوگوی دانشگاه تهران" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+            </div>
+            <div class="col-6" style="text-align: left;">
+                <img src="./assets/fanni_logo.png" alt="لوگوی دانشکده فنی" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>مدل تروپسفری Saastamoinen</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+
+                <div class="calculation-step">
+                    <h2>مقدمه</h2>
+                    <p>
+                        سیگنال‌های ماهواره‌های سامانه‌های مکان‌یابی مانند GPS پیش از رسیدن به گیرنده از لایه‌های مختلف جو عبور می‌کنند.
+                        یکی از مهم‌ترین این لایه‌ها <strong>تروپسفر</strong> است؛ بخشی از جو که از سطح زمین تا ارتفاع حدود ۱۲ کیلومتر امتداد دارد.
+                    </p>
+                    <p>
+                        چگالی و ترکیب هوای این ناحیه باعث می‌شود سرعت انتشار سیگنال کمی کاهش یابد و مسیر طی‌شده توسط سیگنال اندکی «طولانی‌تر» شود.
+                        این پدیده در اندازه‌گیری فاصلهٔ ماهواره–گیرنده به‌صورت یک <strong>تأخیر همیشه مثبت</strong> ظاهر می‌شود.
+                    </p>
+                    <p>
+                        شدت این تأخیر وابسته به <strong>فشار هوا، دما، بخار آب، ارتفاع و زاویهٔ قرارگیری ماهواره نسبت به افق</strong> است.
+                        بنابراین نیاز داریم مدلی داشته باشیم که بتواند با استفاده از این شرایط، مقدار تأخیر را محاسبه کند.
+                        یکی از شناخته‌شده‌ترین مدل‌ها، <strong>مدل Saastamoinen</strong> است که هنوز هم در بسیاری از روش‌های محاسباتی و نرم‌افزارهای ژئودزی به عنوان نقطهٔ شروع به‌کار می‌رود.
+                    </p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>۱. ساختار کلی تأخیر تروپسفری</h2>
+                    <p>تأخیر تروپسفری معمولاً به دو بخش تقسیم می‌شود:</p>
+                    <h3>۱) بخش خشک (Hydrostatic / Dry Delay)</h3>
+                    <ul>
+                        <li>این قسمت به مولکول‌های اصلی هوا (نیتروژن و اکسیژن) مربوط است.</li>
+                        <li>در شرایط معمولی تقریباً <strong>۹۰ درصد تأخیر تروپسفری</strong> را همین بخش تشکیل می‌دهد.</li>
+                        <li>این جزء نسبت به زمان و شرایط آب‌وهوایی تغییرات کمی دارد و بسیار <strong>قابل مدل‌سازی</strong> است.</li>
+                    </ul>
+                    <h3>۲) بخش مرطوب (Wet Delay)</h3>
+                    <ul>
+                        <li>این قسمت نتیجهٔ وجود بخار آب در هواست.</li>
+                        <li>بخار آب پدیده‌ای بسیار <strong>متغیر</strong> است؛ حتی در دو ایستگاه نزدیک به هم نیز ممکن است مقدار آن متفاوت باشد. به همین دلیل مدل‌سازی این بخش دشوارتر است.</li>
+                    </ul>
+                    <p>
+                        در جهت عمودی (زنیت)، مقدار مجموع این دو بخش معمولاً نزدیک <strong>۲ تا ۲٫۵ متر</strong> است.
+                        اگر ماهواره نزدیک افق باشد، این مقدار می‌تواند به راحتی <strong>۱۰ تا ۲۰ متر</strong> هم برسد.
+                    </p>
+                    <div class="text-center mt-3">
+                         <div class="text-center mt-3">
+                        <img src="./assets/images/trop.png" alt="نمودار تغییر تأخیر تروپسفری با زاویه ارتفاع و راستای دید ماهواره" class="center-img" style="max-width: 80%;">
+                        <p style="margin-top: 10px;">
+                            نمای شماتیک تأخیر تروپسفری در راستای زنیت و راستای خط دید ماهواره برای زوایای ارتفاع مختلف.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>۲. ورودی‌های اصلی مدل Saastamoinen</h2>
+                    <p>برای استفاده از این مدل، چند پارامتر محیطی و هندسی لازم است. هرکدام از این پارامترها نقشی مشخص در فرمول دارند و در ادامه در بخش مربوطه توضیح داده می‌شوند:</p>
+                    <ul>
+                        <li>ارتفاع ایستگاه از سطح زمین</li>
+                        <li>عرض جغرافیایی ایستگاه</li>
+                        <li>فشار هوا در سطح ایستگاه</li>
+                        <li>دما در سطح ایستگاه</li>
+                        <li>میزان بخار آب موجود در هوا (با استفاده از رطوبت نسبی)</li>
+                        <li>زاویهٔ ماهواره نسبت به افق (Elevation) یا زاویهٔ زنیت ( \( z \) )</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>۳. مدل جو استاندارد (برای محاسبهٔ فشار، دما و بخار آب)</h2>
+                    <p>
+                        در بسیاری از موارد ممکن است داده‌های هواشناسی دقیق در دسترس نباشد.
+                        در چنین وضعیتی از یک مدل سادهٔ جو استفاده می‌کنیم که رابطهٔ پارامترهای محیطی را با ارتفاع بیان می‌کند.
+                        این روابط در بسیاری از کاربردهای آموزشی و عملی به اندازهٔ کافی دقیق‌اند.
+                    </p>
+
+                    <h3>۳.۱. فشار هوا</h3>
+                    <div class="formula">
+                        \[
+                        p = 1013.25\left(1 - 2.2557 \times 10^{-5} \, h\right)^{5.2568}
+                        \]
+                    </div>
+                    <ul>
+                        <li>\( p \): فشار هوا بر حسب hPa</li>
+                        <li>\( h \): ارتفاع ایستگاه بر حسب متر</li>
+                        <li>عدد 1013.25 فشار استاندارد سطح دریاست.</li>
+                    </ul>
+
+                    <h3>۳.۲. دمای هوا</h3>
+                    <div class="formula">
+                        \[
+                        T = 15 - 6.5 \times 10^{-3} \, h + 273.15
+                        \]
+                    </div>
+                    <ul>
+                        <li>دمای سطح دریا را ۱۵ درجهٔ سانتی‌گراد فرض می‌کنیم.</li>
+                        <li>عدد ۲۷۳.۱۵ اضافه می‌کنیم تا دما به کلوین تبدیل شود.</li>
+                    </ul>
+
+                    <h3>۳.۳. فشار بخار آب</h3>
+                    <div class="formula">
+                        \[
+                        e = e_s(T) \times RH
+                        \]
+                    </div>
+                    <p>
+                        در این رابطه، \( RH \) رطوبت نسبی و \( e_s(T) \) فشار بخار اشباع در دمای \( T \) است.
+                        برای \( e_s(T) \) یک تقریب تجربی رایج این است:
+                    </p>
+                    <div class="formula">
+                        \[
+                        e_s(T) = 6.108 \exp\left(\frac{17.15\,T - 4684}{T - 38.45}\right)
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>۴. بخش خشک مدل Saastamoinen</h2>
+                    <h3>۴.۱. تأخیر خشک در جهت زنیت</h3>
+                    <div class="formula">
+                        \[
+                        ZHD = 0.0022768 \,
+                        \frac{p}{1 - 0.00266 \cos 2\varphi - 0.00028\,h/1000}
+                        \]
+                    </div>
+                    <ul>
+                        <li>\( p \): فشار</li>
+                        <li>\( \varphi \): عرض جغرافیایی</li>
+                        <li>\( h \): ارتفاع</li>
+                        <li>ضریب‌های مربوط به تغییرات گرانش با عرض جغرافیایی و ارتفاع در مخرج مشاهده می‌شوند.</li>
+                    </ul>
+
+                    <h3>۴.۲. تبدیل به راستای ماهواره</h3>
+                    <p>اگر زاویهٔ ماهواره نسبت به افق برابر با \( e \) باشد:</p>
+                    <div class="formula">
+                        \[
+                        z = 90^\circ - e
+                        \]
+                    </div>
+                    <p>سپس تأخیر خشک روی خط دید ماهواره:</p>
+                    <div class="formula">
+                        \[
+                        T_h = \frac{ZHD}{\cos z}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>۵. بخش مرطوب مدل Saastamoinen</h2>
+                    <h3>۵.۱. تأخیر مرطوب در جهت زنیت</h3>
+                    <div class="formula">
+                        \[
+                        ZWD = 0.002277 \left(\frac{1255}{T} + 0.05\right) e
+                        \]
+                    </div>
+                    <ul>
+                        <li>\( T \): دما</li>
+                        <li>\( e \): فشار بخار آب</li>
+                    </ul>
+
+                    <h3>۵.۲. تبدیل به راستای ماهواره</h3>
+                    <div class="formula">
+                        \[
+                        T_w = \frac{ZWD}{\cos z}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>۶. تأخیر کل تروپسفری در راستای ماهواره</h2>
+                    <div class="formula">
+                        \[
+                        T_{\text{trop}} = T_h + T_w
+                        \]
+                    </div>
+                    <p>این مقدار عددی مثبت (بر حسب متر) است و باید از اندازه‌گیری‌های فاصله کم شود.</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>۷. مثال عددی کامل</h2>
+                    <p>
+                        در این قسمت یک مثال واقعی برای <strong>مرکز تهران</strong> حل می‌کنیم.
+                        فرض می‌کنیم مختصات مرکز تهران به صورت تقریبی:
+                    </p>
+                    <ul>
+                        <li>ارتفاع: \( h = 1200 \) متر</li>
+                        <li>عرض جغرافیایی: \( \varphi = 35.7^\circ \) (در فرمول‌ها باید به رادیان تبدیل شود: \( 0.623 \) رادیان)</li>
+                        <li>رطوبت نسبی: 40٪ یعنی \( RH = 0.40 \)</li>
+                        <li>زاویهٔ ارتفاع ماهواره: \( e = 30^\circ \)</li>
+                    </ul>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>گام ۱: محاسبهٔ فشار هوا</h2>
+                    <div class="formula">
+                        \[
+                        p = 1013.25 \left(1 - 2.2557\times10^{-5} \times 1200\right)^{5.2568}
+                        \]
+                    </div>
+                    <p>ابتدا داخل پرانتز:</p>
+                    <div class="formula">
+                        \[
+                        1 - 2.2557\times10^{-5} \times 1200 = 0.9729
+                        \]
+                    </div>
+                    <p>توان‌دادن:</p>
+                    <div class="formula">
+                        \[
+                        0.9729^{5.2568} \approx 0.876
+                        \]
+                    </div>
+                    <p>پس:</p>
+                    <div class="formula">
+                        \[
+                        p = 1013.25 \times 0.876 = 887.6\ \text{hPa}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>گام ۲: محاسبهٔ دمای هوا</h2>
+                    <div class="formula">
+                        \[
+                        T = 15 - 6.5\times10^{-3} \times 1200 + 273.15
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        6.5\times10^{-3} \times 1200 = 7.8
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        T = 15 - 7.8 + 273.15 = 280.35\ K
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>گام ۳: فشار بخار آب</h2>
+                    <p>ابتدا فشار بخار اشباع:</p>
+                    <div class="formula">
+                        \[
+                        e_s = 6.108 \exp\left(\frac{17.15 T - 4684}{T - 38.45}\right)
+                        \]
+                    </div>
+                    <p>جملهٔ بالا:</p>
+                    <div class="formula">
+                        \[
+                        17.15 \times 280.35 = 4800.0
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        4800 - 4684 = 116
+                        \]
+                    </div>
+                    <p>جملهٔ مخرج:</p>
+                    <div class="formula">
+                        \[
+                        T - 38.45 = 241.9
+                        \]
+                    </div>
+                    <p>پس:</p>
+                    <div class="formula">
+                        \[
+                        \frac{116}{241.9} = 0.479
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        e_s = 6.108 \times e^{0.479} = 6.108 \times 1.614 = 9.86\ \text{hPa}
+                        \]
+                    </div>
+                    <p>فشار واقعی بخار آب:</p>
+                    <div class="formula">
+                        \[
+                        e = 9.86 \times 0.40 = 3.94\ \text{hPa}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>گام ۴: محاسبهٔ تأخیر خشک زنیتی</h2>
+                    <div class="formula">
+                        \[
+                        ZHD = 0.0022768 \,
+                        \frac{887.6}{1 - 0.00266\cos(2\times0.623) - 0.00028\times1.2 }
+                        \]
+                    </div>
+                    <p>ابتدا:</p>
+                    <div class="formula">
+                        \[
+                        2\times 0.623 = 1.246
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        \cos 1.246 = 0.316
+                        \]
+                    </div>
+                    <p>جملهٔ مخرج:</p>
+                    <div class="formula">
+                        \[
+                        1 - 0.00266(0.316) - 0.00028(1.2) = 1 - 0.00084 - 0.000336 = 0.998824
+                        \]
+                    </div>
+                    <p>پس:</p>
+                    <div class="formula">
+                        \[
+                        ZHD = 0.0022768 \times \frac{887.6}{0.998824}
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        \frac{887.6}{0.998824} = 888.7
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        ZHD = 0.0022768 \times 888.7 = 2.025\ \text{m}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>گام ۵: محاسبهٔ تأخیر مرطوب زنیتی</h2>
+                    <div class="formula">
+                        \[
+                        ZWD = 0.002277 \left(\frac{1255}{280.35} + 0.05\right) 3.94
+                        \]
+                    </div>
+                    <p>ابتدا:</p>
+                    <div class="formula">
+                        \[
+                        \frac{1255}{280.35} = 4.476
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        4.476 + 0.05 = 4.526
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        4.526 \times 3.94 = 17.84
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        ZWD = 0.002277 \times 17.84 = 0.0406\ \text{m}
+                        \]
+                    </div>
+                    <p>(حدود ۴ سانتی‌متر، مقدار طبیعی برای شرایط نسبتاً خشک تهران)</p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>گام ۶: تبدیل زنیت به راستای ماهواره</h2>
+                    <p>زاویهٔ زنیت:</p>
+                    <div class="formula">
+                        \[
+                        z = 90^\circ - 30^\circ = 60^\circ
+                        \]
+                    </div>
+                    <div class="formula">
+                        \[
+                        \cos 60^\circ = 0.5
+                        \]
+                    </div>
+                    <h3>تأخیر خشک روی مسیر:</h3>
+                    <div class="formula">
+                        \[
+                        T_h = \frac{2.025}{0.5} = 4.05\ \text{m}
+                        \]
+                    </div>
+                    <h3>تأخیر مرطوب روی مسیر:</h3>
+                    <div class="formula">
+                        \[
+                        T_w = \frac{0.0406}{0.5} = 0.0812\ \text{m}
+                        \]
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>گام ۷: تأخیر کل</h2>
+                    <div class="formula">
+                        \[
+                        T_{\text{trop}} = 4.05 + 0.0812 = 4.1312\ \text{m}
+                        \]
+                    </div>
+                    <p class="result">
+                        نتیجهٔ نهایی: در مرکز تهران، برای ماهواره‌ای با زاویهٔ ارتفاع ۳۰ درجه،
+                        مدل Saastamoinen حدود ۴.۱۳ متر تأخیر تروپسفری پیش‌بینی می‌کند.
+                    </p>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>۸. مقادیر معمول تأخیر تروپسفری</h2>
+                    <p>برای آموزش دانشجوها بهتر است حدودهای زیر را همیشه به خاطر بسپارند:</p>
+                    <table class="parameter-table">
+                        <tr>
+                            <th>شرایط</th>
+                            <th>مقدار تأخیر</th>
+                        </tr>
+                        <tr>
+                            <td><strong>زنیت (بالای سر)</strong></td>
+                            <td>معمولاً ۲ تا ۲٫۵ متر</td>
+                        </tr>
+                        <tr>
+                            <td><strong>زاویه ۳۰ درجه</strong></td>
+                            <td>حدود ۴ تا ۵ متر</td>
+                        </tr>
+                        <tr>
+                            <td><strong>زاویه کمتر از ۱۵ درجه</strong></td>
+                            <td>می‌تواند به ۱۰ تا ۲۰ متر برسد</td>
+                        </tr>
+                        <tr>
+                            <td><strong>قسمت مرطوب</strong></td>
+                            <td>معمولاً ۳ تا ۲۰ سانتی‌متر بسته به آب‌وهوا</td>
+                        </tr>
+                        <tr>
+                            <td><strong>قسمت خشک</strong></td>
+                            <td>پایدار و حدود ۹۰٪ تأخیر کل</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
