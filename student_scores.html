@@ -6,6 +6,7 @@
     <title>Advance Satellite Positioning System Course - Student Scores</title>
     <link rel="stylesheet" href="./assets/katex.min.css">
     <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -27,7 +28,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 20px;
             background-color: white;
@@ -118,6 +119,8 @@
             <p>Computation of neutral-atmosphere delay along the GNSS line-of-sight using the Saastamoinen tropospheric model and interpretation of zenith and slant delays.</p>
             <h2>Project 4: Ionospheric Delay (Klobuchar Model)</h2>
             <p>Estimation of ionospheric delay along the GNSS signal path using the Klobuchar broadcast model and analysis of its impact on positioning accuracy.</p>
+            <h2>Project 5: RINEX Observation Extraction</h2>
+            <p>Extraction and analysis of observation data from RINEX version 3.02 files.</p>
         </div>
         <div class="grading-system">
             <h2>Grading System</h2>
@@ -141,8 +144,12 @@
                         <th colspan="2">SP3 Interpolation & Comparison</th>
                         <th colspan="2">Trop. Delay (Saastamoinen Model)</th>
                         <th colspan="2">Iono. Delay (Klobuchar Model)</th>
+                        <th colspan="2">RINEX Obs. Extraction</th>
+                        <th rowspan="2">Progress</th>
                     </tr>
                     <tr>
+                        <th>Submitted</th>
+                        <th>Grade</th>
                         <th>Submitted</th>
                         <th>Grade</th>
                         <th>Submitted</th>
@@ -154,36 +161,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>810303013</td><td>✓</td><td>A</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td></tr>
-                    <tr><td>810304015</td><td>✓</td><td>B</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✗</td><td></td></tr>
-                    <tr><td>810302017</td><td>✗</td><td></td><td>✓</td><td>B</td><td>✗</td><td></td><td>✗</td><td></td></tr>
-                    <tr><td>810304021</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>B</td></tr>
-                    <tr><td>810303020</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td></tr>
-                    <tr><td>810302021</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td></tr>
-                    <tr><td>810303017</td><td>✓</td><td>C</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A</td></tr>
-                    <tr><td>810303021</td><td>✓</td><td>C</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td></tr>
-                    <tr><td>810303024</td><td>✓</td><td>A+</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td></tr>
-                    <tr><td>810304069</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td></tr>
-                    <tr><td>810304030</td><td>✓</td><td>A</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A</td></tr>
-                    <tr><td>810303071</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td></tr>
-                    <tr><td>810304036</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td></tr>
-                    <tr><td>810304074</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td></td></tr>
-                    <tr><td>810304039</td><td>✓</td><td>C</td><td>✓</td><td>C</td><td>✓</td><td>A+</td><td>✓</td><td>A</td></tr>
-                    <tr><td>810304042</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✗</td><td></td></tr>
-                    <tr><td>810304077</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td></tr>
-                    <tr><td>810302036</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td></tr>
-                    <tr><td>810303043</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td></td></tr>
-                    <tr><td>810302045</td><td>✓</td><td>B</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td></td></tr>
-                    <tr><td>810303049</td><td>✓</td><td>B</td><td>✓</td><td>C</td><td>✓</td><td>A+</td><td>✗</td><td></td></tr>
-                    <tr><td>810304050</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td></tr>
-                    <tr><td>810302051</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td></tr>
-                    <tr><td>810304013</td><td>✗</td><td></td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A</td></tr>
-                    <tr><td>810303053</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td></tr>
-                    <tr><td>810303059</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td></tr>
-                    <tr><td>810304060</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A</td></tr>
-                    <tr><td>810303061</td><td>✓</td><td>B</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A</td></tr>
-                    <tr><td>810304009</td><td>✓</td><td>A+</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td></tr>
-                    <tr><td>810303065</td><td>✓</td><td>A</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✗</td><td></td></tr>
+                    <tr><td>810303013</td><td>✓</td><td>A</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>B</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303013">👁️</button></td></tr>
+                    <tr><td>810304015</td><td>✓</td><td>B</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304015">👁️</button></td></tr>
+                    <tr><td>810302017</td><td>✗</td><td></td><td>✓</td><td>B</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302017">👁️</button></td></tr>
+                    <tr><td>810304021</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>B</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304021">👁️</button></td></tr>
+                    <tr><td>810303020</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303020">👁️</button></td></tr>
+                    <tr><td>810302021</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302021">👁️</button></td></tr>
+                    <tr><td>810303017</td><td>✓</td><td>C</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>C</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303017">👁️</button></td></tr>
+                    <tr><td>810303021</td><td>✓</td><td>C</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>B</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303021">👁️</button></td></tr>
+                    <tr><td>810303024</td><td>✓</td><td>A+</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A++</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303024">👁️</button></td></tr>
+                    <tr><td>810304069</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A++</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304069">👁️</button></td></tr>
+                    <tr><td>810304030</td><td>✓</td><td>A</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304030">👁️</button></td></tr>
+                    <tr><td>810303071</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303071">👁️</button></td></tr>
+                    <tr><td>810304036</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304036">👁️</button></td></tr>
+                    <tr><td>810304074</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304074">👁️</button></td></tr>
+                    <tr><td>810304039</td><td>✓</td><td>C</td><td>✓</td><td>C</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>B</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304039">👁️</button></td></tr>
+                    <tr><td>810304042</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304042">👁️</button></td></tr>
+                    <tr><td>810304077</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304077">👁️</button></td></tr>
+                    <tr><td>810302036</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302036">👁️</button></td></tr>
+                    <tr><td>810303043</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303043">👁️</button></td></tr>
+                    <tr><td>810302045</td><td>✓</td><td>B</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>B</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302045">👁️</button></td></tr>
+                    <tr><td>810303049</td><td>✓</td><td>B</td><td>✓</td><td>C</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>C</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303049">👁️</button></td></tr>
+                    <tr><td>810304050</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304050">👁️</button></td></tr>
+                    <tr><td>810302051</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302051">👁️</button></td></tr>
+                    <tr><td>810304013</td><td>✗</td><td></td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304013">👁️</button></td></tr>
+                    <tr><td>810303053</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303053">👁️</button></td></tr>
+                    <tr><td>810303059</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303059">👁️</button></td></tr>
+                    <tr><td>810304060</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304060">👁️</button></td></tr>
+                    <tr><td>810303061</td><td>✓</td><td>B</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>A</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303061">👁️</button></td></tr>
+                    <tr><td>810304009</td><td>✓</td><td>A+</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304009">👁️</button></td></tr>
+                    <tr><td>810303065</td><td>✓</td><td>A</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303065">👁️</button></td></tr>
                 </tbody>
             </table>
         </div>
@@ -200,11 +207,37 @@
             </ul>
         </div>
     </div>
+
+    <!-- Progress Modal -->
+    <div class="modal fade" id="progressModal" tabindex="-1" aria-labelledby="progressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="progressModalLabel">Student Progress Chart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="chartContainer" style="width: 100%; height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
     <script src="./assets/katex.min.js"></script>
     <script src="./assets/auto-render.min.js"></script>
     <script>
+        const gradeMap = {
+            'A++': 5,
+            'A+': 4,
+            'A': 3,
+            'B': 2,
+            'C': 1,
+            '': 0
+        };
+
         document.addEventListener("DOMContentLoaded", function() {
+            // ... Katex code ...
             if (typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(document.body, {
                     delimiters: [
@@ -213,6 +246,57 @@
                     ]
                 });
             }
+
+            // Progress Chart Logic
+            const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+            const chartContainer = document.getElementById('chartContainer');
+
+            document.querySelectorAll('.view-progress').forEach(button => {
+                button.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-student-id');
+                    const row = this.closest('tr');
+                    const cells = row.querySelectorAll('td');
+                    
+                    // Grades are in indices 2, 4, 6, 8, 10
+                    const grades = [
+                        gradeMap[cells[2].innerText.trim()] || 0,
+                        gradeMap[cells[4].innerText.trim()] || 0,
+                        gradeMap[cells[6].innerText.trim()] || 0,
+                        gradeMap[cells[8].innerText.trim()] || 0,
+                        gradeMap[cells[10].innerText.trim()] || 0
+                    ];
+
+                    progressModal.show();
+
+                    Highcharts.chart('chartContainer', {
+                        chart: {
+                            type: 'line'
+                        },
+                        title: {
+                            text: `Progress for Student ID: ${studentId}`
+                        },
+                        xAxis: {
+                            categories: ['Proj 1', 'Proj 2', 'Proj 3', 'Proj 4', 'Proj 5']
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Grade Level'
+                            },
+                            categories: ['', 'C', 'B', 'A', 'A+', 'A++'],
+                            min: 0,
+                            max: 5
+                        },
+                        series: [{
+                            name: 'Grade',
+                            data: grades,
+                            color: '#3498db'
+                        }],
+                        credits: {
+                            enabled: false
+                        }
+                    });
+                });
+            });
         });
     </script>
 </body>
