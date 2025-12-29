@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPP Algorithm (GPS / NAV) — Single Point Positioning</title>
+    <link rel="stylesheet" href="./assets/katex.min.css">
+    <script src="./assets/katex.min.js"></script>
+    <script src="./assets/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'neutral',
+            themeVariables: {
+                fontFamily: 'IRANSans'
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
+    <style>
+        @font-face {
+            font-family: 'IRANSans';
+            src: url('./assets/fonts/IRANSansWeb(FaNum).woff') format('woff');
+        }
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --border-color: #ddd;
+        }
+        body {
+            font-family: 'IRANSans', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        .calculation-step {
+            margin: 20px 0;
+            padding: 15px;
+            border-right: 4px solid var(--secondary-color);
+            border-left: 0;
+            background-color: #f8f9fa;
+        }
+        .parameter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .parameter-table th, .parameter-table td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: right;
+            vertical-align: top;
+        }
+        .parameter-table th {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .formula {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-right: 4px solid #ffc107;
+            border-left: 0;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .result {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .center-img {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 100%;
+            height: auto;
+        }
+        /* اعمال فونت فارسی به تمامی بخش های فلوچارت */
+        .mermaid * {
+            font-family: 'IRANSans', Arial, sans-serif !important;
+        }
+        .ltr {
+            direction: ltr;
+            unicode-bidi: isolate;
+            display: inline-block;
+        }
+        code {
+            direction: ltr;
+            unicode-bidi: bidi-override;
+            display: inline-block;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 18px 0;
+        }
+        ul, ol {
+            margin: 0.25rem 0 0.25rem 0;
+        }
+        li { margin: 0.25rem 0; }
+        .checklist .form-check {
+            margin-bottom: 12px;
+            padding-right: 35px;
+            cursor: pointer;
+        }
+        .checklist .form-check-input {
+            float: right;
+            margin-right: -35px;
+            margin-left: 10px;
+            cursor: pointer;
+            width: 1.2em;
+            height: 1.2em;
+        }
+        .checklist .form-check-input:checked + .form-check-label {
+            text-decoration: line-through;
+            color: #bdc3c7;
+            transition: all 0.3s ease;
+        }
+
+        /* Flip cards for example inputs (Sections 0 & 1) */
+        .calculation-step { position: relative; }
+        .flip-toggle {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+        }
+        .flip-card {
+            perspective: 1600px;
+            margin: 20px 0;
+            min-height: 200px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(.2,.8,.2,1);
+        }
+        .flip-card.is-flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            width: 100%;
+        }
+        .flip-back {
+            position: absolute;
+            inset: 0;
+            transform: rotateY(180deg);
+            z-index: 1;
+        }
+        .flip-back .calculation-step,
+        .flip-front .calculation-step {
+            height: 100%;
+            margin: 0;
+        }
+        .flip-back .calculation-step {
+            border-right-color: var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .flip-scroll {
+            flex-grow: 1;
+            max-height: 650px;
+            overflow-y: auto;
+            padding: 10px 15px 40px 15px;
+        }
+        /* Style the scrollbar for better visibility */
+        .flip-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .flip-scroll::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+              <img src="./assets/ut_logo.png" alt="University of Tehran Logo" class="img-fluid" style="max-height: 100px; margin-bottom: 20px" />
+            </div>
+            <div class="col-6" style="text-align: left;">
+              <img src="./assets/fanni_logo.png" alt="College of Engineering Logo" class="img-fluid" style="max-height: 100px; margin-top: 0px; transform: scale(1.2)" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1>الگوریتم <span class="ltr">SPP</span> (فقط <span class="ltr">GPS</span> / فقط <span class="ltr">NAV</span>)</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="calculation-step">
+                    <h2 class="text-center">فلوچارت کلی الگوریتم <span class="ltr">SPP</span></h2>
+                    <div class="mermaid" style="display: flex; justify-content: center; background: white; padding: 20px; border-radius: 10px;">
+flowchart TD
+    Start([شروع]) --> Input[/ورودی‌ها: مشاهده‌های C1C و ناوبری NAV/]
+    Input --> Init[تقریب اولیه موقعیت و ساعت گیرنده]
+
+    subgraph Iteration["حلقه تکرار کمترین مربعات"]
+        Te["محاسبه زمان ارسال سیگنال tₑ"]
+        Clock["محاسبه تصحیح ساعت ماهواره (پلی‌نوم + نسبیتی)"]
+        SatPos["تعیین موقعیت ماهواره با Broadcast Ephemeris"]
+        Sagnac["اعمال تصحیح چرخش زمین"]
+        Geom["محاسبه فاصله هندسی و زوایای دید ماهواره"]
+        Atmos["محاسبه تأخیرهای یونوسفری و تروپسفری"]
+        DeltaY["تشکیل بردار مشاهده منهای محاسبه‌شده Δy"]
+        MatrixA["تشکیل ماتریس طرح A و ماتریس وزن P"]
+        Solve["حل سیستم معادلات (WLS)"]
+        Update["به‌روزرسانی مختصات و ساعت گیرنده"]
+        Te --> Clock --> SatPos --> Sagnac --> Geom --> Atmos --> DeltaY --> MatrixA --> Solve --> Update
+    end
+
+    Update --> Conv{"آیا همگرایی حاصل شده است؟"}
+    Conv -- خیر --> Te
+    Conv -- بله --> Output[/خروجی: مختصات گیرنده و دقت STD/]
+    Output --> OMT["Overall Model Test (خی‌دو)"]
+    OMT --> OMTOut[/گزارش نتیجه آزمون و تفسیر آماری/]
+    OMTOut --> End([پایان])
+
+    classDef io fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef decision fill:#fff4dd,stroke:#d4a017,stroke-width:2px;
+    classDef terminal fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef process fill:#f8f9fa,stroke:#333,stroke-width:1.2px;
+
+    class Start,End terminal;
+    class Input,Output,OMTOut io;
+    class Conv decision;
+    class Init,Te,Clock,SatPos,Sagnac,Geom,Atmos,DeltaY,MatrixA,Solve,Update,OMT process;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+
+                <div class="flip-card" id="flip-sec0">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec0')">مثال ورودی</button>
+                                <h2>0) ورودی‌ها و نمادگذاری (فقط <span class="ltr">GPS</span> / فقط <span class="ltr">NAV</span>)</h2>
+                                <p>* مشاهده فقط: <strong><span class="ltr">($y = \text{C1C}$)</span></strong> (متر)</p>
+                                <p>* زمان اپک مشاهده: <span class="ltr">($t_r$)</span>  <span class="ltr">(GPS Time)</span></p>
+                                <p>* ثابت‌ها:</p>
+                                <ul>
+                                    <li>سرعت نور: <span class="ltr">($c$)</span></li>
+                                    <li>نرخ چرخش زمین: <span class="ltr">($\omega_e$)</span></li>
+                                    <li>ثابت گرانشی زمین: <span class="ltr">($\mu$)</span></li>
+                                </ul>
+                                <p>* مجهولات:</p>
+                                <ul>
+                                    <li>مختصات گیرنده (<span class="ltr">ECEF</span>): <span class="ltr">($\mathbf{x}_r=[X;Y;Z]^T$)</span></li>
+                                    <li>بایاس ساعت گیرنده در هر اپک: <span class="ltr">($\delta t_r$)</span> (ثانیه) یا معادل متری <span class="ltr">($c\delta t_r$)</span></li>
+                                </ul>
+                                <p>* برای هر ماهواره <span class="ltr">($s$)</span>:</p>
+                                <ul>
+                                    <li>موقعیت ماهواره در <span class="ltr">ECEF</span>: <span class="ltr">($\mathbf{x}_s=[X_s;Y_s;Z_s]^T$)</span></li>
+                                    <li>تصحیح ساعت ماهواره از <span class="ltr">NAV</span>: <span class="ltr">($\delta t_s$)</span> (ثانیه)</li>
+                                    <li>تاخیر تروپسفر: <span class="ltr">($T^s$)</span> (متر)</li>
+                                    <li>تاخیر یونوسفر (<span class="ltr">Klobuchar</span>): <span class="ltr">($I^s$)</span> (متر)</li>
+                                    <li>گروه‌دیلی ماهواره: <span class="ltr">($TGD^s$)</span> (ثانیه) که به متر تبدیل می‌شود: <span class="ltr">($c\,TGD^s$)</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec0')">بازگشت</button>
+                                <h2>مثال ورودی‌ها برای شروع حل (دو اپک، <span class="ltr">PRN=G04</span>)</h2>
+                                <div class="flip-scroll">
+                                    <div class="note">
+                                        <p><strong>نکته:</strong> ضرایب کلوبوچار را اگر در فایل <span class="ltr">NAV</span> به فرم <span class="ltr">D</span> آمده باشند، باید به فرم <span class="ltr">E</span> تبدیل شوند.</p>
+                                    </div>
+
+                                    <h3>1) ورودی‌های ثابت (برای کل حل)</h3>
+                                    <h3>1.1 مختصات اولیه گیرنده (<span class="ltr">ECEF</span>)</h3>
+                                    <div class="formula">$$
+\mathbf{r}_{rcv}^{(0)}=
+\begin{bmatrix}X_0\\Y_0\\Z_0\end{bmatrix}
+=
+\begin{bmatrix}
+3246705.6964\\
+4052996.6836\\
+3692516.1666
+\end{bmatrix}\ \text{m}
+$$</div>
+
+                                    <h3>1.2 ضرایب کلوبوچار (از هدر <span class="ltr">NAV</span>)</h3>
+                                    <p><strong>Alpha (<span class="ltr">GPSA</span>):</strong></p>
+                                    <div class="formula">$$
+\alpha=\big[0.3073\times10^{-7},\ 0,\ -0.1192\times10^{-6},\ 0.1788\times10^{-6}\big]
+$$</div>
+                                    <p><strong>Beta (<span class="ltr">GPSB</span>):</strong></p>
+                                    <div class="formula">$$
+\beta=\big[0.1413\times10^{6},\ -0.9830\times10^{5},\ 0.6554\times10^{5},\ -0.3932\times10^{6}\big]
+$$</div>
+
+                                    <h3>1.3 ثابت‌ها</h3>
+                                    <div class="formula">$$
+c=299792458\ \text{m/s},\qquad
+\omega_e=7.292115\times10^{-5}\ \text{rad/s},\qquad
+\mu=3.986005\times10^{14}\ \text{m}^3/\text{s}^2
+$$</div>
+
+                                    <h3>2) ورودی‌های دو اپک مشاهده (<span class="ltr">OBS</span>)</h3>
+                                    <p><strong>اپک 1</strong></p>
+                                    <div class="formula">$$t_{r1}=\text{2024-11-14 08:57:18}$$</div>
+                                    <div class="formula">$$y_1=C1C(t_{r1})=21274373.129\ \text{m}$$</div>
+
+                                    <p><strong>اپک 2</strong></p>
+                                    <div class="formula">$$t_{r2}=\text{2024-11-14 08:57:19}$$</div>
+                                    <div class="formula">$$y_2=C1C(t_{r2})=21274683.723\ \text{m}$$</div>
+
+                                    <h3>تبدیل به <span class="ltr">GPS seconds-of-week</span></h3>
+                                    <p>(تقریباً دقیق تا سطح میلی‌ثانیه)</p>
+                                    <div class="formula">$$t_{GPS,1}\approx377838\ \text{s}$$</div>
+                                    <p class="note">عدد خام محاسبه‌شده: <span class="ltr">377837.99999</span></p>
+                                    <div class="formula">$$t_{GPS,2}\approx377839\ \text{s}$$</div>
+                                    <p class="note">عدد خام محاسبه‌شده: <span class="ltr">377838.99999</span></p>
+
+                                    <h3>3) ورودی ناوبری (<span class="ltr">NAV</span>) برای ماهواره <span class="ltr">G04</span></h3>
+                                    <h3>3.1 زمان رکورد ناوبری</h3>
+                                    <div class="formula">$$
+t_{\text{nav}}=\text{2024-11-14 10:00:00}
+\Rightarrow\ t_{\text{nav,GPS}}\approx381600\ \text{s}
+$$</div>
+                                    <p class="note">عدد خام: <span class="ltr">381599.99999</span></p>
+
+                                    <h3>3.2 فیلدهای لازم از رکورد <span class="ltr">NAV</span></h3>
+                                    <p><strong>پارامترهای ساعت (از رکورد <span class="ltr">G04</span> در <span class="ltr">36.24N</span>):</strong></p>
+                                    <div class="formula">$$
+\begin{aligned}
+a_0(=\text{af0})&=0.479244161397\times10^{-3}\ \text{s}\\
+a_1(=\text{af1})&=0.648014975013\times10^{-11}\ \text{s/s}\\
+a_2(=\text{af2})&=0\ \text{s/s}^2\\
+t_{oc}&\approx381600\ \text{s}
+\end{aligned}
+$$</div>
+                                    <p><strong>پارامترهای مدار (Broadcast Ephemeris):</strong></p>
+                                    <ul>
+                                        <li><span class="ltr">($C_{rs},\Delta n,M_0$)</span></li>
+                                        <li><span class="ltr">($C_{uc},e,C_{us},\sqrt{A}$)</span></li>
+                                        <li><span class="ltr">($t_{oe}$)</span></li>
+                                        <li><span class="ltr">($C_{ic},\Omega_0,C_{is}$)</span></li>
+                                        <li><span class="ltr">($i_0$)</span></li>
+                                        <li><span class="ltr">($C_{rc},\omega,\dot{\Omega}$)</span></li>
+                                        <li><span class="ltr">($\dot{i}$)</span></li>
+                                    </ul>
+                                    <p><strong>پارامترهای کُد/سخت‌افزار:</strong> <span class="ltr">(TGD)</span></p>
+                                    <p><strong>هفته <span class="ltr">GPS</span>:</strong> <span class="ltr">(week)</span></p>
+
+                                    <h3>4) ورودی‌های مشتق‌شده (برای مدل‌های یونوسفر/تروپسفر)</h3>
+                                    <h3>4.1 تبدیل <span class="ltr">ECEF</span> گیرنده به ژئودتیک</h3>
+                                    <ul>
+                                        <li><span class="ltr">($\phi$)</span> latitude [deg]</li>
+                                        <li><span class="ltr">($\lambda$)</span> longitude [deg]</li>
+                                        <li><span class="ltr">($h$)</span> ellipsoidal height [m]</li>
+                                    </ul>
+                                    <h3>4.2 برای هر اپک و ماهواره (در طول تکرار)</h3>
+                                    <div class="formula">$$Az(t),\ E(t)$$</div>
+                                    <h3>4.3 ورودی تروپسفر Saastamoinen</h3>
+                                    <p>پارامتر محیطی <span class="ltr">(rh)</span> را مشخص کنید (مثلاً <span class="ltr">0.5</span>).</p>
+
+                                    <h3>5) خلاصه “پکیج ورودی” برای شروع حل با دو اپک</h3>
+                                    <ol>
+                                        <li><span class="ltr">$\mathbf{r}_{rcv}^{(0)}=[3246705.6964,\ 4052996.6836,\ 3692516.1666]\ \text{m}$</span></li>
+                                        <li><span class="ltr">$(\alpha,\beta)$</span> از <span class="ltr">GPSA/GPSB</span></li>
+                                        <li>اپک‌ها:
+                                            <ul>
+                                                <li><span class="ltr">$(t_{GPS,1}\approx377838,\ y_1=21274373.129,\ PRN=G04)$</span></li>
+                                                <li><span class="ltr">$(t_{GPS,2}\approx377839,\ y_2=21274683.723,\ PRN=G04)$</span></li>
+                                            </ul>
+                                        </li>
+                                        <li>رکورد <span class="ltr">NAV</span> برای <span class="ltr">G04</span> (از <span class="ltr">36.24N</span>، خطوط 64–71) شامل مقادیر زیر است:</li>
+                                        <div class="formula">$$
+\begin{aligned}
+a_0&=0.479244161397\times10^{-3} & a_1&=0.648014975013\times10^{-11} & a_2&=0\\
+t_{oc}&\approx381600 & t_{oe}&=381600 & week&=2340\\
+\sqrt{A}&=5153.67835236 & e&=3.14607680775\times10^{-3} & M_0&=-0.136268651039\\
+\Delta n&=4.98413618071\times10^{-9} & \omega&=-3.00042464309 & \Omega_0&=1.14317989652\\
+\dot{\Omega}&=-8.30748889740\times10^{-9} & i_0&=0.965789022041 & \dot{i}&=1.06790162525\times10^{-10}\\
+C_{uc}&=7.28294253349\times10^{-7} & C_{us}&=4.79444861412\times10^{-6}\\
+C_{rc}&=288.125 & C_{rs}&=17.8125\\
+C_{ic}&=7.45058059692\times10^{-9} & C_{is}&=1.67638063431\times10^{-8}\\
+TGD&=-4.65661287308\times10^{-9}\ \text{s}
+\end{aligned}
+$$</div>
+                                        <li>ثابت‌ها: <span class="ltr">(c,\omega_e,\mu)</span></li>
+                                        <li>پارامتر محیطی تروپسفر: <span class="ltr">(rh)</span></li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec1">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec1')">مثال استخراج</button>
+                                <h2>1) برداشتن ضرایب <span class="ltr">($a_0,a_1,a_2$)</span> دقیقاً از کجا؟</h2>
+                                <p>در <strong><span class="ltr">RINEX Navigation (GPS)</span></strong> برای هر ماهواره یک رکورد پخش می‌شود که در همان ابتدای رکورد سه ضریب ساعت ماهواره آمده است:</p>
+                                <ul>
+                                    <li><span class="ltr">($a_0$)</span> = <strong><span class="ltr">af0</span></strong></li>
+                                    <li><span class="ltr">($a_1$)</span> = <strong><span class="ltr">af1</span></strong></li>
+                                    <li><span class="ltr">($a_2$)</span> = <strong><span class="ltr">af2</span></strong></li>
+                                </ul>
+                                <p>این‌ها <strong>پارامترهای مدل چندجمله‌ای ساعت ماهواره</strong> هستند و همراه با <span class="ltr">($t_{oc}$)</span> <span class="ltr">(Time of Clock)</span> ارائه می‌شوند.</p>
+                                <p>پس: <strong><span class="ltr">($a_0,a_1,a_2$)</span> را از همان رکورد ناوبری همان <span class="ltr">PRN</span></strong> برمی‌دارند (نه از هدر).</p>
+                                <p>نکته: برای محاسبه <span class="ltr">($\delta t_s$)</span> باید <span class="ltr">($dt = t - t_{oc}$)</span> باشد (از نظر استاندارد ساعت)، ولی در بسیاری کدها از یک مرجع مشترک مثل <span class="ltr">($t_{oe}$)</span> هم استفاده می‌کنند؛ مهم این است که <strong>با تعریف رکورد و زمان مرجع سازگار</strong> باشید. استانداردش این است:</p>
+                                <div class="formula">$$dt = t - t_{oc}$$</div>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec1')">بازگشت</button>
+                                <h2>مثال: ورودی <span class="ltr">NAV</span> برای ماهواره <span class="ltr">G04</span> و فیلدهای لازم</h2>
+                                <div class="flip-scroll">
+                                    <h3>زمان رکورد ناوبری</h3>
+                                    <div class="formula">$$
+t_{\text{nav}}=\text{2024-11-14 10:00:00}
+\Rightarrow\ t_{\text{nav,GPS}}\approx381600\ \text{s}
+$$</div>
+                                    <p class="note">عدد خام: <span class="ltr">381599.99999</span></p>
+
+                                    <h3>حداقل فیلدهای لازم برای توابع <span class="ltr">time_of_emission / dt_satellite / sat_pos</span></h3>
+                                    <p><strong>پارامترهای ساعت:</strong></p>
+                                    <ul>
+                                        <li><span class="ltr">($a_0=\text{af0}=0.479244161397\times10^{-3}\ \text{s}$)</span></li>
+                                        <li><span class="ltr">($a_1=\text{af1}=0.648014975013\times10^{-11}\ \text{s/s}$)</span></li>
+                                        <li><span class="ltr">($a_2=\text{af2}=0\ \text{s/s}^2$)</span></li>
+                                        <li><span class="ltr">($t_{oc}\approx381600\ \text{s}$)</span></li>
+                                    </ul>
+                                    <p><strong>پارامترهای مدار (Broadcast Ephemeris):</strong></p>
+                                    <ul>
+                                        <li><span class="ltr">($C_{rs}=17.8125,\ \Delta n=4.98413618071\times10^{-9},\ M_0=-0.136268651039$)</span></li>
+                                        <li><span class="ltr">($C_{uc}=7.28294253349\times10^{-7},\ e=3.14607680775\times10^{-3},\ C_{us}=4.79444861412\times10^{-6},\ \sqrt{A}=5153.67835236$)</span></li>
+                                        <li><span class="ltr">($t_{oe}=381600\ \text{s}$)</span></li>
+                                        <li><span class="ltr">($C_{ic}=7.45058059692\times10^{-9},\ \Omega_0=1.14317989652,\ C_{is}=1.67638063431\times10^{-8}$)</span></li>
+                                        <li><span class="ltr">($i_0=0.965789022041$)</span></li>
+                                        <li><span class="ltr">($C_{rc}=288.125,\ \omega=-3.00042464309,\ \dot{\Omega}=-8.30748889740\times10^{-9}$)</span></li>
+                                        <li><span class="ltr">($\dot{i}=1.06790162525\times10^{-10}$)</span></li>
+                                    </ul>
+                                    <p><strong>پارامترهای کُد/سخت‌افزار:</strong> <span class="ltr">($TGD=-4.65661287308\times10^{-9}\ \text{s}$)</span></p>
+                                    <p><strong>هفته <span class="ltr">GPS</span>:</strong> <span class="ltr">($week=2340$)</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec2">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec2')">مثال عددی</button>
+                                <h2>2) از زمان دریافت به زمان ارسال</h2>
+                                <p>شما <span class="ltr">($t_r$)</span> و (<code>C1C</code>) را داری. یک تقریب اولیه از زمان ارسال <span class="ltr">($t_e$)</span>:</p>
+                                <div class="formula">$$t_e^{(0)} = t_r - \frac{C1C}{c}$$</div>
+                                <p>حالا باید <strong>تصحیح ساعت ماهواره</strong> را در زمان ارسال حساب کنی و زمان ارسال را اصلاح کنی.</p>
+
+                                <h3>2.1 تصحیح ساعت ماهواره (<span class="ltr">Broadcast clock + relativity</span>)</h3>
+                                <p>مدل ساعت ماهواره:</p>
+                                <div class="formula">$$\delta t_{s,\text{poly}}(t) = a_0 + a_1,dt + a_2,dt^2$$</div>
+                                <div class="formula">$$dt = t - t_{oc}$$</div>
+                                <p>ترم نسبیتی (به‌صورت استاندارد broadcast):</p>
+                                <div class="formula">$$\delta t_{rel}(t) = -\frac{2\sqrt{\mu a}}{c^2}; e \sin(E)$$</div>
+                                <p>پس:</p>
+                                <div class="formula">$$\delta t_s(t)=\delta t_{s,\text{poly}}(t)+\delta t_{rel}(t)$$</div>
+
+                                <h3>2.2 زمان ارسال اصلاح‌شده</h3>
+                                <p>برای کُد <code>C1C</code>، زمان ارسال را این‌طور می‌گیریم :</p>
+                                <div class="formula">$$t_e = t_r - \frac{C1C}{c} - \delta t_s(t_e)$$</div>
+                                <p>چون <span class="ltr">($\delta t_s$)</span> خودش تابع <span class="ltr">($t_e$)</span> است، این رابطه را عملاً با 1–2 تکرار حل می‌کنند:</p>
+                                <ul>
+                                    <li>بار اول <span class="ltr">($\delta t_s$)</span> را با <span class="ltr">($t_e^{(0)}$)</span> حساب کن</li>
+                                    <li>بعد:</li>
+                                </ul>
+                                <div class="formula">$$t_e^{(1)} = t_r - \frac{C1C}{c} - \delta t_s(t_e^{(0)})$$</div>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec2')">بازگشت</button>
+                                <h2>مثال عددی: تبدیل زمان دریافت به زمان ارسال (دو اپک، ماهواره <span class="ltr">G04</span>)</h2>
+                                <div class="flip-scroll">
+                                    <p>در این بخش، برای هر اپکِ مشاهده، ابتدا یک تقریب از زمان ارسال <span class="ltr">($t_e^{(0)}$)</span> می‌سازیم و سپس با اعمال <strong>تصحیح ساعت ماهواره</strong> زمان ارسال را اصلاح می‌کنیم.</p>
+                                    
+                                    <hr>
+                                    <h3>داده‌های لازم از ورودی‌ها</h3>
+                                    <p><strong>1) زمان‌های دریافت (<span class="ltr">GPS seconds-of-week</span>):</strong></p>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($t_{r1}=377838\ \text{s}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($t_{r2}=377839\ \text{s}$)</span></li>
+                                    </ul>
+
+                                    <p><strong>2) مشاهدات کُد:</strong></p>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($C1C_1 = 21274373.129\ \text{m}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($C1C_2 = 21274683.723\ \text{m}$)</span></li>
+                                    </ul>
+
+                                    <p><strong>3) پارامترهای ساعت ماهواره (<span class="ltr">G04</span>):</strong></p>
+                                    <div class="formula">$$
+\begin{aligned}
+a_0&=0.479244161397\times10^{-3}\ \text{s}\\
+a_1&=0.648014975013\times10^{-11}\ \text{s/s}\\
+a_2&=0\\
+t_{oc}&=381600\ \text{s}
+\end{aligned}
+$$</div>
+
+                                    <hr>
+                                    <h3>گام 2.0) تقریب اولیه زمان ارسال</h3>
+                                    <div class="formula">$$t_e^{(0)} = t_r - \frac{C1C}{c},\qquad c=299792458\ \text{m/s}$$</div>
+                                    
+                                    <p><strong>اپک 1:</strong></p>
+                                    <div class="formula">$$\tau_1^{(0)}=\frac{21274373.129}{299792458}=0.0709636702368\ \text{s}$$</div>
+                                    <div class="formula">$$t_{e1}^{(0)} = 377838 - 0.0709636702368 = 377837.9290363298\ \text{s}$$</div>
+
+                                    <p><strong>اپک 2:</strong></p>
+                                    <div class="formula">$$\tau_2^{(0)}=\frac{21274683.723}{299792458}=0.0709647062669\ \text{s}$$</div>
+                                    <div class="formula">$$t_{e2}^{(0)} = 377839 - 0.0709647062669 = 377838.9290352938\ \text{s}$$</div>
+
+                                    <hr>
+                                    <h3>گام 2.1) تصحیح ساعت ماهواره</h3>
+                                    <h4>2.1.1 بخش چندجمله‌ای ساعت</h4>
+                                    <div class="formula">$$dt = t - t_{oc},\qquad \delta t_{s,\text{poly}}(t)=a_0+a_1\,dt+a_2\,dt^2$$</div>
+                                    
+                                    <p><strong>اپک 1:</strong> <span class="ltr">($dt_1 = -3762.0709636702\ \text{s}$)</span></p>
+                                    <div class="formula">$$\delta t_{s,\text{poly},1}=0.0004792197826138\ \text{s}$$</div>
+                                    
+                                    <p><strong>اپک 2:</strong> <span class="ltr">($dt_2 = -3761.0709647062\ \text{s}$)</span></p>
+                                    <div class="formula">$$\delta t_{s,\text{poly},2}=0.0004792197890939\ \text{s}$$</div>
+
+                                    <h4>2.1.2 ترم نسبیتی (<span class="ltr">Relativistic correction</span>)</h4>
+                                    <div class="formula">$$\delta t_{\text{rel}}(t)= -\frac{2\sqrt{\mu A}}{c^2}\, e\sin(E)$$</div>
+                                    <p>نتیجه عددی برای این دو اپک:</p>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($\delta t_{\text{rel},1}=4.5685811063\times 10^{-9}\ \text{s}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($\delta t_{\text{rel},2}=4.5677667276\times 10^{-9}\ \text{s}$)</span></li>
+                                    </ul>
+
+                                    <h4>2.1.3 تصحیح نهایی ساعت ماهواره</h4>
+                                    <div class="formula">$$\delta t_s(t)=\delta t_{s,\text{poly}}(t)+\delta t_{\text{rel}}(t)$$</div>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($\delta t_{s,1}=0.0004792243511949\ \text{s}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($\delta t_{s,2}=0.0004792243568607\ \text{s}$)</span></li>
+                                    </ul>
+
+                                    <hr>
+                                    <h3>گام 2.2) زمان ارسال اصلاح‌شده</h3>
+                                    <div class="formula">$$t_e^{(1)} = t_r - \frac{C1C}{c} - \delta t_s(t_e^{(0)})$$</div>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($t_{e1}^{(1)} = 377837.9285571054\ \text{s}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($t_{e2}^{(1)} = 377838.9285560694\ \text{s}$)</span></li>
+                                    </ul>
+                                    <p class="note">نکته عملی: یک تکرار برای همگرایی کامل (در سطح <span class="ltr">$10^{-15}$</span> ثانیه) کافی است.</p>
+
+                                    <hr>
+                                    <h3>جمع‌بندی عددی نهایی</h3>
+                                    <div class="table-responsive">
+                                        <table class="parameter-table" style="font-size: 0.85em;">
+                                            <thead>
+                                                <tr>
+                                                    <th>اپک</th>
+                                                    <th><span class="ltr">$t_r$ (s)</span></th>
+                                                    <th><span class="ltr">$C1C$ (m)</span></th>
+                                                    <th><span class="ltr">$\tau^{(0)}$ (s)</span></th>
+                                                    <th><span class="ltr">$t_e^{(0)}$ (s)</span></th>
+                                                    <th><span class="ltr">$\delta t_s$ (s)</span></th>
+                                                    <th><span class="ltr">$t_e^{(1)}$ (s)</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>377838</td>
+                                                    <td>21274373.129</td>
+                                                    <td>0.0709636702</td>
+                                                    <td>377837.929036</td>
+                                                    <td>0.0004792244</td>
+                                                    <td><strong>377837.928557</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>377839</td>
+                                                    <td>21274683.723</td>
+                                                    <td>0.0709647063</td>
+                                                    <td>377838.929035</td>
+                                                    <td>0.0004792244</td>
+                                                    <td><strong>377838.928556</strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec3">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec3')">مثال عددی</button>
+                                <h2>3) موقعیت ماهواره از فایل ناوبری (<span class="ltr">Broadcast ephemeris</span>)</h2>
+                                <p>برای هر ماهواره <span class="ltr">($s$)</span>، رکورد ephemeris مناسب را انتخاب کن (نزدیک‌ترین رکورد به زمان ارسال <span class="ltr">($t_e$)</span>، معمولاً نزدیک به <span class="ltr">($t_{oe}$)</span>).</p>
+
+                                <h3>3.1 محاسبات مدار (گام‌های استاندارد <span class="ltr">GPS</span>)</h3>
+                                <p>ابتدا:</p>
+                                <div class="formula">$$A = a^2 \quad (\text{در NAV معمولاً }\sqrt{A}\text{ داده می‌شود})$$</div>
+                                <div class="formula">$$n_0 = \sqrt{\frac{\mu}{A^3}}$$</div>
+                                <div class="formula">$$n = n_0 + \Delta n$$</div>
+                                <div class="formula">$$t_k = t_e - t_{oe}\quad (\text{با اصلاح week crossover})$$</div>
+                                <div class="formula">$$M_k = M_0 + n\,t_k$$</div>
+                                <p>حل کپلر:</p>
+                                <div class="formula">$$E_k - e\sin(E_k) = M_k$$</div>
+                                <p>سپس:</p>
+                                <div class="formula">$$\nu_k = \arctan2\left(\sqrt{1-e^2}\sin E_k,\; \cos E_k - e\right)$$</div>
+                                <div class="formula">$$\phi_k = \nu_k + \omega$$</div>
+                                <p>اصلاحات هارمونیک:</p>
+                                <div class="formula">$$\Delta u_k = C_{us}\sin 2\phi_k + C_{uc}\cos 2\phi_k$$</div>
+                                <div class="formula">$$\Delta r_k = C_{rs}\sin 2\phi_k + C_{rc}\cos 2\phi_k$$</div>
+                                <div class="formula">$$\Delta i_k = C_{is}\sin 2\phi_k + C_{ic}\cos 2\phi_k$$</div>
+                                <div class="formula">$$u_k = \phi_k + \Delta u_k$$</div>
+                                <div class="formula">$$r_k = A(1-e\cos E_k) + \Delta r_k$$</div>
+                                <div class="formula">$$i_k = i_0 + \dot{i}\,t_k + \Delta i_k$$</div>
+                                <p>مختصات در صفحه مدار:</p>
+                                <div class="formula">$$x'_k = r_k \cos u_k,\qquad y'_k = r_k \sin u_k$$</div>
+                                <p>طول گره صعودی:</p>
+                                <div class="formula">$$\Omega_k = \Omega_0 + (\dot{\Omega}-\omega_e)t_k - \omega_e t_{oe}$$</div>
+                                <p>مختصات <span class="ltr">ECEF</span> ماهواره:</p>
+                                <div class="formula">$$X_s = x'_k\cos\Omega_k - y'_k\cos i_k \sin\Omega_k$$</div>
+                                <div class="formula">$$Y_s = x'_k\sin\Omega_k + y'_k\cos i_k \cos\Omega_k$$</div>
+                                <div class="formula">$$Z_s = y'_k\sin i_k$$</div>
+                                <p>این <span class="ltr">($\mathbf{x}_s(t_e)$)</span> موقعیت ماهواره در زمان ارسال است (از <span class="ltr">NAV</span>).</p>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec3')">بازگشت</button>
+                                <h2>مثال عددی: موقعیت ماهواره از <span class="ltr">Broadcast Ephemeris</span> (ماهواره <span class="ltr">G04</span>)</h2>
+                                <div class="flip-scroll">
+                                    <p>در این بخش، با استفاده از پارامترهای ناوبری و <strong>زمان ارسال</strong> <span class="ltr">($t_e$)</span>، مختصات ماهواره را در دستگاه <strong><span class="ltr">ECEF</span></strong> به‌دست می‌آوریم.</p>
+                                    
+                                    <div class="note">
+                                        <p><strong>ورودی این بخش:</strong> زمان‌های ارسال محاسبه‌شده در بخش ۲</p>
+                                        <div class="formula">$$t_{e1}=377837.9285571054\ \text{s},\qquad t_{e2}=377838.9285560694\ \text{s}$$</div>
+                                        <p>و زمان مرجع مدار: <span class="ltr">($t_{oe}=381600\ \text{s}$)</span></p>
+                                    </div>
+
+                                    <hr>
+                                    <h3>3.1 پارامترهای مدار استخراج‌شده (<span class="ltr">G04</span>)</h3>
+                                    <div class="formula">$$
+\begin{aligned}
+\sqrt{A}&=5153.67835236 & e&=0.00314607680775\\
+\Delta n&=0.498413618071\times10^{-8} & M_0&=-0.136268651039\\
+\omega&=-3.00042464309 & \Omega_0&=1.14317989652\\
+\dot{\Omega}&=-0.830748889740\times10^{-8} & i_0&=0.965789022041\\
+\dot{i}&=0.106790162525\times10^{-9}\\
+C_{uc}&=0.728294253349\times10^{-6} & C_{us}&=4.79444861412\times10^{-5}\\
+C_{rc}&=288.125 & C_{rs}&=17.8125\\
+C_{ic}&=7.45058059692\times10^{-9} & C_{is}&=1.67638063431\times10^{-8}
+\end{aligned}
+$$</div>
+
+                                    <hr>
+                                    <h3>3.2 محاسبات مشترک</h3>
+                                    <div class="formula">$$A=(\sqrt{A})^2 = 26560400.5596\ \text{m}$$</div>
+                                    <div class="formula">$$n_0=\sqrt{\frac{\mu}{A^3}} = 1.4585354493\times10^{-4}\ \text{rad/s}$$</div>
+                                    <div class="formula">$$n = n_0 + \Delta n = 1.4585852907\times10^{-4}\ \text{rad/s}$$</div>
+
+                                    <hr>
+                                    <h3>3.3 اپک 1 — محاسبه موقعیت در <span class="ltr">$t_{e1}$</span></h3>
+                                    <div class="formula">$$t_{k1}=t_{e1}-t_{oe}=-3762.0714428946\ \text{s}$$</div>
+                                    <div class="formula">$$M_{k1}=M_0+n\,t_{k1} = -0.6849988580\ \text{rad}$$</div>
+                                    <p>حل معادله کپلر: <span class="ltr">($E_{k1}=-0.6869941504\ \text{rad}$)</span></p>
+                                    <div class="formula">$$\nu_{k1}=-0.6889918768\ \text{rad},\quad \phi_{k1}=-3.6894165198\ \text{rad}$$</div>
+                                    <p>نتایج نهایی پارامترها (پس از تصحیحات):</p>
+                                    <div class="formula">$$u_{k1}=-3.6894204500\ \text{rad},\quad r_{k1}=26495910.8054\ \text{m},\quad i_{k1}=0.9657886088\ \text{rad}$$</div>
+                                    <div class="formula">$$\Omega_{k1}=\Omega_0+(\dot{\Omega}-\omega_e)t_{k1}-\omega_e t_{oe} = -26.4091651141\ \text{rad}$$</div>
+                                    
+                                    <p><strong>مختصات <span class="ltr">ECEF</span> ماهواره (اپک 1):</strong></p>
+                                    <div class="formula">$$
+\mathbf{x}_{s1}=
+\begin{bmatrix}
+948860.7462\\
+23922798.5111\\
+11350447.7484
+\end{bmatrix}\ \text{m}
+$$</div>
+
+                                    <hr>
+                                    <h3>3.4 اپک 2 — محاسبه موقعیت در <span class="ltr">$t_{e2}$</span></h3>
+                                    <div class="formula">$$t_{k2}=t_{e2}-t_{oe}=-3761.0714439306\ \text{s}$$</div>
+                                    <div class="formula">$$M_{k2}=-0.6848529996\ \text{rad}$$</div>
+                                    <p>حل عددی کپلر: <span class="ltr">($E_{k2}=-0.6868479363\ \text{rad}$)</span></p>
+                                    <div class="formula">$$u_{k2}=-3.6892738793\ \text{rad},\quad r_{k2}=26495903.1348\ \text{m},\quad \Omega_{k2}=-26.4092380435\ \text{rad}$$</div>
+                                    
+                                    <p><strong>مختصات <span class="ltr">ECEF</span> ماهواره (اپک 2):</strong></p>
+                                    <div class="formula">$$
+\mathbf{x}_{s2}=
+\begin{bmatrix}
+948213.9049\\
+23924110.8228\\
+11347717.5969
+\end{bmatrix}\ \text{m}
+$$</div>
+
+                                    <hr>
+                                    <h3>4) فاصله هندسی (فرمول طول)</h3>
+                                    <p>با مختصات اولیه گیرنده:</p>
+                                    <div class="formula">$$
+\mathbf{x}_r=
+\begin{bmatrix}
+3246705.6964\\
+4052996.6836\\
+3692516.1666
+\end{bmatrix}\ \text{m}
+$$</div>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($\rho_1 = 21418053.8843\ \text{m}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($\rho_2 = 21418364.7972\ \text{m}$)</span></li>
+                                    </ul>
+
+                                    <hr>
+                                    <div class="note">
+                                        <p><strong>خروجی نهایی:</strong> فاصله‌های هندسی برای استفاده در مدل مشاهده:</p>
+                                        <div class="formula">$$\rho_1=21418053.8843\ \text{m},\qquad \rho_2=21418364.7972\ \text{m}$$</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec4">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec4')">مثال عددی</button>
+                                <h2>4) فاصله هندسی: فرمول «طول» دقیق</h2>
+                                <p>بردار خط دید:</p>
+                                <div class="formula">$$\Delta \mathbf{x}^s = \mathbf{x}_s - \mathbf{x}_r$$</div>
+                                <p>فاصله هندسی:</p>
+                                <div class="formula">$$\rho^s = |\Delta \mathbf{x}^s| = \sqrt{(X_s-X)^2+(Y_s-Y)^2+(Z_s-Z)^2}$$</div>
+                                <p>این همان «فرمول طول» فاصله هندسی است که خواستی.</p>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec4')">بازگشت</button>
+                                <h2>مثال عددی: فاصله هندسی (فرمول «طول» دقیق)</h2>
+                                <div class="flip-scroll">
+                                    <p>در این بخش برای هر اپک، <strong>بردار خط دید</strong> بین گیرنده و ماهواره را می‌سازیم و سپس با گرفتن <strong>طول بردار</strong>، فاصله هندسی <span class="ltr">($\rho$)</span> را به‌دست می‌آوریم.</p>
+                                    
+                                    <hr>
+                                    <h3>4.1 تعریف بردار خط دید</h3>
+                                    <p>مختصات گیرنده و ماهواره در <span class="ltr">ECEF</span>:</p>
+                                    <div class="formula">$$
+\mathbf{x}_r= \begin{bmatrix} X\\Y\\Z \end{bmatrix}, \qquad \mathbf{x}_s= \begin{bmatrix} X_s\\Y_s\\Z_s \end{bmatrix}
+$$</div>
+                                    <p>بردار خط دید:</p>
+                                    <div class="formula">$$
+\Delta\mathbf{x}^s=\mathbf{x}_s-\mathbf{x}_r = \begin{bmatrix} X_s-X\\ Y_s-Y\\ Z_s-Z \end{bmatrix}
+$$</div>
+
+                                    <hr>
+                                    <h3>4.2 فرمول «طول» فاصله هندسی</h3>
+                                    <div class="formula">$$
+\rho^s=|\Delta\mathbf{x}^s| = \sqrt{(X_s-X)^2+(Y_s-Y)^2+(Z_s-Z)^2}
+$$</div>
+
+                                    <hr>
+                                    <h3>محاسبه عددی (ماهواره <span class="ltr">G04</span>)</h3>
+                                    <p>مختصات گیرنده <span class="ltr">($\mathbf{x}_r$)</span>:</p>
+                                    <div class="formula">$$
+\mathbf{x}_r= \begin{bmatrix} 3246705.6964\\ 4052996.6836\\ 3692516.1666 \end{bmatrix}\ \text{m}
+$$</div>
+
+                                    <h4>اپک 1</h4>
+                                    <p>مختصات ماهواره:</p>
+                                    <div class="formula">$$
+\mathbf{x}_{s1}= \begin{bmatrix} 948860.7462\\ 23922798.5111\\ 11350447.7484 \end{bmatrix}\ \text{m}
+$$</div>
+                                    <p>بردار خط دید:</p>
+                                    <div class="formula">$$
+\Delta\mathbf{x}_1= \mathbf{x}_{s1}-\mathbf{x}_r = \begin{bmatrix} -2297844.9502\\ 19869801.8275\\ 7657931.5818 \end{bmatrix}\ \text{m}
+$$</div>
+                                    <p>فاصله هندسی (طول بردار):</p>
+                                    <div class="formula">$$\rho_1 = \sqrt{(-2297844.9502)^2+(19869801.8275)^2+(7657931.5818)^2} = 21418053.8843\ \text{m}$$</div>
+
+                                    <h4>اپک 2</h4>
+                                    <p>مختصات ماهواره:</p>
+                                    <div class="formula">$$
+\mathbf{x}_{s2}= \begin{bmatrix} 948213.9049\\ 23924110.8228\\ 11347717.5969 \end{bmatrix}\ \text{m}
+$$</div>
+                                    <p>بردار خط دید:</p>
+                                    <div class="formula">$$
+\Delta\mathbf{x}_2= \mathbf{x}_{s2}-\mathbf{x}_r = \begin{bmatrix} -2298491.7915\\ 19871114.1392\\ 7655201.4303 \end{bmatrix}\ \text{m}
+$$</div>
+                                    <p>فاصله هندسی (طول بردار):</p>
+                                    <div class="formula">$$\rho_2 = \sqrt{(-2298491.7915)^2+(19871114.1392)^2+(7655201.4303)^2} = 21418364.7972\ \text{m}$$</div>
+
+                                    <hr>
+                                    <div class="note">
+                                        <p><strong>خروجی نهایی بخش 4 (برای مراحل بعد):</strong></p>
+                                        <ul>
+                                            <li>اپک 1: <span class="ltr">($\Delta\mathbf{x}_1 = (-2297844.9502, 19869801.8275, 7657931.5818)\ \text{m}$)</span>, <span class="ltr">($\rho_1=21418053.8843\ \text{m}$)</span></li>
+                                            <li>اپک 2: <span class="ltr">($\Delta\mathbf{x}_2 = (-2298491.7915, 19871114.1392, 7655201.4303)\ \text{m}$)</span>, <span class="ltr">($\rho_2=21418364.7972\ \text{m}$)</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec5">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec5')">مثال عددی</button>
+                                <h2>5) تصحیح چرخش زمین — لازم در <span class="ltr">SPP</span></h2>
+                                <p>چون زمین بین ارسال و دریافت می‌چرخد، معمولاً موقعیت ماهواره را کمی می‌چرخانیم.</p>
+                                <p>تقریب زمان پرواز:</p>
+                                <div class="formula">$$\tau^s \approx \frac{C1C}{c}$$</div>
+                                <p>ماتریس چرخش حول محور <span class="ltr">(Z)</span>:</p>
+                                <div class="formula">$$
+R_3(\theta)=
+\begin{bmatrix}
+\cos\theta & \sin\theta & 0\\
+-\sin\theta & \cos\theta & 0\\
+0&0&1
+\end{bmatrix}
+$$</div>
+                                <p>پس موقعیت تصحیح‌شده:</p>
+                                <div class="formula">$$\mathbf{x}_s' = R_3(\omega_e \tau^s)\; \mathbf{x}_s$$</div>
+                                <p>و در ادامه <span class="ltr">($\rho^s$)</span> را با <span class="ltr">($\mathbf{x}_s'$)</span> حساب می‌کنیم:</p>
+                                <div class="formula">$$\rho^s = |\mathbf{x}_s' - \mathbf{x}_r|$$</div>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec5')">بازگشت</button>
+                                <h2>مثال عددی: تصحیح چرخش زمین — ماهواره <span class="ltr">G04</span></h2>
+                                <div class="flip-scroll">
+                                    <p>در فاصله‌ی زمانی بین <strong>ارسال</strong> و <strong>دریافت</strong> سیگنال، زمین حول محور <span class="ltr">(Z)</span> می‌چرخد. مختصات ماهواره را اصلاح می‌کنیم تا فاصله هندسی را درست محاسبه کنیم.</p>
+                                    
+                                    <hr>
+                                    <h3>5.1 تقریب زمان پرواز سیگنال</h3>
+                                    <div class="formula">$$\tau^s \approx \frac{C1C}{c},\qquad c=299792458\ \text{m/s}$$</div>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($\tau_1=\frac{21274373.129}{299792458} = 0.0709636702\ \text{s}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($\tau_2=\frac{21274683.723}{299792458} = 0.0709647063\ \text{s}$)</span></li>
+                                    </ul>
+
+                                    <hr>
+                                    <h3>5.2 زاویه چرخش زمین در زمان پرواز</h3>
+                                    <div class="formula">$$\theta^s = \omega_e\,\tau^s,\qquad \omega_e=7.292115\times 10^{-5}\ \text{rad/s}$$</div>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($\theta_1 = 5.1747524419\times 10^{-6}\ \text{rad}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($\theta_2 = 5.1748279904\times 10^{-6}\ \text{rad}$)</span></li>
+                                    </ul>
+
+                                    <hr>
+                                    <h3>5.4 محاسبه عددی مختصات تصحیح‌شده ماهواره</h3>
+                                    <p>ورودی‌ها (مختصات <span class="ltr">Broadcast</span> از بخش 3):</p>
+                                    <div class="formula">$$
+\mathbf{x}_{s1}= \begin{bmatrix} 948860.7462\\ 23922798.5111\\ 11350447.7484 \end{bmatrix}\ \text{m},\quad
+\mathbf{x}_{s2}= \begin{bmatrix} 948213.9049\\ 23924110.8228\\ 11347717.5969 \end{bmatrix}\ \text{m}
+$$</div>
+                                    <p><strong>خروجی تصحیح چرخش زمین (<span class="ltr">$\mathbf{x}_s'$</span>):</strong></p>
+                                    <div class="formula">$$
+\mathbf{x}_{s1}'= \begin{bmatrix} 948984.5407\\ 23922793.6007\\ 11350447.7484 \end{bmatrix}\ \text{m},\quad
+\mathbf{x}_{s2}'= \begin{bmatrix} 948337.7080\\ 23924105.9156\\ 11347717.5969 \end{bmatrix}\ \text{m}
+$$</div>
+
+                                    <hr>
+                                    <h3>5.5 فاصله هندسی با مختصات تصحیح‌شده</h3>
+                                    <div class="formula">$$\rho^s = |\mathbf{x}_s' - \mathbf{x}_r|$$</div>
+                                    <p>با مختصات گیرنده <span class="ltr">($\mathbf{x}_r$)</span>:</p>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($\Delta\mathbf{x}_1'= \begin{bmatrix} -2297721.1557\\ 19869796.9171\\ 7657931.5818 \end{bmatrix}\ \text{m}$)</span>, <span class="ltr">($\rho_1' = 21418036.0478\ \text{m}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($\Delta\mathbf{x}_2'= \begin{bmatrix} -2298367.9884\\ 19871109.2320\\ 7655201.4303 \end{bmatrix}\ \text{m}$)</span>, <span class="ltr">($\rho_2' = 21418346.9591\ \text{m}$)</span></li>
+                                    </ul>
+
+                                    <hr>
+                                    <h3>جمع‌بندی خروجی بخش 5</h3>
+                                    <div class="table-responsive">
+                                        <table class="parameter-table" style="font-size: 0.85em;">
+                                            <thead>
+                                                <tr>
+                                                    <th>اپک</th>
+                                                    <th><span class="ltr">$\tau$ (s)</span></th>
+                                                    <th><span class="ltr">$\rho$ (m)</span></th>
+                                                    <th><span class="ltr">$\rho'$ (m)</span></th>
+                                                    <th>تغییر (m)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>0.0709637</td>
+                                                    <td>21418053.8843</td>
+                                                    <td><strong>21418036.0478</strong></td>
+                                                    <td>-17.8365</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>0.0709647</td>
+                                                    <td>21418364.7972</td>
+                                                    <td><strong>21418346.9591</strong></td>
+                                                    <td>-17.8381</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p class="note">از این مرحله به بعد، در تمام محاسبات باید از مختصات و فاصله تصحیح‌شده استفاده شود.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec6">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec6')">مثال عددی</button>
+                                <h2>6) مدل‌های محیطی (در زمان/هندسه همان مشاهده)</h2>
+                                <p>بعد از این‌که <strong>موقعیت ماهواره</strong> و <strong>هندسه خط دید</strong> (Az, El) را به‌دست آوردیم، باید برای هر مشاهده، دو تصحیح محیطی را محاسبه کنیم:</p>
+                                <ul>
+                                    <li><span class="ltr">($T^s$)</span> تأخیر تروپسفری (متر) با مدل <strong>Saastamoinen</strong></li>
+                                    <li><span class="ltr">($I^s$)</span> تأخیر یونوسفری (متر) با مدل <strong>Klobuchar</strong> و ضرایب <span class="ltr">($\alpha,\beta$)</span></li>
+                                </ul>
+                                <p class="note">نکته کلیدی: چون <span class="ltr">($E^s, Az^s$)</span> تابع <span class="ltr">($\mathbf{x}_r$)</span> هستند، پس تصحیحات اتمسفری در هر تکرار به‌روز می‌شوند.</p>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec6')">بازگشت</button>
+                                <h2>مثال عددی: مدل‌های محیطی (<span class="ltr">Troposphere + Ionosphere</span>) — ماهواره <span class="ltr">G04</span></h2>
+                                <div class="flip-scroll">
+                                    <p>در این بخش، تصحیحات محیطی را در هندسه مشخص‌شده برای هر اپک محاسبه می‌کنیم.</p>
+                                    
+                                    <hr>
+                                    <h3>6.1 ورودی‌های لازم این بخش</h3>
+                                    <p><strong>6.1.1 مختصات ژئودتیک گیرنده:</strong></p>
+                                    <div class="formula">$$
+\phi = 35.5965809^\circ,\qquad
+\lambda = 51.3030734^\circ,\qquad
+h = 1081.668\ \text{m}
+$$</div>
+
+                                    <p><strong>6.1.2 آزیموت و ارتفاع ماهواره (با مختصات تصحیح شده برای چرخش زمین):</strong></p>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($Az_1 = 97.863957^\circ,\ E_1 = 47.930137^\circ$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($Az_2 = 97.873439^\circ,\ E_2 = 47.924883^\circ$)</span></li>
+                                    </ul>
+
+                                    <p><strong>6.1.3 ضرایب کلوبوچار (از هدر <span class="ltr">NAV</span>):</strong></p>
+                                    <div class="formula">$$\alpha=[0.3073\times10^{-7},\ 0,\ -0.1192\times10^{-6},\ 0.1788\times10^{-6}]$$</div>
+                                    <div class="formula">$$\beta=[0.1413\times10^{6},\ -0.9830\times10^{5},\ 0.6554\times10^{5},\ -0.3932\times10^{6}]$$</div>
+
+                                    <p><strong>6.1.4 زمان <span class="ltr">GPS</span> برای کلوبوچار:</strong></p>
+                                    <div class="formula">$$t_{GPS,1}=377838\ \text{s},\qquad t_{GPS,2}=377839\ \text{s}$$</div>
+
+                                    <p><strong>6.1.5 پارامتر رطوبت نسبی (<span class="ltr">Saastamoinen</span>):</strong> <span class="ltr">($rh = 0.50$)</span></p>
+
+                                    <hr>
+                                    <h3>6.2 تأخیر یونوسفری با <span class="ltr">Klobuchar</span> (متر)</h3>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($I_1 = 12.653747\ \text{m}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($I_2 = 12.654802\ \text{m}$)</span></li>
+                                    </ul>
+
+                                    <hr>
+                                    <h3>6.3 تأخیر تروپسفری با <span class="ltr">Saastamoinen</span> (متر)</h3>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($T_1 = 2.799249\ \text{m}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($T_2 = 2.799480\ \text{m}$)</span></li>
+                                    </ul>
+
+                                    <hr>
+                                    <h3>خروجی نهایی بخش 6 (برای معادله مشاهده)</h3>
+                                    <div class="table-responsive">
+                                        <table class="parameter-table" style="font-size: 0.85em;">
+                                            <thead>
+                                                <tr>
+                                                    <th>اپک</th>
+                                                    <th><span class="ltr">$Az$ (deg)</span></th>
+                                                    <th><span class="ltr">$E$ (deg)</span></th>
+                                                    <th><span class="ltr">$I$ (m)</span></th>
+                                                    <th><span class="ltr">$T$ (m)</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>97.863957</td>
+                                                    <td>47.930137</td>
+                                                    <td><strong>12.653747</strong></td>
+                                                    <td><strong>2.799249</strong></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>97.873439</td>
+                                                    <td>47.924883</td>
+                                                    <td><strong>12.654802</strong></td>
+                                                    <td><strong>2.799480</strong></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p class="note">این تصحیحات مستقیماً در بردار مشاهده منهای محاسباتی <span class="ltr">($\Delta y$)</span> وارد می‌شوند.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec7">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec7')">مثال عددی</button>
+                                <h2>7) برداشتن <span class="ltr">TGD</span> از نزدیک‌ترین رکورد ناوبری</h2>
+                                <p>برای هر ماهواره <span class="ltr">($s$)</span>:</p>
+                                <ul>
+                                    <li>رکورد ناوبری‌ای که برای مدار/ساعت استفاده کردی (نزدیک به <span class="ltr">($t_e$)</span>) همان‌جا معمولاً <strong><span class="ltr">TGD</span></strong> هم دارد.</li>
+                                    <li><span class="ltr">($TGD^s$)</span> را برمی‌داری و وارد معادله می‌کنی (به متر: <span class="ltr">($c\,TGD^s$)</span>).</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec7')">بازگشت</button>
+                                <h2>مثال عددی: برداشت <span class="ltr">TGD</span> و تبدیل به متر (ماهواره <span class="ltr">G04</span>)</h2>
+                                <div class="flip-scroll">
+                                    <p>در این بخش، <strong>گروه‌دیلی ماهواره (TGD)</strong> را از رکورد ناوبری استخراج کرده و به متر تبدیل می‌کنیم.</p>
+                                    
+                                    <hr>
+                                    <h3>7.1 استخراج <span class="ltr">TGD</span> از رکورد <span class="ltr">NAV (G04)</span></h3>
+                                    <div class="formula">$$TGD^{G04} = -0.465661287308 \times 10^{-8}\ \text{s}$$</div>
+
+                                    <hr>
+                                    <h3>7.2 تبدیل <span class="ltr">TGD</span> از ثانیه به متر</h3>
+                                    <div class="formula">$$c\,TGD^s = c \times TGD^s,\qquad c = 299792458\ \text{m/s}$$</div>
+                                    <div class="formula">$$
+c\,TGD^{G04} = 299792458 \times (-0.465661287308 \times 10^{-8}) = \mathbf{-1.39565\ \text{m}}
+$$</div>
+
+                                    <hr>
+                                    <h3>7.3 کاربرد <span class="ltr">TGD</span> در معادله مشاهده</h3>
+                                    <p>برای هر مشاهده کُد <span class="ltr">(C1C)</span>، مقدار <span class="ltr">TGD</span> به‌صورت افزونی در مدل وارد می‌شود:</p>
+                                    <div class="formula">$$y^s = \rho^s + c(\delta t_r - \delta t_s) + T^s + I^s + \boxed{c\,TGD^s} + \varepsilon^s$$</div>
+                                    
+                                    <hr>
+                                    <div class="note">
+                                        <p><strong>خروجی نهایی بخش 7:</strong></p>
+                                        <div class="formula">$$c\,TGD^{G04} = \mathbf{-1.39565\ \text{m}}$$</div>
+                                    </div>
+                                    <p class="note">این مقدار در مرحله بعد، هنگام محاسبه <strong>مشاهده منهای محاسباتی</strong> <span class="ltr">($\Delta y$)</span> به‌کار می‌رود.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec8">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec8')">مثال عددی</button>
+                                <h2>8) معادله مشاهده کُد (فقط <code>C1C</code>) با نماد <span class="ltr">($y$)</span></h2>
+                                <p>برای ماهواره <span class="ltr">($s$)</span> در اپک دریافت <span class="ltr">($t_r$)</span>، مشاهده را این‌طور تعریف می‌کنیم:</p>
+                                <div class="formula">$$y^s \equiv C1C^s(t_r)\qquad [\text{m}]$$</div>
+                                <p>مدل مشاهده (برای <span class="ltr">GPS</span> و کُد):</p>
+                                <div class="formula">$$y^s = \rho'^s(\mathbf{x}_r,\mathbf{x}_s') + c(\delta t_r - \delta t_s) + T^s + I^s + c\,TGD^s + \varepsilon^s$$</div>
+                                <p>که در آن:</p>
+                                <ul>
+                                    <li><span class="ltr">($\delta t_s$)</span> از <span class="ltr">NAV</span> (بخش 2) <strong>معلوم</strong> است</li>
+                                    <li><span class="ltr">($\mathbf{x}_s'$)</span> از <span class="ltr">NAV</span> (بخش 3 + 5) <strong>معلوم</strong> است (در هر تکرار با <span class="ltr">($t_e$)</span>)</li>
+                                    <li><span class="ltr">($T^s, I^s$)</span> در هر تکرار با هندسه فعلی محاسبه می‌شوند</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec8')">بازگشت</button>
+                                <h2>مثال عددی: معادله مشاهده کُد (ماهواره <span class="ltr">G04</span>)</h2>
+                                <div class="flip-scroll">
+                                    <p>در این بخش، تمام جملات معلوم را در یک طرف جمع می‌کنیم تا مجهول ساعت گیرنده باقی بماند.</p>
+                                    
+                                    <hr>
+                                    <h3>8.1 بازنویسی عددی</h3>
+                                    <div class="formula">$$y^s - \rho'^s - D^s = c\,\delta t_r + \varepsilon^s$$</div>
+                                    <div class="formula">$$D^s = -c\,\delta t_s + T^s + I^s + c\,TGD^s$$</div>
+
+                                    <hr>
+                                    <h3>8.2 جایگذاری عددی (ماهواره <span class="ltr">G04</span>)</h3>
+                                    <p>با سرعت نور: <span class="ltr">($c = 299792458\ \text{m/s}$)</span></p>
+
+                                    <h4>(الف) اپک 1</h4>
+                                    <ul>
+                                        <li>مشاهده: <span class="ltr">($y_1 = 21274373.129\ \text{m}$)</span></li>
+                                        <li>فاصله با تصحیح چرخش زمین: <span class="ltr">($\rho'_1 = 21418036.0478\ \text{m}$)</span></li>
+                                        <li>تصحیحات: <span class="ltr">($I_1 = 12.653747\ \text{m},\ T_1 = 2.799249\ \text{m},\ cTGD = -1.39565\ \text{m}$)</span></li>
+                                        <li>ساعت ماهواره: <span class="ltr">($c\delta t_{s1} = 143667.846178\ \text{m}$)</span></li>
+                                    </ul>
+                                    <div class="formula">$$D_1 = -143667.846178 + 2.799249 + 12.653747 - 1.39565 = \mathbf{-143653.788832\ \text{m}}$$</div>
+                                    <p><strong>معادله نهایی اپک 1:</strong></p>
+                                    <div class="formula">$$\boxed{-9.1299678273 = c\,\delta t_r + \varepsilon_1}\ \text{(m)}$$</div>
+
+                                    <hr>
+                                    <h4>(ب) اپک 2</h4>
+                                    <ul>
+                                        <li>مشاهده: <span class="ltr">($y_2 = 21274683.723\ \text{m}$)</span></li>
+                                        <li>فاصله با تصحیح چرخش زمین: <span class="ltr">($\rho'_2 = 21418346.9591\ \text{m}$)</span></li>
+                                        <li>تصحیحات: <span class="ltr">($I_2 = 12.654802\ \text{m},\ T_2 = 2.799480\ \text{m},\ cTGD = -1.39565\ \text{m}$)</span></li>
+                                        <li>ساعت ماهواره: <span class="ltr">($c\delta t_{s2} = 143667.847877\ \text{m}$)</span></li>
+                                    </ul>
+                                    <div class="formula">$$D_2 = -143667.847877 + 2.799480 + 12.654802 - 1.39565 = \mathbf{-143653.789245\ \text{m}}$$</div>
+                                    <p><strong>معادله نهایی اپک 2:</strong></p>
+                                    <div class="formula">$$\boxed{-9.4468552619 = c\,\delta t_r + \varepsilon_2}\ \text{(m)}$$</div>
+
+                                    <hr>
+                                    <div class="note">
+                                        <p><strong>خروجی نهایی بخش 8:</strong></p>
+                                        <div class="formula">$$y_1 - \rho'_1 - D_1 = \mathbf{-9.1299678273\ \text{m}}$$</div>
+                                        <div class="formula">$$y_2 - \rho'_2 - D_2 = \mathbf{-9.4468552619\ \text{m}}$$</div>
+                                    </div>
+                                    <p class="note">این مقادیر مستقیماً در بردار مشاهده منهای محاسباتی <span class="ltr">($\Delta y$)</span> وارد می‌شوند.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec9">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec9')">مثال عددی</button>
+                                <h2>9) خطی‌سازی و ساخت ماتریس طرح <span class="ltr">($A$)</span> (<span class="ltr">SPP</span> تکراری)</h2>
+                                <p>در تکرار <span class="ltr">($k$)</span>، تقریب <span class="ltr">($\mathbf{x}_r^{(k)}$)</span> و <span class="ltr">($\delta t_r^{(k)}$)</span> را داریم.</p>
+
+                                <h3>9.1 کمیت‌های محاسباتی در تکرار <span class="ltr">($k$)</span></h3>
+                                <div class="formula">$$\rho^{s(k)} = |\mathbf{x}_s' - \mathbf{x}_r^{(k)}|$$</div>
+                                <p>بردار یکه از گیرنده به سمت ماهواره (برای مشتق‌ها):</p>
+                                <div class="formula">$$
+\mathbf{e}^{s(k)}=
+\frac{\mathbf{x}_s' - \mathbf{x}_r^{(k)}}{\rho^{s(k)}}=
+\begin{bmatrix}
+e_x\\ e_y\\ e_z
+\end{bmatrix}
+$$</div>
+
+                                <h3>9.2 شکل خطی معادله</h3>
+                                <p>مجهولات افزایشی را این‌طور تعریف کن:</p>
+                                <div class="formula">$$
+\Delta\mathbf{p}=
+\begin{bmatrix}
+\Delta X\\ \Delta Y\\ \Delta Z\\ \Delta(c\delta t_r)
+\end{bmatrix}
+$$</div>
+                                <p>کمیت مشاهده منهای محاسبه (بر حسب <span class="ltr">($y$)</span>):</p>
+                                <div class="formula">$$
+\Delta y^{s(k)} =
+y^s -
+\Big(
+\rho^{s(k)}
+ + c(\delta t_r^{(k)} - \delta t_s)
+ + T^{s(k)}
+ + I^{s(k)}
+ + c\,TGD^s
+\Big)
+$$</div>
+                                <p>حالا خطی‌سازی:</p>
+                                <div class="formula">$$
+\Delta y^{s(k)} \approx
+\underbrace{\Big[-e_x^{s(k)}\;;\; -e_y^{s(k)}\;;\; -e_z^{s(k)}\;;\; 1\Big]}_{A_s^{(k)}}
+\;\Delta\mathbf{p}
+$$</div>
+                                <p>پس <strong>سطر ماتریس طرح</strong> برای هر مشاهده <code>C1C</code> دقیقاً می‌شود:</p>
+                                <div class="formula">$$
+A_s^{(k)} = \left[-\frac{X_s'-X^{(k)}}{\rho^{s(k)}},\;
+-\frac{Y_s'-Y^{(k)}}{\rho^{s(k)}},\;
+-\frac{Z_s'-Z^{(k)}}{\rho^{s(k)}},\;
+1
+\right]
+$$</div>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec9')">بازگشت</button>
+                                <h2>مثال عددی: خطی‌سازی و ساخت ماتریس طرح (G04)</h2>
+                                <div class="flip-scroll">
+                                    <p>در تکرار اول <span class="ltr">($k=0$)</span>، تقریب اولیه مختصات و ساعت را داریم:</p>
+                                    <div class="formula">$$
+\mathbf{x}_r^{(0)}= \begin{bmatrix} 3246705.6964\\ 4052996.6836\\ 3692516.1666 \end{bmatrix}\ \text{m}, \qquad (c\delta t_r)^{(0)} = 0\ \text{m}
+$$</div>
+
+                                    <hr>
+                                    <h3>9.1 کمیت‌های محاسباتی در تکرار <span class="ltr">($k=0$)</span></h3>
+                                    
+                                    <h4>اپک 1 (G04)</h4>
+                                    <div class="formula">$$\mathbf{x}_{s1}'= \begin{bmatrix} 948984.5407\\ 23922793.6007\\ 11350447.7484 \end{bmatrix}\ \text{m},\quad \rho_1'=21418036.0479\ \text{m}$$</div>
+                                    <p>بردار یکه از گیرنده به ماهواره:</p>
+                                    <div class="formula">$$
+\mathbf{e}_1= \frac{\Delta\mathbf{x}_1'}{\rho_1'}= \begin{bmatrix} e_{x1}\\e_{y1}\\e_{z1} \end{bmatrix} = \begin{bmatrix} -0.10727973\\ \ \ 0.92771330\\ \ \ 0.35754593 \end{bmatrix}
+$$</div>
+
+                                    <h4>اپک 2 (G04)</h4>
+                                    <div class="formula">$$\mathbf{x}_{s2}'= \begin{bmatrix} 948337.7080\\ 23924105.9156\\ 11347717.5969 \end{bmatrix}\ \text{m},\quad \rho_2'=21418346.9591\ \text{m}$$</div>
+                                    <p>بردار یکه:</p>
+                                    <div class="formula">$$
+\mathbf{e}_2= \frac{\Delta\mathbf{x}_2'}{\rho_2'}= \begin{bmatrix} -0.10730837\\ \ \ 0.92776110\\ \ \ 0.35741327 \end{bmatrix}
+$$</div>
+
+                                    <hr>
+                                    <h3>9.2 تشکیل سطرهای ماتریس طرح و بردار مشاهده</h3>
+                                    <p>کمیت «مشاهده منهای محاسبه» (از بخش 8):</p>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($\Delta y_1^{(0)}= -9.1299678273\ \text{m}$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($\Delta y_2^{(0)}= -9.4468552619\ \text{m}$)</span></li>
+                                    </ul>
+
+                                    <p>سطر ماتریس طرح <span class="ltr">($A_s^{(k)} = [-e_x,\ -e_y,\ -e_z,\ 1]$)</span>:</p>
+                                    <ul>
+                                        <li>اپک 1: <span class="ltr">($A_1^{(0)} = [0.10727973,\ -0.92771330,\ -0.35754593,\ 1]$)</span></li>
+                                        <li>اپک 2: <span class="ltr">($A_2^{(0)} = [0.10730837,\ -0.92776110,\ -0.35741327,\ 1]$)</span></li>
+                                    </ul>
+
+                                    <hr>
+                                    <div class="note">
+                                        <p><strong>خروجی نهایی بخش 9 (آماده برای سرشکنی):</strong></p>
+                                        <div class="formula">$$
+A^{(0)}= \begin{bmatrix} 0.10727973 & -0.92771330 & -0.35754593 & 1\\ 0.10730837 & -0.92776110 & -0.35741327 & 1 \end{bmatrix}
+$$</div>
+                                        <div class="formula">$$
+\Delta\mathbf{y}^{(0)}= \begin{bmatrix} -9.1299678273\\ -9.4468552619 \end{bmatrix}\ \text{m}
+$$</div>
+                                    </div>
+                                    <p class="note">توجه: این سیستم با ۲ معادله و ۴ مجهول کم‌معادله است. در عمل سطر تمام ماهواره‌ها روی هم قرار می‌گیرند تا سیستم قابل حل شود.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" id="flip-sec10">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec10')">مثال عددی</button>
+                                <h2>10) حل کمترین مربعات تکراری</h2>
+                                <p>اگر در یک اپک <span class="ltr">($m$)</span> ماهواره داریم، بردارها:</p>
+                                <div class="formula">$$
+\Delta\mathbf{y}^{(k)} =
+\begin{bmatrix}
+\Delta y^{1(k)}\ \Delta y^{2(k)}\ \vdots\ \Delta y^{m(k)}
+\end{bmatrix},
+\quad
+A^{(k)}=
+\begin{bmatrix}
+A_1^{(k)}\ A_2^{(k)}\ \vdots\ A_m^{(k)}
+\end{bmatrix}
+$$</div>
+                                <p>مدل خطی:</p>
+                                <div class="formula">$$\Delta\mathbf{y}^{(k)} = A^{(k)}\Delta\mathbf{p} + \mathbf{v}$$</div>
+                                <p>حل <span class="ltr">WLS</span>:</p>
+                                <div class="formula">$$
+\Delta\hat{\mathbf{p}}=
+\left((A^{(k)})^T P A^{(k)}\right)^{-1}(A^{(k)})^T P \Delta\mathbf{y}^{(k)}
+$$</div>
+                                <p>به‌روزرسانی:</p>
+                                <div class="formula">$$
+\mathbf{x}_r^{(k+1)}=\mathbf{x}_r^{(k)}+\begin{bmatrix}\Delta X\\ \Delta Y\\ \Delta Z\end{bmatrix}
+$$</div>
+                                <div class="formula">$$
+(c\delta t_r)^{(k+1)}=(c\delta t_r)^{(k)}+\Delta(c\delta t_r)
+$$</div>
+                                <p>معیار همگرایی (پیشنهاد عملی):</p>
+                                <div class="formula">$$\sqrt{\Delta X^2+\Delta Y^2+\Delta Z^2} < 10^{-3}\ \text{m}$$</div>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec10')">بازگشت</button>
+                                <h2>مثال عددی: حل کمترین مربعات تکراری (<span class="ltr">Iterative Least Squares</span>)</h2>
+                                <div class="flip-scroll">
+                                    <p>در این بخش نشان می‌دهیم که <strong>پس از ساخت <span class="ltr">($\Delta \mathbf{y}$)</span> و ماتریس طرح <span class="ltr">(A)</span></strong> چگونه مجهولات را به‌صورت تکراری به‌روزرسانی می‌کنیم.</p>
+                                    
+                                    <div class="note">
+                                        <p><strong>نکته آموزشی:</strong> روش حل مستقل از تعداد ماهواره‌هاست؛ در این مثال فقط یک ماهواره داریم، پس حل کامل ممکن نیست، اما منطق دقیقاً همان <span class="ltr">SPP</span> واقعی است.</p>
+                                    </div>
+
+                                    <hr>
+                                    <h3>10.1 مدل خطی در تکرار <span class="ltr">(k)</span></h3>
+                                    <div class="formula">$$\Delta\mathbf{y}^{(k)} = A^{(k)}\Delta\mathbf{p} + \mathbf{v}$$</div>
+
+                                    <hr>
+                                    <h3>10.2 داده‌های مثال (ماهواره <span class="ltr">G04</span>)</h3>
+                                    <p><strong>بردار مجهولات افزایشی:</strong></p>
+                                    <div class="formula">$$\Delta\mathbf{p}= \begin{bmatrix} \Delta X\\ \Delta Y\\ \Delta Z\\ \Delta(c\delta t_r) \end{bmatrix}$$</div>
+                                    
+                                    <p><strong>بردار <span class="ltr">($\Delta \mathbf{y}$)</span> (از بخش 9):</strong></p>
+                                    <div class="formula">$$\Delta\mathbf{y}^{(0)}= \begin{bmatrix} -9.1299678273\\ -9.4468552619 \end{bmatrix}\ \text{m}$$</div>
+
+                                    <p><strong>ماتریس طرح <span class="ltr">(A)</span>:</strong></p>
+                                    <div class="formula">$$A^{(0)}= \begin{bmatrix} 0.10727973 & -0.92771330 & -0.35754593 & 1\\ 0.10730837 & -0.92776110 & -0.35741327 & 1 \end{bmatrix}$$</div>
+
+                                    <hr>
+                                    <h3>10.3 تفسیر عددی برای این مثال خاص</h3>
+                                    <p>در این مسئله تعداد معادلات <span class="ltr">($n=2$)</span> کمتر از مجهولات <span class="ltr">($u=4$)</span> است، پس ماتریس <span class="ltr">$A^T A$</span> وارون‌پذیر نیست. اما اگر (صرفاً برای درک) فرض کنیم مختصات ثابت است:</p>
+                                    <div class="formula">$$\Delta(c\delta t_r) \approx \frac{-9.13 + (-9.45)}{2} = \mathbf{-9.29\ \text{m}}$$</div>
+                                    <p>معادل زمانی:</p>
+                                    <div class="formula">$$\delta t_r \approx \frac{-9.29}{c} \approx \mathbf{-31.0\ \text{ns}}$$</div>
+                                    <p class="note">این عدد نشان می‌دهد ساعت گیرنده در این اپک‌ها حدود 30 نانوثانیه جلو بوده است.</p>
+
+                                    <hr>
+                                    <h3>10.4 به‌روزرسانی مجهولات و همگرایی</h3>
+                                    <p>در حالت کلی <span class="ltr">SPP</span>، پس از حل:</p>
+                                    <div class="formula">$$\mathbf{x}_r^{(k+1)} = \mathbf{x}_r^{(k)} + \Delta\mathbf{x}$$</div>
+                                    <div class="formula">$$(c\delta t_r)^{(k+1)} = (c\delta t_r)^{(k)} + \Delta(c\delta t_r)$$</div>
+                                    <p>حل تا برقراری شرط زیر ادامه می‌یابد:</p>
+                                    <div class="formula">$$\sqrt{(\Delta X)^2+(\Delta Y)^2+(\Delta Z)^2} < 10^{-3}\ \text{m}$$</div>
+
+                                    <hr>
+                                    <div class="note">
+                                        <p><strong>جمع‌بندی آموزشی:</strong> کمترین مربعات تکراری قلب الگوریتم <span class="ltr">SPP</span> است. ما با استفاده از اختلاف مشاهده و مدل، اصلاحات را به‌دست آورده و تا همگرایی پیش می‌رویم.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>11) ماتریس طرح در <span class="ltr">SPP</span> با ساعت گیرنده مشترک</h2>
+
+                    <p>فرض می‌کنیم مجموعه‌ای از مشاهدات کُد (<code>C1C</code>) در چند اپک مختلف در اختیار داریم. در مدل <span class="ltr">SPP</span> مورد استفاده در این سند:</p>
+                    <ul>
+                        <li>مختصات گیرنده (<span class="ltr">X,Y,Z</span>) <strong>برای کل مجموعه مشاهدات ثابت</strong> فرض می‌شود.</li>
+                        <li>بایاس ساعت گیرنده <span class="ltr">($\delta t_r$)</span> نیز <strong>یک پارامتر مشترک</strong> برای تمام مشاهدات در نظر گرفته می‌شود.</li>
+                        <li>در نتیجه، <strong>بردار مجهولات مستقل از تعداد اپک‌ها</strong> بوده و فقط شامل چهار مؤلفه است.</li>
+                    </ul>
+
+                    <h3>بردار مجهولات (با واحد متر):</h3>
+                    <div class="formula">$$
+\Delta \mathbf{p} =
+\begin{bmatrix}
+\Delta X \\
+\Delta Y \\
+\Delta Z \\
+\Delta (c\,\delta t_r)
+\end{bmatrix}
+$$</div>
+
+                    <h3>سطر ماتریس طرح برای هر مشاهده</h3>
+                    <p>برای هر مشاهده <span class="ltr">($s$)</span> (صرف‌نظر از این‌که متعلق به کدام اپک باشد)، سطر متناظر در ماتریس طرح به‌صورت زیر تعریف می‌شود:</p>
+                    <div class="formula">$$
+A_s =
+\left[
+-\frac{X_s' - X}{\rho^s},
+-\frac{Y_s' - Y}{\rho^s},
+-\frac{Z_s' - Z}{\rho^s},
+1
+\right]
+$$</div>
+                    <p>که در آن:</p>
+                    <ul>
+                        <li><span class="ltr">($X_s',Y_s',Z_s'$)</span> مختصات ماهواره پس از اعمال تصحیح چرخش زمین است،</li>
+                        <li><span class="ltr">($\rho^s$)</span> فاصله هندسی بین گیرنده و ماهواره می‌باشد.</li>
+                    </ul>
+
+                    <h3>ساختار کلی ماتریس طرح</h3>
+                    <p>اگر مجموعاً <span class="ltr">($N$)</span> مشاهده کُد (<code>C1C</code>) (از یک یا چند اپک) در اختیار باشد، ماتریس طرح به‌صورت زیر نوشته می‌شود:</p>
+                    <div class="formula">$$
+A =
+\begin{bmatrix}
+A_1 \\
+A_2 \\
+\vdots \\
+A_N
+\end{bmatrix}
+\quad
+\Rightarrow
+\quad
+A \in \mathbb{R}^{N \times 4}
+$$</div>
+                    <p>در این ساختار:</p>
+                    <ul>
+                        <li><strong>تعداد سطرها</strong> برابر تعداد کل مشاهدات است،</li>
+                        <li><strong>تعداد ستون‌ها همیشه برابر ۴</strong> و مستقل از تعداد اپک‌ها می‌باشد.</li>
+                    </ul>
+
+                    <h3>بردار مشاهدات خطی‌شده</h3>
+                    <p>بردار کمیت «مشاهده منهای محاسبه‌شده» نیز به‌صورت زیر تشکیل می‌شود:</p>
+                    <div class="formula">$$
+\Delta \mathbf{y} =
+\begin{bmatrix}
+\Delta y_1 \\
+\Delta y_2 \\
+\vdots \\
+\Delta y_N
+\end{bmatrix}
+$$</div>
+                    <p>که هر مؤلفه آن از رابطه زیر به‌دست می‌آید:</p>
+                    <div class="formula">$$
+\Delta y_s =
+y^s -
+\left(
+\rho^s
+ + c(\delta t_r - \delta t_s)
+ + T^s
+ + I^s
+ + c\,TGD^s
+\right)
+$$</div>
+                </div>
+
+                <div class="flip-card" id="flip-sec12">
+                    <div class="flip-card-inner">
+                        <div class="flip-face flip-front">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec12')">تفسیر و جزییات</button>
+                                <h2>12) دقت مجهولات از وارون ماتریس نرمال</h2>
+                                <p>پس از همگرایی حل کمترین مربعات، می‌توان <strong>دقت آماری مجهولات تخمینی</strong> را با استفاده از ماتریس نرمال محاسبه کرد.</p>
+                                <div class="formula">$$\mathbf{Q}_{\hat{p}} = \hat{\sigma}_0^2\,\mathbf{N}^{-1}$$</div>
+                                <p>که در آن <span class="ltr">($\mathbf{N} = \mathbf{A}^T \mathbf{P} \mathbf{A}$)</span> ماتریس نرمال و <span class="ltr">($\hat{\sigma}_0^2$)</span> واریانس واحد وزن است.</p>
+                            </div>
+                        </div>
+                        <div class="flip-face flip-back">
+                            <div class="calculation-step">
+                                <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec12')">بازگشت</button>
+                                <h2>جزییات محاسباتی دقت مجهولات در <span class="ltr">SPP</span></h2>
+                                <div class="flip-scroll">
+                                    <div class="note">
+                                        <p><strong>نکته مهم:</strong> در <span class="ltr">SPP</span> کلاسیک، بردار مجهولات <strong>۴تایی</strong> است:</p>
+                                        <div class="formula">$$(X,\ Y,\ Z,\ c\delta t_r)$$</div>
+                                        <p>بنابراین <strong>فقط یک انحراف معیار ساعت گیرنده داریم</strong>.</p>
+                                    </div>
+
+                                    <hr>
+                                    <h3>12.1 ماتریس نرمال</h3>
+                                    <p>پس از تشکیل ماتریس طرح <span class="ltr">(A)</span> و ماتریس وزن <span class="ltr">(P)</span>:</p>
+                                    <div class="formula">$$\mathbf{N} = \mathbf{A}^T \mathbf{P} \mathbf{A}$$</div>
+
+                                    <hr>
+                                    <h3>12.2 تخمین مجهولات (یادآوری)</h3>
+                                    <div class="formula">$$\hat{\Delta \mathbf{p}} = \mathbf{N}^{-1}\mathbf{A}^T \mathbf{P}\,\Delta\mathbf{y}$$</div>
+
+                                    <hr>
+                                    <h3>12.3 پس‌ماندها</h3>
+                                    <p>نشان‌دهنده میزان سازگاری هر مشاهده با مدل نهایی:</p>
+                                    <div class="formula">$$\mathbf{v} = \Delta\mathbf{y} - \mathbf{A}\,\hat{\Delta \mathbf{p}}$$</div>
+
+                                    <hr>
+                                    <h3>12.4 واریانس واحد وزن</h3>
+                                    <p>برآوردشده از داده‌ها:</p>
+                                    <div class="formula">$$\hat{\sigma}_0^2 = \frac{\mathbf{v}^T \mathbf{P}\mathbf{v}}{n-u}$$</div>
+                                    <p>که در آن <span class="ltr">($n$)</span> تعداد مشاهدات و <span class="ltr">($u=4$)</span> تعداد مجهولات است.</p>
+
+                                    <hr>
+                                    <h3>12.5 ماتریس کوواریانس مجهولات</h3>
+                                    <div class="formula">$$\mathbf{Q}_{\hat{p}} = \hat{\sigma}_0^2\,\mathbf{N}^{-1}$$</div>
+
+                                    <hr>
+                                    <h3>12.6 انحراف معیار مجهولات</h3>
+                                    <p>از عناصر قطری ماتریس کوواریانس:</p>
+                                    <div class="formula">$$
+\begin{aligned}
+\sigma_X &= \sqrt{Q_{\hat{p}}(1,1)} \\
+\sigma_Y &= \sqrt{Q_{\hat{p}}(2,2)} \\
+\sigma_Z &= \sqrt{Q_{\hat{p}}(3,3)} \\
+\sigma_{c\delta t_r} &= \sqrt{Q_{\hat{p}}(4,4)}
+\end{aligned}
+$$</div>
+
+                                    <hr>
+                                    <h3>12.7 تفسیر فیزیکی نتایج</h3>
+                                    <ul>
+                                        <li><strong><span class="ltr">($\sigma_X,\sigma_Y,\sigma_Z$)</span>:</strong> دقت مختصات گیرنده در دستگاه <span class="ltr">ECEF</span> (متر).</li>
+                                        <li><strong><span class="ltr">($\sigma_{c\delta t_r}$)</span>:</strong> دقت تخمین بایاس ساعت گیرنده (متر).</li>
+                                    </ul>
+                                    <p class="note">هرچه تعداد ماهواره‌ها بیشتر و هندسه بهتر باشد (<span class="ltr">GDOP</span> کمتر)، این مقادیر کوچک‌تر خواهند شد.</p>
+
+                                    <hr>
+                                    <h3>12.8 نکته آموزشی بسیار مهم</h3>
+                                    <p>دقت مجهولات فقط به نویز مشاهدات وابسته نیست؛ بلکه به <strong>هندسه ماهواره‌ها، وزن‌دهی، و صحت مدل‌ها</strong> نیز وابسته است.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>13) آزمون آماری پس از سرشکنی (Overall Model Test)</h2>
+                    <p>پس از انجام سرشکنی کمترین مربعات و محاسبه بردار پس‌ماندها، لازم است <strong>سازگاری کلی بین مشاهدات، مدل ریاضی و وزن‌ها</strong> بررسی شود.</p>
+                    <p>این بررسی با استفاده از <strong>Overall Model Test</strong> (آزمون کلی <strong>خی‌دو</strong>) انجام می‌شود که یکی از مهم‌ترین آزمون‌های آماری پس از سرشکنی در ژئودزی و <span class="ltr">GNSS</span> است.</p>
+
+                    <h3>13.1 تعریف واریانس واحد وزن</h3>
+                    <p>پس از سرشکنی، واریانس واحد وزن به‌صورت زیر برآورد می‌شود:</p>
+                    <div class="formula">$$
+\hat{\sigma}_0^2=\frac{\hat{\mathbf{v}}^T \mathbf{P}\,\hat{\mathbf{v}}}{n-u}
+$$</div>
+                    <p>که در آن:</p>
+                    <ul>
+                        <li><span class="ltr">($\hat{\mathbf{v}}$)</span> : بردار پس‌ماندها</li>
+                        <li><span class="ltr">($\mathbf{P}$)</span> : ماتریس وزن مشاهدات</li>
+                        <li><span class="ltr">($n$)</span> : تعداد مشاهدات</li>
+                        <li><span class="ltr">($u$)</span> : تعداد مجهولات (در <span class="ltr">SPP</span> برابر ۴)</li>
+                    </ul>
+                    <p>در صورت استفاده از وزن واحد <span class="ltr">($\mathbf{P}=\mathbf{I}$)</span>:</p>
+                    <div class="formula">$$
+\hat{\sigma}_0^2=\frac{\hat{\mathbf{v}}^T \hat{\mathbf{v}}}{n-u}
+$$</div>
+
+                    <h3>13.2 آماره آزمون خی‌دو</h3>
+                    <p>آماره آزمون کلی به‌صورت زیر تعریف می‌شود:</p>
+                    <div class="formula">$$
+T=\frac{\hat{\mathbf{v}}^T \mathbf{P}\,\hat{\mathbf{v}}}{\sigma_0^2}
+$$</div>
+                    <ul>
+                        <li><span class="ltr">($\sigma_0^2$)</span> واریانس <strong>فرض‌شده اولیه</strong> مشاهدات (<span class="ltr">a priori</span>) است.</li>
+                        <li>آماره <span class="ltr">($T$)</span> از توزیع خی‌دو با <span class="ltr">($n-u$)</span> درجه آزادی تبعیت می‌کند:</li>
+                    </ul>
+                    <div class="formula">$$
+T \sim \chi^2_{(n-u)}
+$$</div>
+
+                    <h3>13.3 معیار قبولی یا رد آزمون</h3>
+                    <p>برای سطح اطمینان <span class="ltr">($1-\alpha$)</span> (معمولاً ۹۵٪):</p>
+                    <div class="formula">$$
+\chi^2_{\alpha/2,\;n-u}\;\le\;T\;\le\;\chi^2_{1-\alpha/2,\;n-u}
+$$</div>
+                    <ul>
+                        <li>اگر این شرط برقرار باشد → <strong>مدل، مشاهدات و وزن‌ها سازگار هستند</strong></li>
+                        <li>اگر برقرار نباشد → <strong>مدل یا داده‌ها دارای مشکل آماری هستند</strong></li>
+                    </ul>
+
+                    <h3>13.4 تفسیر نتایج آزمون</h3>
+                    <ul>
+                        <li>اگر <span class="ltr">($\hat{\sigma}_0^2 \approx \sigma_0^2$)</span>، مدل ریاضی و وزن‌ها مناسب انتخاب شده‌اند.</li>
+                        <li>اگر <span class="ltr">($\hat{\sigma}_0^2 \gg \sigma_0^2$)</span>، نویز مشاهدات بیش از انتظار است (مانند <span class="ltr">multipath</span>، خطای یونوسفر، یا حذف نکردن ماهواره نامناسب).</li>
+                        <li>اگر <span class="ltr">($\hat{\sigma}_0^2 \ll \sigma_0^2$)</span>، وزن‌ها بیش از حد محافظه‌کارانه انتخاب شده‌اند.</li>
+                    </ul>
+
+                    <h3>13.5 ارتباط آزمون با دقت مجهولات</h3>
+                    <p>کوواریانس مجهولات تخمینی به‌صورت زیر محاسبه می‌شود:</p>
+                    <div class="formula">$$
+\mathbf{Q}_{\hat{x}}=\hat{\sigma}_0^2\,(\mathbf{A}^T \mathbf{P} \mathbf{A})^{-1}
+$$</div>
+                    <p>و انحراف معیار هر مؤلفه از قطر این ماتریس به‌دست می‌آید:</p>
+                    <div class="formula">$$
+\sigma_X=\sqrt{Q_{\hat{x}}(1,1)},\quad
+\sigma_Y=\sqrt{Q_{\hat{x}}(2,2)},\quad
+\sigma_Z=\sqrt{Q_{\hat{x}}(3,3)}
+$$</div>
+
+                    <h3>13.6 نتیجه‌گیری آموزشی</h3>
+                    <div class="note">
+                        <p>&gt; Overall Model Test (آزمون کلی خی‌دو) یکی از مهم‌ترین مراحل پس از سرشکنی است که نشان می‌دهد آیا حل به‌دست‌آمده از نظر آماری قابل اعتماد است یا خیر.<br/>&gt; بدون این آزمون، تحلیل دقت مختصات گیرنده کامل نخواهد بود.</p>
+                    </div>
+                </div>
+
+                <div class="calculation-step">
+                    <h2>چک‌لیست اجرایی (خارج از شماره‌بندی)</h2>
+                    <p>برای تمرین و اجرای مرحله‌به‌مرحله، بعد از انجام هر بخش می‌توانید تیک بزنید:</p>
+                    <div class="checklist">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step1">
+                            <label class="form-check-label" for="step1">
+                                ۱. خواندن مقادیر مشاهده <span class="ltr">(y = <code>C1C</code>)</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step2">
+                            <label class="form-check-label" for="step2">
+                                ۲. محاسبه تقریب اولیه زمان ارسال <span class="ltr">($t_e^{(0)} = t_r - \frac{y}{c}$)</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step3">
+                            <label class="form-check-label" for="step3">
+                                ۳. استخراج <span class="ltr">($a_0, a_1, a_2, t_{oc}$)</span>، پارامترهای مدار و <span class="ltr">TGD</span> از فایل <span class="ltr">NAV</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step4">
+                            <label class="form-check-label" for="step4">
+                                ۴. محاسبه تصحیح ساعت ماهواره <span class="ltr">($\delta t_s(t_e)$)</span> (پلی‌نوم + نسبیتی) و به‌روزرسانی دقیق زمان ارسال <span class="ltr">($t_e$)</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step5">
+                            <label class="form-check-label" for="step5">
+                                ۵. محاسبه موقعیت ماهواره در زمان ارسال <span class="ltr">($\mathbf{x}_s(t_e)$)</span> با استفاده از <span class="ltr">Broadcast ephemeris</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step6">
+                            <label class="form-check-label" for="step6">
+                                ۶. اعمال تصحیح چرخش زمین: <span class="ltr">($\mathbf{x}_s' = R_3(\omega_e \tau) \mathbf{x}_s$)</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step7">
+                            <label class="form-check-label" for="step7">
+                                ۷. محاسبه زوایای هندسی <span class="ltr">(E, Az)</span> و استخراج تاخیر تروپسفر <span class="ltr">($T$)</span> و یونوسفر <span class="ltr">($I$)</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step8">
+                            <label class="form-check-label" for="step8">
+                                ۸. تشکیل بردار باقی‌مانده‌ها <span class="ltr">($\Delta y = y - [\rho + c(\delta t_r - \delta t_s) + T + I + c\,TGD]$)</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step9">
+                            <label class="form-check-label" for="step9">
+                                ۹. تشکیل سطر ماتریس طرح برای هر ماهواره: <span class="ltr">($A_s = [-e_x, -e_y, -e_z, 1]$)</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step10">
+                            <label class="form-check-label" for="step10">
+                                ۱۰. حل سیستم معادلات با کمترین مربعات (<span class="ltr">WLS</span>)، به‌روزرسانی مجهولات و تکرار تا همگرایی
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step11">
+                            <label class="form-check-label" for="step11">
+                                ۱۱. محاسبه و گزارش دقت مجهولات (<span class="ltr">STD</span>) از وارون ماتریس نرمال <span class="ltr">($N^{-1}$)</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="step12">
+                            <label class="form-check-label" for="step12">
+                                ۱۲. اجرای <span class="ltr">Overall Model Test</span> (خی‌دو): محاسبه <span class="ltr">($\hat{\sigma}_0^2$)</span> و آماره <span class="ltr">($T$)</span> و مقایسه با حدود خی‌دو برای <span class="ltr">($n-u$)</span> درجه آزادی
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="./assets/bootstrap-5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleFlip(containerId) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            el.classList.toggle('is-flipped');
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false}
+                ]
+            });
+        });
+    </script>
+</body>
+</html>
+
+
