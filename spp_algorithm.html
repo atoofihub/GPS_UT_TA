@@ -1294,82 +1294,131 @@ $$</div>
                         <div class="flip-face flip-front">
                             <div class="calculation-step">
                                 <button type="button" class="btn btn-sm btn-outline-primary flip-toggle" onclick="toggleFlip('flip-sec10')">مثال عددی</button>
-                                <h2>10) حل کمترین مربعات تکراری</h2>
-                                <p>اگر در یک اپک <span class="ltr">($m$)</span> ماهواره داریم، بردارها:</p>
+                                <h2>10) حل کمترین مربعات تکراری (<span class="ltr">Iterative Weighted Least Squares</span>)</h2>
+                                <p>در هر تکرار <span class="ltr">($k$)</span>، پس از تشکیل بردار «مشاهده منهای محاسبه» و ماتریس طرح، دستگاه معادلات خطی به‌صورت زیر نوشته می‌شود.</p>
+
+                                <h3>10.1 بردارها و مدل خطی</h3>
+                                <p>اگر در یک اپک <span class="ltr">($m$)</span> ماهواره مشاهده شده باشد:</p>
                                 <div class="formula">$$
-\Delta\mathbf{y}^{(k)} =
+\Delta\mathbf{y}^{(k)}=
 \begin{bmatrix}
-\Delta y^{1(k)}\ \Delta y^{2(k)}\ \vdots\ \Delta y^{m(k)}
+\Delta y_1^{(k)}\\
+\Delta y_2^{(k)}\\
+\vdots\\
+\Delta y_m^{(k)}
 \end{bmatrix},
-\quad
-A^{(k)}=
+\qquad
+\mathbf{A}^{(k)}=
 \begin{bmatrix}
-A_1^{(k)}\ A_2^{(k)}\ \vdots\ A_m^{(k)}
+A_1^{(k)}\\
+A_2^{(k)}\\
+\vdots\\
+A_m^{(k)}
 \end{bmatrix}
 $$</div>
-                                <p>مدل خطی:</p>
-                                <div class="formula">$$\Delta\mathbf{y}^{(k)} = A^{(k)}\Delta\mathbf{p} + \mathbf{v}$$</div>
-                                <p>حل <span class="ltr">WLS</span>:</p>
+                                <p>مدل خطی‌شده:</p>
+                                <div class="formula">$$\Delta\mathbf{y}^{(k)} = \mathbf{A}^{(k)}\Delta\mathbf{p} + \mathbf{v}$$</div>
+                                <p>که در آن <span class="ltr">($\Delta\mathbf{p}$)</span> بردار اصلاح مجهولات و <span class="ltr">($\mathbf{v}$)</span> بردار پس‌ماندها است.</p>
+
+                                <h3>10.2 بردار مجهولات افزایشی</h3>
+                                <p>مجهولات به‌صورت متری تعریف می‌شوند:</p>
                                 <div class="formula">$$
-\Delta\hat{\mathbf{p}}=
-\left((A^{(k)})^T P A^{(k)}\right)^{-1}(A^{(k)})^T P \Delta\mathbf{y}^{(k)}
+\Delta\mathbf{p}=
+\begin{bmatrix}
+\Delta X\\
+\Delta Y\\
+\Delta Z\\
+\Delta(c\,\delta t_r)
+\end{bmatrix}
 $$</div>
-                                <p>به‌روزرسانی:</p>
+
+                                <h3>10.3 ساخت ماتریس وزن بر اساس ارتفاع ماهواره (<span class="ltr">Elevation-based Weighting</span>)</h3>
+                                <p>در <span class="ltr">GNSS</span>، کیفیت مشاهدات به‌شدت به <strong>ارتفاع ماهواره</strong> وابسته است.</p>
+                                <p>مدل وزن‌دهی پیشنهادی (رایج در <span class="ltr">SPP</span>) برای هر ماهواره <span class="ltr">($s$)</span>:</p>
+                                <div class="formula">$$\sigma_s^2 = \frac{\sigma_0^2}{\sin^2 E_s} \implies w_s = \frac{1}{\sigma_s^2} = \sin^2 E_s$$</div>
+                                <p>ماتریس وزن به‌صورت قطری تعریف می‌شود:</p>
                                 <div class="formula">$$
-\mathbf{x}_r^{(k+1)}=\mathbf{x}_r^{(k)}+\begin{bmatrix}\Delta X\\ \Delta Y\\ \Delta Z\end{bmatrix}
+\mathbf{P} =
+\begin{bmatrix}
+\sin^2 E_1 & 0 & \cdots & 0\\
+0 & \sin^2 E_2 & \cdots & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0 & 0 & \cdots & \sin^2 E_m
+\end{bmatrix}
 $$</div>
+
+                                <h3>10.4 حل کمترین مربعات وزن‌دار (<span class="ltr">WLS</span>)</h3>
                                 <div class="formula">$$
-(c\delta t_r)^{(k+1)}=(c\delta t_r)^{(k)}+\Delta(c\delta t_r)
+\boxed{
+\Delta\hat{\mathbf{p}} = \left( (\mathbf{A}^{(k)})^T \mathbf{P}\,\mathbf{A}^{(k)} \right)^{-1} (\mathbf{A}^{(k)})^T \mathbf{P}\,\Delta\mathbf{y}^{(k)}
+}
 $$</div>
-                                <p>معیار همگرایی (پیشنهاد عملی):</p>
-                                <div class="formula">$$\sqrt{\Delta X^2+\Delta Y^2+\Delta Z^2} < 10^{-3}\ \text{m}$$</div>
+
+                                <h3>10.5 به‌روزرسانی مجهولات</h3>
+                                <p>مختصات گیرنده:</p>
+                                <div class="formula">$$\mathbf{x}_r^{(k+1)} = \mathbf{x}_r^{(k)} + \begin{bmatrix} \Delta X \\ \Delta Y \\ \Delta Z \end{bmatrix}$$</div>
+                                <p>ساعت گیرنده:</p>
+                                <div class="formula">$$(c\,\delta t_r)^{(k+1)} = (c\,\delta t_r)^{(k)} + \Delta(c\,\delta t_r)$$</div>
+
+                                <h3>10.6 معیار همگرایی</h3>
+                                <div class="formula">$$\sqrt{(\Delta X)^2+(\Delta Y)^2+(\Delta Z)^2} < 10^{-3}\ \text{m}$$</div>
+                                <p class="note"><strong>نکته آموزشی:</strong> استفاده از ماتریس وزن بر اساس ارتفاع ماهواره برای پایداری و دقت حل در <span class="ltr">SPP</span> واقعی <strong>ضروری</strong> است.</p>
                             </div>
                         </div>
                         <div class="flip-face flip-back">
                             <div class="calculation-step">
                                 <button type="button" class="btn btn-sm btn-outline-secondary flip-toggle" onclick="toggleFlip('flip-sec10')">بازگشت</button>
-                                <h2>مثال عددی: حل کمترین مربعات تکراری (<span class="ltr">Iterative Least Squares</span>)</h2>
+                                <h2>مثال عددی: <span class="ltr">WLS</span> با وزن‌دهی ارتفاع (ساعت گیرنده)</h2>
                                 <div class="flip-scroll">
-                                    <p>در این بخش نشان می‌دهیم که <strong>پس از ساخت <span class="ltr">($\Delta \mathbf{y}$)</span> و ماتریس طرح <span class="ltr">(A)</span></strong> چگونه مجهولات را به‌صورت تکراری به‌روزرسانی می‌کنیم.</p>
-                                    
                                     <div class="note">
-                                        <p><strong>نکته آموزشی:</strong> روش حل مستقل از تعداد ماهواره‌هاست؛ در این مثال فقط یک ماهواره داریم، پس حل کامل ممکن نیست، اما منطق دقیقاً همان <span class="ltr">SPP</span> واقعی است.</p>
+                                        <p>چون فقط <strong>یک ماهواره <span class="ltr">(G04)</span></strong> داریم، سیستم برای حل ۴ مجهول <strong>کم‌معادله</strong> است. لذا در این مثال، مختصات را ثابت فرض کرده و فقط <strong>ساعت گیرنده <span class="ltr">($\Delta(c\delta t_r)$)</span></strong> را تخمین می‌زنیم.</p>
                                     </div>
 
                                     <hr>
-                                    <h3>10.1 مدل خطی در تکرار <span class="ltr">(k)</span></h3>
-                                    <div class="formula">$$\Delta\mathbf{y}^{(k)} = A^{(k)}\Delta\mathbf{p} + \mathbf{v}$$</div>
+                                    <h3>۱) داده‌های ورودی (از بخش‌های قبل)</h3>
+                                    <p>مشاهده منهای محاسبه در تکرار اول:</p>
+                                    <div class="formula">$$\Delta y_1^{(0)}=-9.1299678273\ \text{m},\qquad \Delta y_2^{(0)}=-9.4468552619\ \text{m}$$</div>
+                                    <p>ارتفاع ماهواره:</p>
+                                    <div class="formula">$$E_1 = 47.930137^\circ,\qquad E_2 = 47.924883^\circ$$</div>
 
                                     <hr>
-                                    <h3>10.2 داده‌های مثال (ماهواره <span class="ltr">G04</span>)</h3>
-                                    <p><strong>بردار مجهولات افزایشی:</strong></p>
-                                    <div class="formula">$$\Delta\mathbf{p}= \begin{bmatrix} \Delta X\\ \Delta Y\\ \Delta Z\\ \Delta(c\delta t_r) \end{bmatrix}$$</div>
-                                    
-                                    <p><strong>بردار <span class="ltr">($\Delta \mathbf{y}$)</span> (از بخش 9):</strong></p>
-                                    <div class="formula">$$\Delta\mathbf{y}^{(0)}= \begin{bmatrix} -9.1299678273\\ -9.4468552619 \end{bmatrix}\ \text{m}$$</div>
-
-                                    <p><strong>ماتریس طرح <span class="ltr">(A)</span>:</strong></p>
-                                    <div class="formula">$$A^{(0)}= \begin{bmatrix} 0.10727973 & -0.92771330 & -0.35754593 & 1\\ 0.10730837 & -0.92776110 & -0.35741327 & 1 \end{bmatrix}$$</div>
+                                    <h3>۲) ساخت وزن‌ها بر اساس <span class="ltr">Elevation</span></h3>
+                                    <div class="formula">$$w_s = \sin^2(E_s)$$</div>
+                                    <div class="formula">$$w_1 = \sin^2(47.930137^\circ) = 0.5510514177$$</div>
+                                    <div class="formula">$$w_2 = \sin^2(47.924883^\circ) = 0.5509601965$$</div>
+                                    <p>ماتریس وزن:</p>
+                                    <div class="formula">$$P = \begin{bmatrix} 0.5510514177 & 0 \\ 0 & 0.5509601965 \end{bmatrix}$$</div>
 
                                     <hr>
-                                    <h3>10.3 تفسیر عددی برای این مثال خاص</h3>
-                                    <p>در این مسئله تعداد معادلات <span class="ltr">($n=2$)</span> کمتر از مجهولات <span class="ltr">($u=4$)</span> است، پس ماتریس <span class="ltr">$A^T A$</span> وارون‌پذیر نیست. اما اگر (صرفاً برای درک) فرض کنیم مختصات ثابت است:</p>
-                                    <div class="formula">$$\Delta(c\delta t_r) \approx \frac{-9.13 + (-9.45)}{2} = \mathbf{-9.29\ \text{m}}$$</div>
+                                    <h3>۳) مدل خطی (فقط ساعت گیرنده)</h3>
+                                    <div class="formula">$$\Delta y \approx \Delta(c\delta t_r) + v \implies A = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$$</div>
+
+                                    <hr>
+                                    <h3>۴) حل <span class="ltr">WLS</span></h3>
+                                    <div class="formula">$$\Delta\hat{p} = (A^T P A)^{-1} A^T P \Delta y = \frac{w_1 \Delta y_1 + w_2 \Delta y_2}{w_1 + w_2}$$</div>
+                                    <div class="formula">$$\Delta\hat{p} = \frac{(0.5510514177)(-9.1299678273) + (0.5509601965)(-9.4468552619)}{1.1020116142}$$</div>
+                                    <div class="formula">$$\boxed{\Delta\hat{p} = \Delta(c\delta t_r) = -9.2883984291\ \text{m}}$$</div>
                                     <p>معادل زمانی:</p>
-                                    <div class="formula">$$\delta t_r \approx \frac{-9.29}{c} \approx \mathbf{-31.0\ \text{ns}}$$</div>
-                                    <p class="note">این عدد نشان می‌دهد ساعت گیرنده در این اپک‌ها حدود 30 نانوثانیه جلو بوده است.</p>
+                                    <div class="formula">$$\boxed{\delta t_r = \frac{-9.2883984291}{c} \approx -30.98\ \text{ns}}$$</div>
 
                                     <hr>
-                                    <h3>10.4 به‌روزرسانی مجهولات و همگرایی</h3>
-                                    <p>در حالت کلی <span class="ltr">SPP</span>، پس از حل:</p>
-                                    <div class="formula">$$\mathbf{x}_r^{(k+1)} = \mathbf{x}_r^{(k)} + \Delta\mathbf{x}$$</div>
-                                    <div class="formula">$$(c\delta t_r)^{(k+1)} = (c\delta t_r)^{(k)} + \Delta(c\delta t_r)$$</div>
-                                    <p>حل تا برقراری شرط زیر ادامه می‌یابد:</p>
-                                    <div class="formula">$$\sqrt{(\Delta X)^2+(\Delta Y)^2+(\Delta Z)^2} < 10^{-3}\ \text{m}$$</div>
+                                    <h3>۵) پس‌ماندها (<span class="ltr">Residuals</span>)</h3>
+                                    <div class="formula">$$v_1 = \Delta y_1 - \Delta\hat{p} = +0.1584306018\ \text{m}$$</div>
+                                    <div class="formula">$$v_2 = \Delta y_2 - \Delta\hat{p} = -0.1584568328\ \text{m}$$</div>
+
+                                    <hr>
+                                    <h3>۶) واریانس واحد وزن (<span class="ltr">$\hat{\sigma}_0^2$</span>)</h3>
+                                    <div class="formula">$$\hat{\sigma}_0^2 = \frac{w_1 v_1^2 + w_2 v_2^2}{n-u} = \frac{0.0305141}{2-1}$$</div>
+                                    <div class="formula">$$\boxed{\hat{\sigma}_0^2 = 0.0276653529\ \text{m}^2} \implies \hat{\sigma}_0 = 0.1663\ \text{m}$$</div>
+
+                                    <hr>
+                                    <h3>۷) دقت تخمین <span class="ltr">($\Delta(c\delta t_r)$)</span></h3>
+                                    <div class="formula">$$Q_{\hat{p}} = \frac{\hat{\sigma}_0^2}{w_1 + w_2} = 0.02510441138\ \text{m}^2$$</div>
+                                    <div class="formula">$$\boxed{\sigma_{\Delta(c\delta t_r)} = \sqrt{Q_{\hat{p}}} = 0.15844\ \text{m}}$$</div>
 
                                     <hr>
                                     <div class="note">
-                                        <p><strong>جمع‌بندی آموزشی:</strong> کمترین مربعات تکراری قلب الگوریتم <span class="ltr">SPP</span> است. ما با استفاده از اختلاف مشاهده و مدل، اصلاحات را به‌دست آورده و تا همگرایی پیش می‌رویم.</p>
+                                        <p><strong>جمع‌بندی:</strong> این مثال نشان می‌دهد که چگونه وزن‌دهی بر اساس ارتفاع، تأثیر مشاهدات را در حل نهایی متعادل می‌کند و معیاری برای سنجش دقت (\(\sigma\)) فراهم می‌آورد.</p>
                                     </div>
                                 </div>
                             </div>
