@@ -6,7 +6,7 @@
     <title>Advance Satellite Positioning System Course - Student Scores</title>
     <link rel="stylesheet" href="./assets/katex.min.css">
     <link rel="stylesheet" href="./assets/bootstrap-5.2.3/css/bootstrap.min.css">
-    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="./assets/chart.umd.min.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -104,23 +104,14 @@
             </div>
             <div class="col-6 text-center">
                 <h1>GPS Satellite Positioning Course - Student Scores</h1>
-                <div class="lead">Project Evaluation Table - Fall 2025</div>
+                <div class="lead">Project Evaluation Table - Fall 2026</div>
             </div>
             <div class="col-3" style="text-align: right;">
                 <img src="./assets/fanni_logo.png" alt="College of Engineering Logo" style="max-height: 60px; transform: scale(1.1)">
             </div>
         </div>
-        <div class="project-description">
-            <h2>Project 1: Keplerian Elements Interpolation</h2>
-            <p>Satellite coordinate interpolation using Keplerian orbital elements and appropriate mathematical models.</p>
-            <h2>Project 2: SP3 File Interpolation and Comparison</h2>
-            <p>Satellite coordinate interpolation using SP3 precise ephemeris files, and comparison with the results of Project 1.</p>
-            <h2>Project 3: Tropospheric Delay (Saastamoinen Model)</h2>
-            <p>Computation of neutral-atmosphere delay along the GNSS line-of-sight using the Saastamoinen tropospheric model and interpretation of zenith and slant delays.</p>
-            <h2>Project 4: Ionospheric Delay (Klobuchar Model)</h2>
-            <p>Estimation of ionospheric delay along the GNSS signal path using the Klobuchar broadcast model and analysis of its impact on positioning accuracy.</p>
-            <h2>Project 5: RINEX Observation Extraction</h2>
-            <p>Extraction and analysis of observation data from RINEX version 3.02 files.</p>
+        <div class="project-description" id="projectDescriptions">
+            <p>No projects have been assigned yet.</p>
         </div>
         <div class="grading-system">
             <h2>Grading System</h2>
@@ -137,61 +128,8 @@
         <h2 class="mt-4">Student Scores Table</h2>
         <div class="table-responsive">
             <table class="scores-table">
-                <thead>
-                    <tr>
-                        <th rowspan="2">Student ID</th>
-                        <th colspan="2">Keplerian Interpolation</th>
-                        <th colspan="2">SP3 Interpolation & Comparison</th>
-                        <th colspan="2">Trop. Delay (Saastamoinen Model)</th>
-                        <th colspan="2">Iono. Delay (Klobuchar Model)</th>
-                        <th colspan="2">RINEX Obs. Extraction</th>
-                        <th rowspan="2">Progress</th>
-                    </tr>
-                    <tr>
-                        <th>Submitted</th>
-                        <th>Grade</th>
-                        <th>Submitted</th>
-                        <th>Grade</th>
-                        <th>Submitted</th>
-                        <th>Grade</th>
-                        <th>Submitted</th>
-                        <th>Grade</th>
-                        <th>Submitted</th>
-                        <th>Grade</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>810303013</td><td>✓</td><td>A</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303013">👁️</button></td></tr>
-                    <tr><td>810304015</td><td>✓</td><td>B</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✗</td><td></td><td>✓</td><td>‌B</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304015">👁️</button></td></tr>
-                    <tr><td>810302017</td><td>✗</td><td></td><td>✓</td><td>B</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302017">👁️</button></td></tr>
-                    <tr><td>810304021</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>B</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304021">👁️</button></td></tr>
-                    <tr><td>810303020</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303020">👁️</button></td></tr>
-                    <tr><td>810302021</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302021">👁️</button></td></tr>
-                    <tr><td>810303017</td><td>✓</td><td>C</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>C</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303017">👁️</button></td></tr>
-                    <tr><td>810303021</td><td>✓</td><td>C</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>B</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303021">👁️</button></td></tr>
-                    <tr><td>810303024</td><td>✓</td><td>A+</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A++</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303024">👁️</button></td></tr>
-                    <tr><td>810304069</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A++</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304069">👁️</button></td></tr>
-                    <tr><td>810304030</td><td>✓</td><td>A</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304030">👁️</button></td></tr>
-                    <tr><td>810303071</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303071">👁️</button></td></tr>
-                    <tr><td>810304036</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304036">👁️</button></td></tr>
-                    <tr><td>810304074</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304074">👁️</button></td></tr>
-                    <tr><td>810304039</td><td>✓</td><td>C</td><td>✓</td><td>C</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304039">👁️</button></td></tr>
-                    <tr><td>810304042</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304042">👁️</button></td></tr>
-                    <tr><td>810304077</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A++</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304077">👁️</button></td></tr>
-                    <tr><td>810302036</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302036">👁️</button></td></tr>
-                    <tr><td>810303043</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303043">👁️</button></td></tr>
-                    <tr><td>810302045</td><td>✓</td><td>B</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>B</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302045">👁️</button></td></tr>
-                    <tr><td>810303049</td><td>✓</td><td>B</td><td>✓</td><td>C</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>C</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303049">👁️</button></td></tr>
-                    <tr><td>810304050</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304050">👁️</button></td></tr>
-                    <tr><td>810302051</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810302051">👁️</button></td></tr>
-                    <tr><td>810304013</td><td>✗</td><td></td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304013">👁️</button></td></tr>
-                    <tr><td>810303053</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303053">👁️</button></td></tr>
-                    <tr><td>810303059</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303059">👁️</button></td></tr>
-                    <tr><td>810304060</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>A+</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304060">👁️</button></td></tr>
-                    <tr><td>810303061</td><td>✓</td><td>B</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✓</td><td>A</td><td>✓</td><td>A</td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303061">👁️</button></td></tr>
-                    <tr><td>810304009</td><td>✓</td><td>A+</td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810304009">👁️</button></td></tr>
-                    <tr><td>810303065</td><td>✓</td><td>A</td><td>✓</td><td>B</td><td>✓</td><td>A+</td><td>✗</td><td></td><td>✗</td><td></td><td><button class="btn btn-sm btn-outline-primary view-progress" data-student-id="810303065">👁️</button></td></tr>
-                </tbody>
+                <thead id="scoresHead"></thead>
+                <tbody id="scoresBody"></tbody>
             </table>
         </div>
         <div class="note">
@@ -203,7 +141,6 @@
                 <li>Students with <span class="grade-b">B</span> grades demonstrated good understanding with room for improvement</li>
                 <li>Students with <span class="grade-c">C</span> grades need additional work to meet course objectives</li>
                 <li>Students with <span class="grade-empty">-</span> have not submitted or completed the project</li>
-                <li>Overall grades are calculated based on the average performance across all projects</li>
             </ul>
         </div>
     </div>
@@ -217,7 +154,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="chartContainer" style="width: 100%; height: 400px;"></div>
+                    <p id="chartEmpty" class="text-center mb-0" hidden>No graded projects yet.</p>
+                    <div id="chartContainer" style="position: relative; width: 100%; height: 400px;" hidden>
+                        <canvas id="progressChart" aria-label="Student progress chart" role="img"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -227,74 +167,110 @@
     <script src="./assets/katex.min.js"></script>
     <script src="./assets/auto-render.min.js"></script>
     <script>
-        const gradeMap = {
-            'A++': 5,
-            'A+': 4,
-            'A': 3,
-            'B': 2,
-            'C': 1,
-            '': 0
-        };
+        // Add projects in order and enter grades under the matching student ID.
+        // Example project: { id: 'project1', title: 'Project 1', description: '...' }
+        // Example result: '810305061': { project1: { submitted: true, grade: 'A' } }
+        const projects = [];
+        const students = [
+            '810305061', '810305020', '810305056', '810304031', '810304037',
+            '810305036', '810304041', '810304043', '810304044', '810305040',
+            '810305045', '810304050', '810304058', '810304059', '810304064',
+            '810305063', '810305054'
+        ];
+        const results = {};
+        const gradeMap = { 'A++': 5, 'A+': 4, 'A': 3, 'B': 2, 'C': 1 };
 
-        document.addEventListener("DOMContentLoaded", function() {
-            // ... Katex code ...
-            if (typeof renderMathInElement !== 'undefined') {
-                renderMathInElement(document.body, {
-                    delimiters: [
-                        {left: "$$", right: "$$", display: true},
-                        {left: "$", right: "$", display: false}
-                    ]
+        document.addEventListener('DOMContentLoaded', function () {
+            const descriptions = document.getElementById('projectDescriptions');
+            const head = document.getElementById('scoresHead');
+            const body = document.getElementById('scoresBody');
+            const modalElement = document.getElementById('progressModal');
+            const progressModal = new bootstrap.Modal(modalElement);
+            const chartContainer = document.getElementById('chartContainer');
+            const chartEmpty = document.getElementById('chartEmpty');
+            let chart;
+            let selectedStudent;
+
+            if (projects.length) {
+                descriptions.replaceChildren();
+                projects.forEach(project => {
+                    const heading = document.createElement('h2');
+                    const description = document.createElement('p');
+                    heading.textContent = project.title;
+                    description.textContent = project.description;
+                    descriptions.append(heading, description);
                 });
             }
 
-            // Progress Chart Logic
-            const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
-            const chartContainer = document.getElementById('chartContainer');
+            const headerRow = head.insertRow();
+            const addHeading = (label, span = 1) => {
+                const th = document.createElement('th');
+                th.textContent = label;
+                th.colSpan = span;
+                headerRow.appendChild(th);
+            };
+            addHeading('Student ID');
+            projects.forEach(project => addHeading(project.title, 2));
+            addHeading('Progress');
+            if (projects.length) {
+                const subheader = head.insertRow();
+                subheader.insertCell().textContent = '';
+                projects.forEach(() => {
+                    subheader.insertCell().textContent = 'Submitted';
+                    subheader.insertCell().textContent = 'Grade';
+                });
+                subheader.insertCell().textContent = '';
+            }
 
-            document.querySelectorAll('.view-progress').forEach(button => {
-                button.addEventListener('click', function() {
-                    const studentId = this.getAttribute('data-student-id');
-                    const row = this.closest('tr');
-                    const cells = row.querySelectorAll('td');
-                    
-                    // Grades are in indices 2, 4, 6, 8, 10
-                    const grades = [
-                        gradeMap[cells[2].innerText.trim()] || 0,
-                        gradeMap[cells[4].innerText.trim()] || 0,
-                        gradeMap[cells[6].innerText.trim()] || 0,
-                        gradeMap[cells[8].innerText.trim()] || 0,
-                        gradeMap[cells[10].innerText.trim()] || 0
-                    ];
-
+            students.forEach(studentId => {
+                const row = body.insertRow();
+                row.insertCell().textContent = studentId;
+                projects.forEach(project => {
+                    const result = results[studentId]?.[project.id];
+                    row.insertCell().textContent = result ? (result.submitted ? '✓' : '✗') : '–';
+                    row.insertCell().textContent = result?.grade || '–';
+                });
+                const button = document.createElement('button');
+                button.className = 'btn btn-sm btn-outline-primary view-progress';
+                button.type = 'button';
+                button.textContent = 'View';
+                button.setAttribute('aria-label', `View progress for student ${studentId}`);
+                button.addEventListener('click', () => {
+                    selectedStudent = studentId;
                     progressModal.show();
+                });
+                row.insertCell().appendChild(button);
+            });
 
-                    Highcharts.chart('chartContainer', {
-                        chart: {
-                            type: 'line'
-                        },
-                        title: {
-                            text: `Progress for Student ID: ${studentId}`
-                        },
-                        xAxis: {
-                            categories: ['Proj 1', 'Proj 2', 'Proj 3', 'Proj 4', 'Proj 5']
-                        },
-                        yAxis: {
-                            title: {
-                                text: 'Grade Level'
-                            },
-                            categories: ['', 'C', 'B', 'A', 'A+', 'A++'],
-                            min: 0,
-                            max: 5
-                        },
-                        series: [{
-                            name: 'Grade',
-                            data: grades,
-                            color: '#3498db'
-                        }],
-                        credits: {
-                            enabled: false
+            modalElement.addEventListener('shown.bs.modal', () => {
+                const grades = projects.map(project => {
+                    const grade = results[selectedStudent]?.[project.id]?.grade;
+                    return Object.hasOwn(gradeMap, grade) ? gradeMap[grade] : null;
+                });
+                const hasGrades = grades.some(grade => grade !== null);
+                chartEmpty.hidden = hasGrades;
+                chartContainer.hidden = !hasGrades;
+                if (chart) chart.destroy();
+                chart = null;
+                if (!hasGrades) return;
+                chart = new Chart(document.getElementById('progressChart'), {
+                    type: 'line',
+                    data: {
+                        labels: projects.map(project => project.title),
+                        datasets: [{ label: 'Grade', data: grades, borderColor: '#3498db' }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { title: { display: true, text: `Progress for Student ID: ${selectedStudent}` } },
+                        scales: {
+                            y: {
+                                min: 0, max: 5,
+                                title: { display: true, text: 'Grade Level' },
+                                ticks: { stepSize: 1, callback: value => ['', 'C', 'B', 'A', 'A+', 'A++'][value] }
+                            }
                         }
-                    });
+                    }
                 });
             });
         });
