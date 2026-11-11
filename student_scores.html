@@ -104,7 +104,7 @@
             </div>
             <div class="col-6 text-center">
                 <h1>GPS Satellite Positioning Course - Student Scores</h1>
-                <div class="lead">Project Evaluation Table - Fall 2026</div>
+                <div class="lead">Quiz and Project Evaluation - Fall 2026</div>
             </div>
             <div class="col-3" style="text-align: right;">
                 <img src="./assets/fanni_logo.png" alt="College of Engineering Logo" style="max-height: 60px; transform: scale(1.1)">
@@ -175,8 +175,18 @@
             '810305061', '810305020', '810305056', '810304031', '810304037',
             '810305036', '810304041', '810304043', '810304044', '810305040',
             '810305045', '810304050', '810304058', '810304059', '810304064',
-            '810305063', '810305054'
+            '810305063', '810305054', '810305025', '151605004',
+            '810305029', 'Pending ID 1'
         ];
+        // Quiz 1 covers undergraduate satellite positioning topics; scores are out of 20.
+        const quiz1Scores = {
+            '810304050': 3.3, '810304044': 5, '810305045': 5,
+            '810305025': 3, '810304037': 12.5, '810304043': 7.7,
+            '151605004': 3.75, '810304059': 3, '810305020': 0.5,
+            '810304058': 4.5, '810305054': 12, '810305036': 6.75,
+            '810305056': 10.5, 'Pending ID 1': 13.5, '810305061': 6.75,
+            '810305063': 6, '810304041': 7.75, '810305029': 5
+        };
         const results = {};
         const gradeMap = { 'A++': 5, 'A+': 4, 'A': 3, 'B': 2, 'C': 1 };
 
@@ -210,10 +220,12 @@
                 headerRow.appendChild(th);
             };
             addHeading('Student ID');
+            addHeading('Quiz 1: Undergraduate Satellite Positioning (out of 20)');
             projects.forEach(project => addHeading(project.title, 2));
             addHeading('Progress');
             if (projects.length) {
                 const subheader = head.insertRow();
+                subheader.insertCell().textContent = '';
                 subheader.insertCell().textContent = '';
                 projects.forEach(() => {
                     subheader.insertCell().textContent = 'Submitted';
@@ -225,6 +237,7 @@
             students.forEach(studentId => {
                 const row = body.insertRow();
                 row.insertCell().textContent = studentId;
+                row.insertCell().textContent = quiz1Scores[studentId] ?? '–';
                 projects.forEach(project => {
                     const result = results[studentId]?.[project.id];
                     row.insertCell().textContent = result ? (result.submitted ? '✓' : '✗') : '–';
