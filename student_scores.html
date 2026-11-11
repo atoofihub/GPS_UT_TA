@@ -63,6 +63,9 @@
             border: 1px solid var(--border-color);
             text-align: center;
         }
+        .scores-table thead tr:nth-child(2) th:nth-child(-n+2) {
+            min-width: 80px;
+        }
         .scores-table th {
             background-color: var(--secondary-color);
             color: white;
@@ -112,6 +115,11 @@
         </div>
         <div class="project-description" id="projectDescriptions">
             <p>No projects have been assigned yet.</p>
+        </div>
+        <div class="project-description">
+            <h2>Error Propagation Analysis of GNSS Wide-Lane and Narrow-Lane Combinations</h2>
+            <p>Exercise 1: Derivation of the wide-lane observation standard deviation using the law of error propagation.</p>
+            <p>Exercise 2: Derivation of the narrow-lane observation standard deviation using the law of error propagation.</p>
         </div>
         <div class="grading-system">
             <h2>Grading System</h2>
@@ -187,6 +195,17 @@
             '810305056': 10.5, 'Pending ID 1': 13.5, '810305061': 6.75,
             '810305063': 6, '810304041': 7.75, '810305029': 5
         };
+        // Source exercise scores are out of 10; displayed exercise scores are converted to 20.
+        const assignmentScores = {
+            '810305061': [8, 8, 'B'], '810305063': [8.5, 10, 'A'],
+            '810304059': [4.5, 4.5, 'C'], '810304037': [9.5, 9, 'A'],
+            '810304041': [8.5, 9, 'A'], '151605004': [8, 8, 'B'],
+            '810304058': [9.5, 9.5, 'A+'], '810304031': [10, 9.5, 'A+'],
+            '810305036': [8, 9, 'A'], '810305056': [10, 8, 'A'],
+            '810305045': [9.5, 8, 'A'], '810304043': [8, 8.5, 'B'],
+            '810305029': [10, 9.5, 'A+'], '810305040': [9.5, 10, 'A+'],
+            '810305054': [10, 5.5, 'B']
+        };
         const results = {};
         const gradeMap = { 'A++': 5, 'A+': 4, 'A': 3, 'B': 2, 'C': 1 };
 
@@ -213,31 +232,40 @@
             }
 
             const headerRow = head.insertRow();
-            const addHeading = (label, span = 1) => {
+            const subheader = head.insertRow();
+            const addHeading = (label, span = 1, rowSpan = 1) => {
                 const th = document.createElement('th');
                 th.textContent = label;
                 th.colSpan = span;
+                th.rowSpan = rowSpan;
                 headerRow.appendChild(th);
             };
-            addHeading('Student ID');
-            addHeading('Quiz 1: Undergraduate Satellite Positioning (out of 20)');
-            projects.forEach(project => addHeading(project.title, 2));
-            addHeading('Progress');
-            if (projects.length) {
-                const subheader = head.insertRow();
-                subheader.insertCell().textContent = '';
-                subheader.insertCell().textContent = '';
-                projects.forEach(() => {
-                    subheader.insertCell().textContent = 'Submitted';
-                    subheader.insertCell().textContent = 'Grade';
-                });
-                subheader.insertCell().textContent = '';
-            }
+            const addSubheading = label => {
+                const th = document.createElement('th');
+                th.textContent = label;
+                subheader.appendChild(th);
+            };
+            addHeading('Student ID', 1, 2);
+            addHeading('Quiz 1: Undergraduate Satellite Positioning (out of 20)', 1, 2);
+            addHeading('GNSS Wide-Lane and Narrow-Lane Error Propagation', 3);
+            addSubheading('Exercise 1 /20');
+            addSubheading('Exercise 2 /20');
+            addSubheading('Final Grade');
+            projects.forEach(project => {
+                addHeading(project.title, 2);
+                addSubheading('Submitted');
+                addSubheading('Grade');
+            });
+            addHeading('Progress', 1, 2);
 
             students.forEach(studentId => {
                 const row = body.insertRow();
                 row.insertCell().textContent = studentId;
                 row.insertCell().textContent = quiz1Scores[studentId] ?? '–';
+                const assignment = assignmentScores[studentId];
+                row.insertCell().textContent = assignment ? assignment[0] * 2 : '–';
+                row.insertCell().textContent = assignment ? assignment[1] * 2 : '–';
+                row.insertCell().textContent = assignment?.[2] ?? '–';
                 projects.forEach(project => {
                     const result = results[studentId]?.[project.id];
                     row.insertCell().textContent = result ? (result.submitted ? '✓' : '✗') : '–';
