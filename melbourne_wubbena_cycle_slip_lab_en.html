@@ -151,6 +151,108 @@
     <p class="small-caption">On the teaching plot, numbered vertical lines mark events and the pale red band marks the data gap.</p>
   </div>
 
+  <div class="calculation-step theory-addendum">
+    <h2 class="section-title">5. Full theory and implementation layer for cycle-slip detection</h2>
+    <p>This section starts with the physical definition of a phase jump and ends with the final decision, arc repair, and the effect on least squares. <span class="ltr">k</span> is the epoch index, <span class="ltr">i,j</span> are two frequencies, and <span class="ltr">λ</span> is wavelength.</p>
+
+    <h3>5.1 What exactly is a cycle slip?</h3>
+    <p>With a healthy lock, the receiver tracks carrier phase continuously while the integer ambiguity stays constant. If tracking is lost for a few cycles, the integer changes by <span class="ltr">ΔN</span>:</p>
+    <div class="formula">N<sub>k</sub> = N<sub>k−1</sub> + ΔN<sub>k</sub> &nbsp;&nbsp;⇒&nbsp;&nbsp; Φ<sub>k</sub> = Φ<sub>k</sub><sup>smooth</sup> + ΔN<sub>k</sub>λ</div>
+    <p>A slip is therefore a sudden phase offset; satellite geometry does not create such a step over 30 seconds. For GPS L1, <span class="ltr">λ₁≈0.1902937 m</span>, so three cycles equal <strong>0.5709 m</strong>. Typical causes are blockage, severe multipath, low <span class="ltr">C/N₀</span>, and rapid ionospheric changes.</p>
+
+    <h3>5.2 Cycle slip versus data gap versus outlier</h3>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>Event</th><th>Observation</th><th>Plot signature</th><th>Decision</th></tr></thead><tbody>
+      <tr><td>Cycle slip</td><td>Samples exist before and after</td><td>Persistent phase step; GF/MW jump</td><td>Estimate <span class="ltr">ΔN</span> and repair or split the arc</td></tr>
+      <tr><td>Data gap</td><td>One or more fields are missing</td><td>Valid line is broken; baseline restarts after return</td><td>Start a new arc and reset the window</td></tr>
+      <tr><td>Outlier</td><td>One sample is abnormal</td><td>Short spike; level before and after is the same</td><td>Quality control or down-weighting</td></tr>
+    </tbody></table></div>
+
+    <h3>5.3 Observation equations and parameter meaning</h3>
+    <div class="formula">P<sub>i</sub> = ρ + c(δt<sub>r</sub>−δt<sub>s</sub>) + T + I<sub>i</sub> + b<sub>P,i</sub> + ε<sub>P,i</sub></div>
+    <div class="formula">Φ<sub>i</sub> = ρ + c(δt<sub>r</sub>−δt<sub>s</sub>) + T − I<sub>i</sub> + λ<sub>i</sub>N<sub>i</sub> + b<sub>Φ,i</sub> + ε<sub>Φ,i</sub></div>
+    <p><span class="ltr">ρ</span> is geometric range, <span class="ltr">T</span> tropospheric delay, <span class="ltr">Iᵢ</span> ionospheric delay, <span class="ltr">Nᵢ</span> integer ambiguity, and <span class="ltr">ε</span> noise. Code and phase share range, clock, and troposphere, while ionosphere has opposite signs. That structure enables geometry-free combinations.</p>
+
+    <h3>5.4 Geometry-free combination <span class="ltr">GF</span></h3>
+    <div class="formula">GF = Φ<sub>i</sub> − Φ<sub>j</sub> = (λ<sub>i</sub>N<sub>i</sub>−λ<sub>j</sub>N<sub>j</sub>) + (I<sub>i</sub>−I<sub>j</sub>) + bias + noise</div>
+    <div class="formula">ΔGF<sub>k</sub> = GF<sub>k</sub> − GF<sub>k−1</sub> ≈ λ<sub>i</sub>ΔN<sub>i</sub> − λ<sub>j</sub>ΔN<sub>j</sub></div>
+    <p>Range, clocks, and troposphere cancel, so a fast GF change is strong slip evidence. GF remains sensitive to ionosphere. One L1 cycle gives about <span class="ltr">0.1903 m</span>. If <span class="ltr">ΔN₁=9</span> and <span class="ltr">ΔN₂=7</span>, the near-cancellation produces only about <span class="ltr">0.0033 m</span>; GF is nearly blind.</p>
+
+    <h3>5.5 Building the <span class="ltr">Melbourne–Wübbena</span> combination</h3>
+    <div class="formula">λ<sub>W</sub> = c/(f<sub>i</sub>−f<sub>j</sub>) &nbsp;&nbsp;≈&nbsp;&nbsp; 0.8619 m (GPS L1/L2)</div>
+    <div class="formula">Φ<sub>W</sub> = (f<sub>i</sub>Φ<sub>i</sub>−f<sub>j</sub>Φ<sub>j</sub>)/(f<sub>i</sub>−f<sub>j</sub>)<br>P<sub>N</sub> = (f<sub>i</sub>P<sub>i</sub>+f<sub>j</sub>P<sub>j</sub>)/(f<sub>i</sub>+f<sub>j</sub>)<br>MW = Φ<sub>W</sub> − P<sub>N</sub></div>
+    <p>Substitution cancels range, clocks, and troposphere. The ideal result is:</p>
+    <div class="formula">MW ≈ λ<sub>W</sub>(N<sub>i</sub>−N<sub>j</sub>) + hardware bias + noise</div>
+    <div class="formula">ΔMW<sub>k</sub> ≈ λ<sub>W</sub>(ΔN<sub>i</sub>−ΔN<sub>j</sub>)</div>
+    <p>MW is therefore very sensitive to unequal slips. Because code is included, it is noisier than raw phase. If both frequencies slip by exactly the same amount, <span class="ltr">ΔNᵢ=ΔNⱼ</span>, MW may stay near zero and must be supported by GF or CMC.</p>
+
+    <h3>5.6 Numerical comparison</h3>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>Scenario</th><th>ΔN<sub>i</sub></th><th>ΔN<sub>j</sub></th><th>ΔGF</th><th>ΔMW</th><th>Interpretation</th></tr></thead><tbody>
+      <tr><td>L1 only, one cycle</td><td>1</td><td>0</td><td>≈0.190 m</td><td>≈0.862 m</td><td>Both detect it</td></tr>
+      <tr><td>Unequal 9/7-cycle jump</td><td>9</td><td>7</td><td>≈0.003 m</td><td>≈1.724 m</td><td>GF weak, MW strong</td></tr>
+      <tr><td>Equal jump</td><td>5</td><td>5</td><td>≈0.951 m</td><td>≈0 m</td><td>MW blind, GF is needed</td></tr>
+    </tbody></table></div>
+
+    <h3>5.7 <span class="ltr">MW_res</span>, moving window, and robust statistics</h3>
+    <p>Absolute MW contains a constant ambiguity and hardware bias; local changes are what detection needs. In this lesson the blue line is <span class="ltr">MW_res = MW − N<sub>WL</sub>λ<sub>W</sub></span>. If a known teaching jump of <span class="ltr">n</span> cycles is added, the red teaching line is:</p>
+    <div class="formula">MW<sub>red</sub>(k)=MW<sub>res</sub>(k)+λ<sub>W</sub>Σ<sub>j≤k</sub>n<sub>j</sub></div>
+    <p>The red line is not a second sensor measurement. It is the same blue path with a known offset, so students can see the arithmetic effect of a slip. Real detection must still be based on epoch differences and the raw observations.</p>
+    <div class="formula">W=[−0.02,0,0.02] m &nbsp;→&nbsp; median(W)=0<br>MAD=median(|W−median(W)|)=0.02<br>σ≈1.4826·MAD=0.0297 m<br>Z=|d−median|/σ</div>
+    <p>For <span class="ltr">d=0.88 m</span>, <span class="ltr">Z≈29.7</span>; with threshold <span class="ltr">K=6</span> it is flagged. Then compute <span class="ltr">n=round(d/λ<sub>W</sub>)</span> and test <span class="ltr">r=d−nλ<sub>W</sub></span>. A practical condition such as <span class="ltr">|r|≤0.25λ<sub>W</sub></span>, together with a reasonable maximum cycle count, rejects isolated outliers.</p>
+
+    <h3>5.8 From combinations to per-frequency slip counts</h3>
+    <p>MW gives a difference of two frequency slips, while GF provides a second weighted equation:</p>
+    <div class="formula">[ λ<sub>W</sub>  −λ<sub>W</sub> ; λ<sub>i</sub>  −λ<sub>j</sub> ] [ΔN<sub>i</sub>; ΔN<sub>j</sub>] = [ΔMW; ΔGF]</div>
+    <p>Solve this 2×2 system and round to the nearest integers. If the determinant is small, noise is high, or a field is missing, keep the result as suspect and use neighboring epochs, Doppler, or the next arc.</p>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>Stage</th><th>Detection</th><th>Repair</th></tr></thead><tbody>
+      <tr><td>Flag</td><td>ΔMW, ΔGF, CMC, or Doppler exceeds threshold</td><td>Do not alter ambiguity yet</td></tr>
+      <tr><td>Confirm</td><td>Check time, LLI, field completeness, and a second combination</td><td>Estimate cycle counts</td></tr>
+      <tr><td>Repair</td><td>Integer jump is stable and consistent</td><td>Apply the offset forward or split the arc</td></tr>
+    </tbody></table></div>
+
+    <h3>5.9 Data gaps and <span class="ltr">LLI</span></h3>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>Signal</th><th>Meaning</th><th>Algorithm behavior</th></tr></thead><tbody>
+      <tr><td>Missing phase/code field</td><td>Combination cannot be computed</td><td>Use <span class="ltr">NaN</span>; do not connect the line</td></tr>
+      <tr><td>Time jump above threshold</td><td>One or more epochs are missing</td><td>Reset window and statistics</td></tr>
+      <tr><td><span class="ltr">LLI</span> loss-of-lock bit</td><td>Receiver reports a lock warning</td><td>Mark the epoch as a slip candidate</td></tr>
+    </tbody></table></div>
+
+    <h3>5.10 Arc, design matrix, and least-squares impact</h3>
+    <div class="formula">Before: y = A x + a<sub>1</sub>N<sub>1</sub><br>After: y = A x + a<sub>1</sub>N<sub>2</sub> &nbsp;&nbsp; N<sub>2</sub>=N<sub>1</sub>+ΔN</div>
+    <p>If both arcs use one ambiguity column, least squares spreads the unmodeled step into coordinates, clocks, and ambiguities. Three standard choices are:</p>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>Choice</th><th>Action</th><th>When to use</th></tr></thead><tbody>
+      <tr><td>Repair</td><td>Estimate ΔN and shift following epochs</td><td>Small, reliable slip</td></tr>
+      <tr><td>Split arc</td><td>Start a new ambiguity column</td><td>Exact value is uncertain</td></tr>
+      <tr><td>Drop</td><td>Remove the contaminated interval</td><td>Insufficient data for repair</td></tr>
+    </tbody></table></div>
+
+    <h3>5.11 Kalman and RTK consequences</h3>
+    <p>In a filter, a slip means the ambiguity state is no longer consistent with its previous value. If it is not reset, innovation grows, weighting becomes misleading, and RTK integer fixing can fail. Feed LLI, ΔMW, and ΔGF to quality control: reset the ambiguity, inflate its covariance, or temporarily exclude the satellite.</p>
+
+    <h3>5.12 Single-frequency support: CMC and Doppler</h3>
+    <div class="formula">CMC<sub>i</sub>=Φ<sub>i</sub>−P<sub>i</sub> &nbsp;&nbsp;⇒&nbsp;&nbsp; ΔCMC≈λ<sub>i</sub>ΔN<sub>i</sub> + noise</div>
+    <div class="formula">ΔΦ<sub>pred</sub>≈−(Doppler<sub>k</sub>+Doppler<sub>k−1</sub>)Δt/2<br>d<sub>k</sub>=Φ<sub>k</sub>−Φ<sub>k−1</sub>−ΔΦ<sub>pred</sub></div>
+    <p>CMC is noisier because of code, while Doppler depends on the receiver sign and unit convention. Both are valuable independent witnesses when GF or MW is unavailable.</p>
+
+    <h3>5.13 Complete implementation path</h3>
+    <div class="flowchart"><div class="flow-step"><span class="num">1</span><h4>Read RINEX</h4><p>Read fields, epochs, LLI, and interval.</p></div><div class="flow-step"><span class="num">2</span><h4>Select signals</h4><p>Choose a compatible pair per constellation.</p></div><div class="flow-step"><span class="num">3</span><h4>Validity mask</h4><p>Separate NaN, time gaps, and low SNR.</p></div><div class="flow-step"><span class="num">4</span><h4>Compute</h4><p>Build GF, MW, CMC, and Doppler residuals.</p></div><div class="flow-step"><span class="num">5</span><h4>Window</h4><p>Update median/MAD inside the current arc.</p></div><div class="flow-step"><span class="num">6</span><h4>Decide</h4><p>Confirm, estimate ΔN, repair or split.</p></div></div>
+    <p>For GPS and Galileo, use pairs such as L1/L2 or E1/E5a. For BeiDou use the available B1I/B3I pair. For GLONASS, include the frequency channel <span class="ltr">k</span>: <span class="ltr">f<sub>i,k</sub>=f<sub>0,i</sub>+k·Δf<sub>i</sub></span>. Two GLONASS satellites can have different <span class="ltr">k</span>, so their wavelengths, thresholds, and cycle-to-meter conversions differ; process each satellite with its actual channel.</p>
+
+    <h3>5.14 Implementation caveats</h3>
+    <ul><li>A slip is cumulative: every later epoch carries the new offset.</li><li>The red teaching layer must be clearly labeled as derived; proof of detection comes from ΔMW/ΔGF and the raw observations.</li><li>MW is blind to equal slips; no single detector covers every case.</li><li>Normalize units before combining: phase in meters, code in meters, Doppler according to the receiver convention.</li><li>After a data gap, do not compare the first valid epoch with the last epoch of the previous arc; start a fresh arc.</li></ul>
+
+    <h3>5.15 Final detector decision table</h3>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>Detector</th><th>Strength</th><th>Weakness</th><th>Use</th></tr></thead><tbody>
+      <tr><td>CMC</td><td>Single-frequency and simple</td><td>Code noise</td><td>Supporting witness</td></tr>
+      <tr><td>Doppler</td><td>Independent of code</td><td>Sign/model convention</td><td>Short-term confirmation</td></tr>
+      <tr><td>GF</td><td>Removes range and clocks</td><td>Ionosphere and equal-slip cancellation</td><td>Combination check</td></tr>
+      <tr><td>MW</td><td>Large wide-lane wavelength</td><td>Code-dependent and blind to equal slips</td><td>Primary dual-frequency detector</td></tr>
+      <tr><td>GF + MW + LLI</td><td>Cross-check and solvable ΔN</td><td>Needs complete, correctly scaled data</td><td>Final decision and arc repair</td></tr>
+    </tbody></table></div>
+    <div class="good-note"><strong>Practical rule:</strong> flag with epoch differences and a moving window, confirm with GF/MW/LLI, estimate cycle counts, and repair only when the evidence is consistent; otherwise split the arc.</div>
+    <p class="small-caption">Further reading: <a href="https://gssc.esa.int/navipedia/index.php/Detector_based_in_code_and_carrier_phase_data:_The_Melbourne-W%C3%BCbbena_combination" target="_blank" rel="noopener">Melbourne–Wübbena combination</a> · <a href="https://gssc.esa.int/navipedia/index.php/Detector_based_in_carrier_phase_data:_The_geometry-free_combination" target="_blank" rel="noopener">geometry-free combination</a> · <a href="https://gssc.esa.int/navipedia/index.php/Examples_of_single_frequency_Cycle-Slip_Detectors" target="_blank" rel="noopener">single-frequency detectors</a></p>
+
+  </div>
+
   <div class="footer-note">Real data source: <span class="ltr">GOP600CZE_R_20262740000_01D_30S_MO.rnx</span> · The calculations follow <span class="ltr">MW_Comprehensive_GNSS_with_CycleSlip.py</span> and its accompanying documentation.</div>
 </div>
 

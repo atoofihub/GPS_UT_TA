@@ -151,6 +151,110 @@
     <p class="small-caption">در نمودار سناریوی آموزشی، خط عمودی شمارهٔ رخداد را نشان می‌دهد و نوار قرمز کم‌رنگ بازهٔ قطع مشاهده است.</p>
   </div>
 
+  <div class="calculation-step theory-addendum">
+    <h2 class="section-title">۵. لایهٔ نظری و پیاده‌سازی کامل تشخیص سایکل‌اسلیپ</h2>
+    <p>این بخش از تعریف فیزیکی جهش فاز شروع می‌کند و تا تصمیم نهایی، تعمیر آرک و وارد کردن نتیجه در حل کمترین مربعات پیش می‌رود. نماد <span class="ltr">k</span> شمارهٔ اپک، <span class="ltr">i,j</span> دو فرکانس و <span class="ltr">λ</span> طول موج است.</p>
+
+    <h3>۵–۱. سایکل‌اسلیپ دقیقاً چیست؟</h3>
+    <p>گیرنده در حالت سالم تغییر فاز حامل را پیوسته دنبال می‌کند، اما عدد صحیح ابهام فاز ثابت می‌ماند. اگر قفل ردیابی برای چند چرخه از بین برود، عدد صحیح به اندازهٔ <span class="ltr">ΔN</span> عوض می‌شود:</p>
+    <div class="formula">N<sub>k</sub> = N<sub>k−1</sub> + ΔN<sub>k</sub> &nbsp;&nbsp;⇒&nbsp;&nbsp; Φ<sub>k</sub> = Φ<sub>k</sub><sup>smooth</sup> + ΔN<sub>k</sub>λ</div>
+    <p>پس جهش، تغییر ناگهانیِ offset فاز است؛ مسیر هندسی ماهواره در همان ۳۰ ثانیه چنین پله‌ای نمی‌سازد. برای GPS L1 با <span class="ltr">λ₁≈0.1902937 m</span>، جهش ۳ چرخه برابر <strong>۰٫۵۷۰۹ متر</strong> است. علت‌های معمول، انسداد، چندمسیری شدید، افت <span class="ltr">C/N₀</span> و تغییر سریع محیط یونوسفری‌اند.</p>
+
+    <h3>۵–۲. فرق سه رخداد در داده</h3>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>رخداد</th><th>مشاهده</th><th>اثر روی نمودار</th><th>تصمیم</th></tr></thead><tbody>
+      <tr><td>سایکل‌اسلیپ</td><td>قبل و بعد از اپک داده داریم</td><td>پلهٔ پایدار در فاز؛ GF/MW جهش می‌کنند</td><td>برآورد <span class="ltr">ΔN</span> و تعمیر یا شکستن آرک</td></tr>
+      <tr><td>قطع مشاهده</td><td>یک یا چند فیلد خالی است</td><td>خط معتبر قطع می‌شود؛ بعد از بازگشت مبنا عوض می‌شود</td><td>آرک جدید و reset پنجره</td></tr>
+      <tr><td>نقطهٔ پرت</td><td>فقط یک نمونه غیرعادی است</td><td>قلهٔ کوتاه؛ سطح قبل و بعد یکی می‌ماند</td><td>کنترل کیفیت/وزن‌دهی، نه تغییر ابهام</td></tr>
+    </tbody></table></div>
+
+    <h3>۵–۳. معادلهٔ مشاهده و معنای پارامترها</h3>
+    <div class="formula">P<sub>i</sub> = ρ + c(δt<sub>r</sub>−δt<sub>s</sub>) + T + I<sub>i</sub> + b<sub>P,i</sub> + ε<sub>P,i</sub></div>
+    <div class="formula">Φ<sub>i</sub> = ρ + c(δt<sub>r</sub>−δt<sub>s</sub>) + T − I<sub>i</sub> + λ<sub>i</sub>N<sub>i</sub> + b<sub>Φ,i</sub> + ε<sub>Φ,i</sub></div>
+    <p><span class="ltr">ρ</span> برد هندسی، <span class="ltr">T</span> تأخیر تروپوسفری، <span class="ltr">Iᵢ</span> تأخیر یونوسفری، <span class="ltr">Nᵢ</span> ابهام صحیح و <span class="ltr">ε</span> نویز است. کد و فاز هر دو برد مشترک را دارند، اما علامت یونوسفر در آن‌ها مخالف است؛ همین ساختار، ترکیب‌های هندسی‌عاری را ممکن می‌کند.</p>
+
+    <h3>۵–۴. ترکیب هندسی‌عاری <span class="ltr">GF</span></h3>
+    <div class="formula">GF = Φ<sub>i</sub> − Φ<sub>j</sub> = (λ<sub>i</sub>N<sub>i</sub>−λ<sub>j</sub>N<sub>j</sub>) + (I<sub>i</sub>−I<sub>j</sub>) + bias + noise</div>
+    <div class="formula">ΔGF<sub>k</sub> = GF<sub>k</sub> − GF<sub>k−1</sub> ≈ λ<sub>i</sub>ΔN<sub>i</sub> − λ<sub>j</sub>ΔN<sub>j</sub></div>
+    <p>برد، ساعت و تروپوسفر حذف می‌شوند؛ بنابراین تغییر سریع <span class="ltr">GF</span> شاهد خوبی برای جهش است. اما GF در برابر یونوسفر حساس است. یک جهش L1، حدود <span class="ltr">0.1903 m</span> تغییر می‌سازد. اگر هم‌زمان <span class="ltr">ΔN₁=9</span> و <span class="ltr">ΔN₂=7</span> باشد، به دلیل نزدیک بودن طول موج‌ها، مقدار حاصل حدود <span class="ltr">0.0033 m</span> می‌شود و GF تقریباً کور است.</p>
+
+    <h3>۵–۵. ساخت ترکیب <span class="ltr">Melbourne–Wübbena</span></h3>
+    <p>طول موج وایدلین را از دو فرکانس می‌سازیم:</p>
+    <div class="formula">λ<sub>W</sub> = c/(f<sub>i</sub>−f<sub>j</sub>) &nbsp;&nbsp;≈&nbsp;&nbsp; 0.8619 m (GPS L1/L2)</div>
+    <div class="formula">Φ<sub>W</sub> = (f<sub>i</sub>Φ<sub>i</sub>−f<sub>j</sub>Φ<sub>j</sub>)/(f<sub>i</sub>−f<sub>j</sub>)<br>P<sub>N</sub> = (f<sub>i</sub>P<sub>i</sub>+f<sub>j</sub>P<sub>j</sub>)/(f<sub>i</sub>+f<sub>j</sub>)<br>MW = Φ<sub>W</sub> − P<sub>N</sub></div>
+    <p>با جایگذاری معادلات، ترم‌های برد، ساعت و تروپوسفر حذف می‌شوند و تقریب ایده‌آل به دست می‌آید:</p>
+    <div class="formula">MW ≈ λ<sub>W</sub>(N<sub>i</sub>−N<sub>j</sub>) + hardware bias + noise</div>
+    <div class="formula">ΔMW<sub>k</sub> ≈ λ<sub>W</sub>(ΔN<sub>i</sub>−ΔN<sub>j</sub>)</div>
+    <p>بنابراین MW برای جهش‌های نابرابر بسیار حساس است و چون کد در آن وارد شده، نویز آن از فاز خام بیشتر است. اگر هر دو فرکانس دقیقاً به یک اندازه بپرند، <span class="ltr">ΔNᵢ=ΔNⱼ</span>، MW می‌تواند تقریباً صفر بماند و باید با GF یا CMC تکمیل شود.</p>
+
+    <h3>۵–۶. مقایسهٔ عددی دو ترکیب</h3>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>سناریو</th><th>ΔN<sub>i</sub></th><th>ΔN<sub>j</sub></th><th>ΔGF</th><th>ΔMW</th><th>برداشت</th></tr></thead><tbody>
+      <tr><td>فقط L1، یک چرخه</td><td>1</td><td>0</td><td>≈۰٫۱۹۰ m</td><td>≈۰٫۸۶۲ m</td><td>هر دو آشکار می‌کنند</td></tr>
+      <tr><td>هم‌جهش ۹ و ۷ چرخه</td><td>9</td><td>7</td><td>≈۰٫۰۰۳ m</td><td>≈۱٫۷۲۴ m</td><td>GF ضعیف، MW قوی</td></tr>
+      <tr><td>هم‌جهش برابر</td><td>5</td><td>5</td><td>≈۰٫۹۵۱ m</td><td>≈۰ m</td><td>MW کور، GF لازم</td></tr>
+    </tbody></table></div>
+
+    <h3>۵–۷. <span class="ltr">MW_res</span>، پنجره و آزمون آماری</h3>
+    <p><span class="ltr">MW</span> مطلق شامل ابهام ثابت و bias سخت‌افزاری است؛ برای تشخیص، تغییرات محلی مهم‌تر از مقدار مطلق‌اند. در کد آموزشی، خط آبی <span class="ltr">MW_res = MW − N<sub>WL</sub>λ<sub>W</sub></span> است. اگر در هر جهش مصنوعی <span class="ltr">n</span> چرخه اضافه کنیم، خط قرمز آموزشی چنین ساخته می‌شود:</p>
+    <div class="formula">MW<sub>red</sub>(k)=MW<sub>res</sub>(k)+λ<sub>W</sub>Σ<sub>j≤k</sub>n<sub>j</sub></div>
+    <p>این خط قرمز دادهٔ حسگر نیست؛ همان مسیر آبی است که اثر یک جهش شناخته‌شده روی آن نمایش داده شده تا دانشجو بتواند رابطهٔ عددی را ببیند. در دادهٔ واقعی، جهش باید از اختلاف اپک‌ها و آزمون‌ها بیاید.</p>
+    <div class="formula">W=[−0.02,0,0.02] m &nbsp;→&nbsp; median(W)=0<br>MAD=median(|W−median(W)|)=0.02<br>σ≈1.4826·MAD=0.0297 m<br>Z=|d−median|/σ</div>
+    <p>مثلاً برای <span class="ltr">d=0.88 m</span>، <span class="ltr">Z≈29.7</span> است؛ با آستانهٔ <span class="ltr">K=6</span>، رخداد پرچم می‌شود. سپس <span class="ltr">n=round(d/λ<sub>W</sub>)</span> و باقیماندهٔ <span class="ltr">r=d−nλ<sub>W</sub></span> بررسی می‌شود. شرط‌های عملی مانند <span class="ltr">|r|≤0.25λ<sub>W</sub></span> و سقف معقول برای تعداد چرخه، جلوی پذیرش قلهٔ پرت را می‌گیرند.</p>
+
+    <h3>۵–۸. از ترکیب‌ها تا تعداد جهش هر فرکانس</h3>
+    <p>MW اختلاف جهش دو فرکانس را می‌دهد و GF ترکیب وزن‌دار دیگری از همان دو مجهول است. بنابراین:</p>
+    <div class="formula">[ λ<sub>W</sub>  −λ<sub>W</sub> ; λ<sub>i</sub>  −λ<sub>j</sub> ] [ΔN<sub>i</sub>; ΔN<sub>j</sub>] = [ΔMW; ΔGF]</div>
+    <p>با حل این ماتریس ۲×۲، نتیجه به نزدیک‌ترین اعداد صحیح گرد می‌شود. اگر دترمینان کوچک، نویز زیاد یا دادهٔ ناقص باشد، نتیجه را «مشکوک» نگه می‌داریم و از اپک همسایه، Doppler یا آرک بعدی کمک می‌گیریم.</p>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>مرحله</th><th>تشخیص</th><th>تعمیر</th></tr></thead><tbody>
+      <tr><td>پرچم‌گذاری</td><td>ΔMW، ΔGF، CMC یا Doppler از آستانه گذشت</td><td>هنوز ابهام را تغییر نده</td></tr>
+      <tr><td>تأیید</td><td>زمان، LLI، کامل بودن فیلدها و ترکیب دوم را کنترل کن</td><td>تعداد چرخه را برآورد کن</td></tr>
+      <tr><td>تعمیر</td><td>جهش صحیح و پایدار است</td><td>offset را برای اپک‌های بعدی اعمال کن یا آرک را جدا کن</td></tr>
+    </tbody></table></div>
+
+    <h3>۵–۹. قطع داده و پرچم <span class="ltr">LLI</span></h3>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>نشانه</th><th>معنی</th><th>رفتار الگوریتم</th></tr></thead><tbody>
+      <tr><td>فیلد فاز/کد خالی</td><td>مشاهده قابل محاسبه نیست</td><td><span class="ltr">NaN</span>؛ خط را وصل نکن</td></tr>
+      <tr><td>پرش زمانی بیش از آستانه</td><td>بین دو نمونه اپک گم شده</td><td>پنجره و آمار را reset کن</td></tr>
+      <tr><td><span class="ltr">LLI</span> با بیت loss of lock</td><td>گیرنده هشدار قفل می‌دهد</td><td>اپک را نامزد سایکل‌اسلیپ کن</td></tr>
+    </tbody></table></div>
+
+    <h3>۵–۱۰. اثر روی آرک، ماتریس طراحی و حل کمترین مربعات</h3>
+    <p>برای یک ماهواره، قبل از جهش یک ابهام و بعد از جهش ابهام دیگری داریم:</p>
+    <div class="formula">قبل: y = A x + a<sub>1</sub>N<sub>1</sub><br>بعد: y = A x + a<sub>1</sub>N<sub>2</sub> &nbsp;&nbsp; N<sub>2</sub>=N<sub>1</sub>+ΔN</div>
+    <p>اگر هر دو آرک با یک ستون ابهام مدل شوند، حل کمترین مربعات مجبور می‌شود خطای پله‌ای را میان مختصات، ساعت و ابهام پخش کند. نتیجه می‌تواند مختصات و residual را خراب کند. سه راه استاندارد:</p>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>راهکار</th><th>کار</th><th>کاربرد</th></tr></thead><tbody>
+      <tr><td>Repair</td><td>برآورد ΔN و جابه‌جایی اپک‌های بعدی</td><td>وقتی slip کوچک و قابل اعتماد است</td></tr>
+      <tr><td>Split arc</td><td>ستون ابهام جدید از اپک بعدی</td><td>وقتی مقدار دقیق نامطمئن است</td></tr>
+      <tr><td>Drop</td><td>حذف بازهٔ آلوده</td><td>وقتی دادهٔ کافی برای تعمیر نیست</td></tr>
+    </tbody></table></div>
+
+    <h3>۵–۱۱. اثر در Kalman و RTK</h3>
+    <p>در فیلتر، سایکل‌اسلیپ یعنی state ابهام دیگر با مقدار قبل سازگار نیست. اگر آن را reset نکنیم، نوآوری بزرگ می‌شود، وزن‌گذاری به‌هم می‌ریزد و در RTK ممکن است integer fixing شکست بخورد. پس LLI/ΔMW/ΔGF باید به بخش کنترل کیفیت فیلتر خوراک بدهند: یا ابهام reset شود، یا covariance آن افزایش یابد، یا ماهواره موقتاً کنار گذاشته شود.</p>
+
+    <h3>۵–۱۲. وقتی فقط یک فرکانس داریم: CMC و Doppler</h3>
+    <div class="formula">CMC<sub>i</sub>=Φ<sub>i</sub>−P<sub>i</sub> &nbsp;&nbsp;⇒&nbsp;&nbsp; ΔCMC≈λ<sub>i</sub>ΔN<sub>i</sub> + noise</div>
+    <div class="formula">ΔΦ<sub>pred</sub>≈−(Doppler<sub>k</sub>+Doppler<sub>k−1</sub>)Δt/2<br>d<sub>k</sub>=Φ<sub>k</sub>−Φ<sub>k−1</sub>−ΔΦ<sub>pred</sub></div>
+    <p>CMC از کد نویزی‌تر است و Doppler به مدل علامت و واحد گیرنده حساس است، اما این دو شاهد مستقل ارزشمندی برای تأیید جهش هستند؛ مخصوصاً وقتی GF یا MW در دسترس نیست.</p>
+
+    <h3>۵–۱۳. مسیر کامل الگوریتم برای پیاده‌سازی</h3>
+    <div class="flowchart"><div class="flow-step"><span class="num">۱</span><h4>خواندن RINEX</h4><p>فیلدها، epoch، LLI و interval را بخوان.</p></div><div class="flow-step"><span class="num">۲</span><h4>انتخاب سیگنال</h4><p>برای هر منظومه جفت فرکانسی سازگار انتخاب کن.</p></div><div class="flow-step"><span class="num">۳</span><h4>ماسک اعتبار</h4><p>NaN، قطع زمانی و SNR کم را جدا کن.</p></div><div class="flow-step"><span class="num">۴</span><h4>محاسبه</h4><p>GF، MW، CMC و Doppler residual را بساز.</p></div><div class="flow-step"><span class="num">۵</span><h4>پنجره</h4><p>median/MAD را فقط داخل آرک جاری به‌روز کن.</p></div><div class="flow-step"><span class="num">۶</span><h4>تصمیم</h4><p>تأیید، برآورد ΔN، repair یا split arc.</p></div></div>
+    <p>برای GPS و Galileo معمولاً جفت L1/L2 یا E1/E5a، برای BeiDou جفت B1I/B3I یا سیگنال موجود، و برای GLONASS باید کانال فرکانسی <span class="ltr">k</span> را در طول موج وارد کرد: <span class="ltr">f<sub>i,k</sub>=f<sub>0,i</sub>+k·Δf<sub>i</sub></span>. در GLONASS، دو ماهواره با <span class="ltr">k</span> متفاوت λ و در نتیجه آستانه و تبدیل چرخه متفاوت دارند؛ هر ماهواره را با <span class="ltr">k</span> واقعی خودش پردازش کن.</p>
+
+    <h3>۵–۱۴. نکته‌های پیاده‌سازی که جلوی خطای آموزشی را می‌گیرند</h3>
+    <ul><li>اثر slip تجمعی است؛ بعد از یک جهش، همهٔ اپک‌های بعدی offset جدید دارند.</li><li>برای نمایش آموزشی، لایهٔ قرمز باید صریحاً از خط واقعی جدا نام‌گذاری شود؛ اثبات آشکارسازی باید با ΔMW/ΔGF و دادهٔ خام انجام شود.</li><li>MW به جهش برابر دو فرکانس حساس نیست؛ هیچ آشکارساز واحدی را معیار قطعی همهٔ حالت‌ها ندان.</li><li>قبل از محاسبهٔ ترکیب، واحدها را یکی کن: فاز به متر، کد به متر، Doppler به چرخه بر ثانیه یا متر بر ثانیه طبق قرارداد گیرنده.</li><li>بعد از data gap، اولین اپک معتبر را با اپک قبلی مقایسه نکن؛ یک آرک تازه بساز.</li></ul>
+
+    <h3>۵–۱۵. جدول تصمیم نهایی آشکارسازها</h3>
+    <div class="table-scroll"><table class="parameter-table compact"><thead><tr><th>آشکارساز</th><th>مزیت</th><th>ضعف</th><th>استفاده</th></tr></thead><tbody>
+      <tr><td>CMC</td><td>تک‌فرکانسه و ساده</td><td>نویز کد زیاد</td><td>شاهد کمکی</td></tr>
+      <tr><td>Doppler</td><td>مستقل از کد</td><td>حساس به قرارداد علامت و مدل</td><td>تأیید کوتاه‌مدت</td></tr>
+      <tr><td>GF</td><td>حذف برد و ساعت</td><td>یونوسفر و کورشدن هم‌جهش</td><td>تخمین ترکیبی</td></tr>
+      <tr><td>MW</td><td>طول موج وایدلین بزرگ</td><td>وابسته به کد و کورشدن جهش برابر</td><td>آشکارسازی اصلی دوفرکانسه</td></tr>
+      <tr><td>GF + MW + LLI</td><td>تأیید متقابل و امکان حل ΔN</td><td>نیازمند دادهٔ کامل و واحدهای درست</td><td>تصمیم نهایی و تعمیر آرک</td></tr>
+    </tbody></table></div>
+    <div class="good-note"><strong>قاعدهٔ عملی:</strong> اول رخداد را با اختلاف زمانی و پنجره پرچم کن، بعد با GF/MW/LLI تأیید کن، سپس تعداد چرخه را برآورد و فقط در صورت اطمینان repair کن؛ در غیر این صورت آرک را split کن.</div>
+    <p class="small-caption">برای مطالعهٔ تکمیلی: <a href="https://gssc.esa.int/navipedia/index.php/Detector_based_in_code_and_carrier_phase_data:_The_Melbourne-W%C3%BCbbena_combination" target="_blank" rel="noopener">توضیح ترکیب Melbourne–Wübbena</a> · <a href="https://gssc.esa.int/navipedia/index.php/Detector_based_in_carrier_phase_data:_The_geometry-free_combination" target="_blank" rel="noopener">توضیح ترکیب GF</a> · <a href="https://gssc.esa.int/navipedia/index.php/Examples_of_single_frequency_Cycle-Slip_Detectors" target="_blank" rel="noopener">آشکارسازهای تک‌فرکانسه</a></p>
+
+  </div>
+
   <div class="footer-note">منبع دادهٔ واقعی: <span class="ltr">GOP600CZE_R_20262740000_01D_30S_MO.rnx</span> · منطق محاسبات بر اساس <span class="ltr">MW_Comprehensive_GNSS_with_CycleSlip.py</span> و مستندات همراه آن تنظیم شده است.</div>
 </div>
 
