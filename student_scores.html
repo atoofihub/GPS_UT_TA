@@ -28,7 +28,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 1100px;
+            max-width: 1440px;
             margin: 0 auto;
             padding: 20px;
             background-color: white;
@@ -53,6 +53,7 @@
         }
         .scores-table {
             width: 100%;
+            min-width: 1160px;
             border-collapse: collapse;
             margin: 20px 0;
             background: white;
@@ -70,7 +71,38 @@
             background-color: var(--secondary-color);
             color: white;
             font-weight: bold;
+            vertical-align: middle;
         }
+        .scores-table thead tr:nth-child(2) th { background-color: #2378ad; }
+        .scores-table th[scope="row"] {
+            background: inherit;
+            color: var(--text-color);
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+        .scores-table .project-start { border-left: 3px solid #c4d9e8; }
+        .project-summary { margin: 0 0 16px; }
+        .project-summary:last-child { margin-bottom: 0; }
+        .project-summary h2 { font-size: 1.15rem; margin-bottom: 6px; }
+        .project-summary p { margin: 0; }
+        .grade-stack { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .grade-badge { display: inline-block; min-width: 44px; padding: 4px 10px; border-radius: 6px; font-weight: 700; }
+        .grade-badge.grade-a-plus { background: #166534; color: #fff; }
+        .grade-badge.grade-a { background: #dbeafe; color: #1e40af; }
+        .grade-badge.grade-b { background: #fef3c7; color: #78350f; }
+        .grade-badge.grade-c { background: #ffedd5; color: #9a3412; }
+        .grade-badge.grade-f { background: #fee2e2; color: #991b1b; }
+        .score-value { font-size: 0.85rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .decision-label { font-size: 0.75rem; color: #5c6670; white-space: nowrap; }
+        .submission-status { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 0.85rem; }
+        .status-received { background: #e8f5e9; color: #1b5e20; }
+        .status-missing { background: #f1f5f9; color: #475569; }
+        .status-review { background: #fff3cd; color: #664d03; }
+        .unmatched-row { border-top: 3px solid #9ab8cd; }
+        .unmatched-row th[scope="row"] { white-space: normal; max-width: 150px; }
+        .table-responsive:focus-visible { outline: 3px solid var(--secondary-color); outline-offset: 3px; }
+        .view-progress { min-height: 44px; min-width: 60px; font: inherit; font-size: 0.9rem; }
+        .table-help { color: #526375; font-size: 0.9rem; }
         .scores-table tr:nth-child(even) {
             background-color: #f8f9fa;
         }
@@ -93,9 +125,9 @@
                 padding: 5px;
             }
             .scores-table th, .scores-table td {
-                padding: 3px;
-                font-size: 0.85em;
+                padding: 8px;
             }
+            body { padding: 10px; }
         }
     </style>
 </head>
@@ -114,7 +146,7 @@
             </div>
         </div>
         <div class="project-description" id="projectDescriptions">
-            <p>No projects have been assigned yet.</p>
+            <p>Assignment descriptions are listed below.</p>
         </div>
         <div class="project-description">
             <h2>Error Propagation Analysis of GNSS Wide-Lane and Narrow-Lane Combinations</h2>
@@ -125,17 +157,19 @@
             <h2>Grading System</h2>
             <p><strong>Grade Scale:</strong></p>
             <ul>
-                <li><span class="grade-a-plus">A++</span> - Level 4 with bonus (+1)</li>
                 <li><span class="grade-a-plus">A+</span> - Level 4</li>
                 <li><span class="grade-a">A</span> - Level 3</li>
                 <li><span class="grade-b">B</span> - Level 2</li>
                 <li><span class="grade-c">C</span> - Level 1</li>
                 <li><span class="grade-empty">-</span> - No submission or incomplete</li>
             </ul>
+            <p class="mb-0"><strong>A01 / A02 display bands:</strong> A+ = 18–20; A = 16–&lt;18; B = 14–&lt;16; C = 10–&lt;14; F = 0–&lt;10. These display bands do not change the earlier exercise grades. Recorded scores include the latest instructor review. Provisional grades show the technical score pending oral defense and instructor confirmation. No bonus grade is awarded for A01 or A02.</p>
         </div>
         <h2 class="mt-4">Student Scores Table</h2>
-        <div class="table-responsive">
-            <table class="scores-table">
+        <p class="table-help" id="tableHelp">Each new assignment has two columns: submission status and grade. Scroll the table horizontally on smaller screens. “Not received” means no separate submission was located in the reviewed files; it is not a score of zero.</p>
+        <div class="table-responsive" role="region" aria-label="Student scores, horizontally scrollable" tabindex="0">
+            <table class="scores-table" aria-describedby="tableHelp">
+                <caption class="visually-hidden">Quiz, earlier exercises, A01 and A02 results. A01 and A02 grades marked Provisional are not final.</caption>
                 <thead id="scoresHead"></thead>
                 <tbody id="scoresBody"></tbody>
             </table>
@@ -143,12 +177,12 @@
         <div class="note">
             <h3>Grade Scale Notes:</h3>
             <ul>
-                <li>Students with <span class="grade-a-plus">A++</span> grades demonstrated exceptional performance with bonus points (+1)</li>
                 <li>Students with <span class="grade-a-plus">A+</span> grades demonstrated excellent performance (Level 4)</li>
                 <li>Students with <span class="grade-a">A</span> grades showed excellent understanding of the concepts</li>
                 <li>Students with <span class="grade-b">B</span> grades demonstrated good understanding with room for improvement</li>
                 <li>Students with <span class="grade-c">C</span> grades need additional work to meet course objectives</li>
-                <li>Students with <span class="grade-empty">-</span> have not submitted or completed the project</li>
+                <li>A dash in A01 / A02 means no grade is assigned. Submission status is shown separately.</li>
+                <li>The unmatched report has a recorded score of 0/20; its student ID and assignment attribution remain unresolved. It is not linked to student 151605008 or any other roster student.</li>
             </ul>
         </div>
     </div>
@@ -163,6 +197,7 @@
                 </div>
                 <div class="modal-body">
                     <p id="chartEmpty" class="text-center mb-0" hidden>No graded projects yet.</p>
+                    <p id="chartNote" class="table-help">A01 / A02 provisional technical grades remain subject to oral defense and instructor confirmation.</p>
                     <div id="chartContainer" style="position: relative; width: 100%; height: 400px;" hidden>
                         <canvas id="progressChart" aria-label="Student progress chart" role="img"></canvas>
                     </div>
@@ -175,16 +210,16 @@
     <script src="./assets/katex.min.js"></script>
     <script src="./assets/auto-render.min.js"></script>
     <script>
-        // Add projects in order and enter grades under the matching student ID.
-        // Example project: { id: 'project1', title: 'Project 1', description: '...' }
-        // Example result: '810305061': { project1: { submitted: true, grade: 'A' } }
-        const projects = [];
+        const projects = [
+            { id: 'A01', title: 'A01 · RINEX & GNSS Combinations', description: 'RINEX observation processing, signal and frequency selection, GLONASS channels, and IF / GF / WL / NL / MW combinations.' },
+            { id: 'A02', title: 'A02 · Cycle-slip Detection', description: 'CMC, Doppler, geometry-free and Melbourne–Wübbena detection; moving windows, gaps, injected slips and performance evaluation.' }
+        ];
         const students = [
             '810305061', '810305020', '810305056', '810304031', '810304037',
             '810305036', '810304041', '810304043', '810304044', '810305040',
             '810305045', '810304050', '810304058', '810304059', '810304064',
             '810305063', '810305054', '810305025', '151605004',
-            '810305029', 'Pending ID 1'
+            '810305029', '151605014', '151605008', 'UNMATCHED_REPORT'
         ];
         // Quiz 1 covers undergraduate satellite positioning topics; scores are out of 20.
         const quiz1Scores = {
@@ -192,7 +227,7 @@
             '810305025': 3, '810304037': 12.5, '810304043': 7.7,
             '151605004': 3.75, '810304059': 3, '810305020': 0.5,
             '810304058': 4.5, '810305054': 12, '810305036': 6.75,
-            '810305056': 10.5, 'Pending ID 1': 13.5, '810305061': 6.75,
+            '810305056': 10.5, '151605008': 13.5, '810305061': 6.75,
             '810305063': 6, '810304041': 7.75, '810305029': 5
         };
         // Source exercise scores are out of 10; displayed exercise scores are converted to 20.
@@ -204,10 +239,193 @@
             '810305036': [8, 9, 'A'], '810305056': [10, 8, 'A'],
             '810305045': [9.5, 8, 'A'], '810304043': [8, 8.5, 'B'],
             '810305029': [10, 9.5, 'A+'], '810305040': [9.5, 10, 'A+'],
-            '810305054': [10, 5.5, 'B']
+            '810305054': [10, 5.5, 'B'], '151605008': [10, 9, 'A']
         };
-        const results = {};
-        const gradeMap = { 'A++': 5, 'A+': 4, 'A': 3, 'B': 2, 'C': 1 };
+        // BEGIN AUDITED RESULTS — scores and submission states from the private audit register.
+        const results = {
+            "810304037": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 16.4,
+                    "provisional": true
+                },
+                "A02": {
+                    "submitted": false,
+                    "submission": "missing",
+                    "score": null,
+                    "provisional": false
+                }
+            },
+            "810305056": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 18.8,
+                    "provisional": false
+                },
+                "A02": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 17.8,
+                    "provisional": false
+                }
+            },
+            "810305063": {
+                "A01": {
+                    "submitted": false,
+                    "submission": "missing",
+                    "score": null,
+                    "provisional": false
+                },
+                "A02": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 18.2,
+                    "provisional": true
+                }
+            },
+            "810305029": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 0.0,
+                    "provisional": false
+                },
+                "A02": {
+                    "submitted": false,
+                    "submission": "missing",
+                    "score": null,
+                    "provisional": false
+                }
+            },
+            "810304059": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 0.0,
+                    "provisional": false
+                },
+                "A02": {
+                    "submitted": false,
+                    "submission": "missing",
+                    "score": null,
+                    "provisional": false
+                }
+            },
+            "151605004": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 14.0,
+                    "provisional": false
+                },
+                "A02": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 6.8,
+                    "provisional": false
+                }
+            },
+            "151605014": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 14.0,
+                    "provisional": false
+                },
+                "A02": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 14.0,
+                    "provisional": false
+                }
+            },
+            "810304041": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 14.0,
+                    "provisional": false
+                },
+                "A02": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 14.0,
+                    "provisional": false
+                }
+            },
+            "810305036": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 18.2,
+                    "provisional": true
+                },
+                "A02": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 16.0,
+                    "provisional": true
+                }
+            },
+            "810305054": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 14.4,
+                    "provisional": true
+                },
+                "A02": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 13.2,
+                    "provisional": true
+                }
+            },
+            "810305061": {
+                "A01": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 11.2,
+                    "provisional": false
+                },
+                "A02": {
+                    "submitted": true,
+                    "submission": "submitted",
+                    "score": 10.0,
+                    "provisional": false
+                }
+            },
+            "UNMATCHED_REPORT": {
+                "A01": {
+                    "submitted": false,
+                    "submission": "unassigned",
+                    "score": null,
+                    "provisional": false
+                },
+                "A02": {
+                    "submitted": true,
+                    "submission": "report_only",
+                    "score": 0.0,
+                    "provisional": false
+                }
+            }
+        };
+        // END AUDITED RESULTS
+        const gradeMap = { 'A+': 4, 'A': 3, 'B': 2, 'C': 1, 'F': 0 };
+        function displayGrade(score) {
+            if (score == null) return null;
+            if (score >= 18) return 'A+';
+            if (score >= 16) return 'A';
+            if (score >= 14) return 'B';
+            if (score >= 10) return 'C';
+            return 'F';
+        }
+        const studentLabel = id => id === 'UNMATCHED_REPORT' ? 'Unmatched report · ID pending' : id;
+        Object.values(results).forEach(assignments => {
+            Object.values(assignments).forEach(result => { result.grade = displayGrade(result.score); });
+        });
 
         document.addEventListener('DOMContentLoaded', function () {
             const descriptions = document.getElementById('projectDescriptions');
@@ -227,7 +445,10 @@
                     const description = document.createElement('p');
                     heading.textContent = project.title;
                     description.textContent = project.description;
-                    descriptions.append(heading, description);
+                    const section = document.createElement('div');
+                    section.className = 'project-summary';
+                    section.append(heading, description);
+                    descriptions.append(section);
                 });
             }
 
@@ -238,11 +459,14 @@
                 th.textContent = label;
                 th.colSpan = span;
                 th.rowSpan = rowSpan;
+                th.scope = span > 1 ? 'colgroup' : 'col';
+                if (span === 2) th.className = 'project-start';
                 headerRow.appendChild(th);
             };
             const addSubheading = label => {
                 const th = document.createElement('th');
                 th.textContent = label;
+                th.scope = 'col';
                 subheader.appendChild(th);
             };
             addHeading('Student ID', 1, 2);
@@ -253,14 +477,19 @@
             addSubheading('Final Grade');
             projects.forEach(project => {
                 addHeading(project.title, 2);
-                addSubheading('Submitted');
+                addSubheading('Submission');
                 addSubheading('Grade');
             });
             addHeading('Progress', 1, 2);
 
             students.forEach(studentId => {
                 const row = body.insertRow();
-                row.insertCell().textContent = studentId;
+                row.dataset.studentId = studentId;
+                if (studentId === 'UNMATCHED_REPORT') row.className = 'unmatched-row';
+                const identifier = document.createElement('th');
+                identifier.scope = 'row';
+                identifier.textContent = studentLabel(studentId);
+                row.appendChild(identifier);
                 row.insertCell().textContent = quiz1Scores[studentId] ?? '–';
                 const assignment = assignmentScores[studentId];
                 row.insertCell().textContent = assignment ? assignment[0] * 2 : '–';
@@ -268,16 +497,40 @@
                 row.insertCell().textContent = assignment?.[2] ?? '–';
                 projects.forEach(project => {
                     const result = results[studentId]?.[project.id];
-                    row.insertCell().textContent = result ? (result.submitted ? '✓' : '✗') : '–';
-                    row.insertCell().textContent = result?.grade || '–';
+                    const statusCell = row.insertCell();
+                    statusCell.className = 'project-start';
+                    const status = document.createElement('span');
+                    const state = result?.submission || 'missing';
+                    status.className = `submission-status status-${state === 'submitted' ? 'received' : state === 'missing' ? 'missing' : 'review'}`;
+                    status.textContent = ({ submitted: 'Submitted', missing: 'Not received', report_only: 'Report only · ID pending', unassigned: 'Unassigned' })[state];
+                    statusCell.appendChild(status);
+                    const gradeCell = row.insertCell();
+                    if (result?.grade) {
+                        const stack = document.createElement('div');
+                        stack.className = 'grade-stack';
+                        const grade = document.createElement('span');
+                        grade.className = `grade-badge grade-${result.grade.toLowerCase().replace('+', '-plus')}`;
+                        grade.textContent = result.grade;
+                        const score = document.createElement('span');
+                        score.className = 'score-value';
+                        score.textContent = `${result.score.toFixed(1)} / 20`;
+                        const decision = document.createElement('span');
+                        decision.className = 'decision-label';
+                        decision.textContent = result.provisional ? 'Provisional' : studentId === 'UNMATCHED_REPORT' ? 'Recorded · ID pending' : 'Recorded';
+                        stack.append(grade, score, decision);
+                        gradeCell.appendChild(stack);
+                    } else {
+                        gradeCell.textContent = '–';
+                    }
                 });
                 const button = document.createElement('button');
                 button.className = 'btn btn-sm btn-outline-primary view-progress';
                 button.type = 'button';
                 button.textContent = 'View';
-                button.setAttribute('aria-label', `View progress for student ${studentId}`);
+                button.setAttribute('aria-label', `View progress for ${studentLabel(studentId)}`);
                 button.addEventListener('click', () => {
                     selectedStudent = studentId;
+                    document.getElementById('progressModalLabel').textContent = `Progress: ${studentLabel(studentId)}`;
                     progressModal.show();
                 });
                 row.insertCell().appendChild(button);
@@ -297,18 +550,24 @@
                 chart = new Chart(document.getElementById('progressChart'), {
                     type: 'line',
                     data: {
-                        labels: projects.map(project => project.title),
+                        labels: projects.map(project => project.id),
                         datasets: [{ label: 'Grade', data: grades, borderColor: '#3498db' }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { title: { display: true, text: `Progress for Student ID: ${selectedStudent}` } },
+                        plugins: {
+                            title: { display: true, text: `Progress: ${studentLabel(selectedStudent)}` },
+                            tooltip: { callbacks: { label: context => {
+                                const result = results[selectedStudent]?.[projects[context.dataIndex].id];
+                                return result?.grade ? `${result.grade} · ${result.score.toFixed(1)}/20${result.provisional ? ' · Provisional' : ' · Recorded'}` : 'No grade';
+                            } } }
+                        },
                         scales: {
                             y: {
-                                min: 0, max: 5,
+                                min: 0, max: 4,
                                 title: { display: true, text: 'Grade Level' },
-                                ticks: { stepSize: 1, callback: value => ['', 'C', 'B', 'A', 'A+', 'A++'][value] }
+                                ticks: { stepSize: 1, callback: value => ['F', 'C', 'B', 'A', 'A+'][value] }
                             }
                         }
                     }
